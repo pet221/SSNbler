@@ -44,9 +44,15 @@ updist_edges <- function(edges, lsn_path, calc_length = FALSE, length_col = NULL
     stop("edges.gpkg already exists in lsn_path and overwrite = FALSE")
   }
   ## Can we overwrite upDist column if necessary
-  if(overwrite == FALSE & sum(colnames(edges) == "upDist") > 0) {
-    stop("upDist already exists in edges and overwrite = FALSE")
+  if(sum(colnames(edges) == "upDist") > 0) {
+    if(overwrite == FALSE) {
+      stop("upDist already exists in edges and overwrite = FALSE")
+    } else { ## Remove upDist
+      ind <- colnames(edges) == "upDist"
+      edges<- edges[,!ind]
+    }
   }
+  
   ## Does length_col contain NAs
   if(!is.null(length_col) & sum(is.na(edges[,length_col])) > 0) {
     stop(paste0("NA values in length_col, ", length_col,
