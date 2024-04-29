@@ -34,7 +34,7 @@
 #'   \itemize{
 #'     \item STREAMNAME: Stream name
 #'     \item COMID: Common identifier of an NHD feature or relationship
-#'     \item CDRAINAG: Cumulative drainage area (km2)
+#'     \item CDRAINAG: Cumulative drainage area (km2) for the downstream node of the edge the site resides on
 #'     \item AREAWTMAP: Area weighted mean annual precipitation (mm) at lowermost
 #'       location on the line segment where the site resides
 #'     \item SLOPE: Slope of the line segment (cm/cm) where the site resides
@@ -54,6 +54,8 @@
 #'       from 1980-2009 across 10 COOP air stations within the domain.
 #'       MWMT = maximum 7-day moving average of the maximum daily temperature
 #'       (i.e. maximum of all the 7-day maximums)
+#'     \item rcaAreaKm2: Reach contributing area (km2) for the downstream node of the edge feature the site resides on. RCA area is the land area draining directly into each line segment.
+#'     \item h2oAreaKm2: Watershed area (km2) for the downstream node of the edge feature the site resides on
 #' }
 #'
 #'@source \code{MF_obs} are unpublished United States Forest Service data. 
@@ -70,7 +72,7 @@
 #' The \code{sf} data.frame contains 1273 point features and 8 columns:
 #'   \itemize{
 #'     \item COMID: Common identifier of an NHD feature or relationship
-#'     \item CDRAINAG: Cumulative drainage area (km2)
+#'     \item CDRAINAG: Cumulative drainage area (km2) for the downstream node of the edge the site resides on
 #'     \item AREAWTMAP: Area weighted mean annual precipitation (mm) at lowermost
 #'       location on the line segment where the site resides
 #'     \item SLOPE: Slope of the line segment (cm/cm) where the site resides
@@ -83,6 +85,8 @@
 #'       from 1980-2009 across 10 COOP air stations within the domain.
 #'       MWMT = maximum 7-day moving average of the maximum daily temperature
 #'       (i.e. maximum of all the 7-day maximums)
+#'     \item rcaAreaKm2: Reach contributing area (km2) for the downstream node of the edge feature the site resides on. RCA area is the land area draining directly into each line segment.
+#'     \item h2oAreaKm2: Watershed area (km2) for the downstream node of the edge feature the site resides on
 #' }
 #'
 #'@source \code{MF_Knapp} are unpublished United States Forest Service data. 
@@ -99,7 +103,7 @@
 #' The \code{sf} data.frame contains 654 point features and 8 columns:
 #'   \itemize{
 #'     \item COMID: Common identifier of an NHD feature or relationship
-#'     \item CDRAINAG: Cumulative drainage area (km2)
+#'     \item CDRAINAG: Cumulative drainage area (km2) for the downstream node of the edge the site resides on
 #'     \item AREAWTMAP: Area weighted mean annual precipitation (mm) at lowermost
 #'       location on the line segment where the site resides
 #'     \item SLOPE: Slope of the line segment (cm/cm) where the site resides
@@ -113,6 +117,8 @@
 #'       from 1980-2009 across 10 COOP air stations within the domain.
 #'       MWMT = maximum 7-day moving average of the maximum daily temperature
 #'       (i.e. maximum of all the 7-day maximums)
+#'     \item rcaAreaKm2: Reach contributing area (km2) for the downstream node of the edge feature the site resides on. RCA area is the land area draining directly into each line segment.
+#'     \item h2oAreaKm2: Watershed area (km2) for the downstream node of the edge feature the site resides on
 #' }
 #'
 #'@source \code{MF_CapeHorn} are unpublished United States Forest Service data. 
@@ -129,7 +135,7 @@
 #' The \code{sf} data.frame contains 175 point features and 8 columns:
 #'   \itemize{
 #'     \item COMID: Common identifier of an NHD feature or relationship
-#'     \item CDRAINAG: Cumulative drainage area (km2)
+#'     \item Cumulative drainage area (km2) for the downstream node of the edge the site resides on
 #'     \item AREAWTMAP: Area weighted mean annual precipitation (mm) at lowermost
 #'       location on the line segment where the site resides
 #'     \item SLOPE: Slope of the line segment (cm/cm) where the site resides
@@ -143,6 +149,8 @@
 #'       from 1980-2009 across 10 COOP air stations within the domain.
 #'       MWMT = maximum 7-day moving average of the maximum daily temperature
 #'       (i.e. maximum of all the 7-day maximums)
+#'     \item rcaAreaKm2: Reach contributing area (km2) for the downstream node of the edge feature the site resides on. RCA area is the land area draining directly into each line segment.
+#'     \item h2oAreaKm2: Watershed area (km2) for the downstream node of the edge feature the site resides on
 #' }
 #'
 #'@source \code{MF_pred1km} are unpublished United States Forest Service data. 

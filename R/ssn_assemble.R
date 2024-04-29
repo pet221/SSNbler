@@ -28,10 +28,10 @@
 #' @details The \code{SSNbler} package is used to generate the
 #'   spatial, topological, and attribute information needed to fit
 #'   spatial stream-network models using the \code{SSN2} package. The
-#'   \code{lsn_to_ssn} function will often be the final step in the
+#'   \code{ssn_assemble} function will often be the final step in the
 #'   \code{SSNbler} data-processing workflow and it is important that
 #'   the previous processing steps have been followed. Prior to
-#'   running \code{lsn_to_ssn}, the \code{edges} must be processed
+#'   running \code{ssn_assemble}, the \code{edges} must be processed
 #'   using \code{link{lines_to_lsn}}, \code{link{updist_edges}}, and
 #'   \code{link{afv_edges}}. The \code{obs_sites} and prediction site
 #'   datasets in \code{preds_list} must be processed with
@@ -47,7 +47,7 @@
 #'   \code{ssn.object$obs} is required for fitting spatial statistical
 #'   models in \code{SSN2}.
 #'
-#'   \code{lsn_to_ssn} stores the output locally in \code{ssn_path}. If
+#'   \code{ssn_assemble} stores the output locally in \code{ssn_path}. If
 #'   \code{ssn_path} does not include the .ssn extension, it is added
 #'   before the new directory is created. This directory contains:
 #'   \itemize{
@@ -61,7 +61,7 @@
 #' @return An object of class \code{SSN}.  The function returns an object of class \code{SSN}. The output is also stored locally in \code{ssn_path} (see Details). 
 #' 
 #' @export
-lsn_to_ssn<- function(edges, lsn_path = NULL, obs_sites = NULL,
+ssn_assemble<- function(edges, lsn_path = NULL, obs_sites = NULL,
                    preds_list = NULL, ssn_path, import = TRUE,
                    overwrite = FALSE, verbose = TRUE) {
 
