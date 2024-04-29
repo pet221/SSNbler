@@ -1,0 +1,107 @@
+#' @title Calculate additive function values for sites in a LSN
+#'
+#' @param sites A named list of one or more \code{sf} objects with
+#'   POINT geometry that have been snapped to the LSN using
+#'   \code{\link[SSNbler]{sites_to_lsn}}.
+#' @param edges An \code{sf} object with LINESTING geometry created
+#'   using \code{\link{lines_to_lsn}}.
+#' @param afv_col Name of the column in \code{edges} containing
+#'   the additive function value for each feature, in character
+#'   format. Created using \code{\link{afv_edges}}.
+#' @param save_local Logical indicating whether the updated
+#'   \code{sites} should be saved to \code{lsn_path} in geopackage
+#'   format. File basenames are taken from the names assigned to the
+#'   \code{sites} list. Default is \code{TRUE}.
+#' @param lsn_path Optional. Local pathname to a directory in
+#'   character format specifying where the LSN resides, which is
+#'   created using \code{link[SSNbler]{lines_to_lsn}}. Must be
+#'   specified if \code{save_local = TRUE}.
+#' @param overwrite A logical indicating whether results should be
+#'   overwritten if \code{afv_col} already exists in \code{sites}
+#'   or sites.gpkg already exists in \code{lsn_path} and
+#'   \code{save_local = TRUE}.
+#' 
+#' @return One or more \code{sf} object(s) with all the original data
+#'   from \code{sites}, along with a new \code{afv_col} column in each
+#'   \code{sites sf} object. A named list is returned. If
+#'   \code{save_local = TRUE}, a geopackage for each \code{sf} object
+#'   is saved in \code{lsn_path}. Output file names are assigned based
+#'   on the input \code{sites} attribute \code{names}.
+#' @export
+
+afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
+                      lsn_path=NULL, overwrite = FALSE){
+  ## Check inputs -------------------------------------------
+  if(is.null(lsn_path) & save_local == TRUE) {
+    stop("lsn_path is required when save_local = TRUE")
+  }
+    
+  ## Check lsn_path exists
+  if (save_local == TRUE & !file.exists(lsn_path)){
+    stop("\n lsn_path does not exist.\n\n")
+  }
+
+  ## Convert edges to df
+  edges_df <- edges[, c("rid", afv_col)]
+  edges_df <- st_drop_geometry(edges_df)
+  
+  ## Can we overwrite sites geopackage files if necessary
+  if(save_local == TRUE & overwrite == FALSE) {
+    s.exists<- vector()
+    for(e in 1:length(sites)) {
+      if(file.exists(paste0(lsn_path, "/", names(sites)[e], ".gpkg"))){
+        s.exists[e] <- TRUE
+      } else {
+        s.exists[e]<-FALSE
+      }
+    }
+    ## Do some sites geopackage files already exist 
+    if(sum(s.exists) > 0) {
+      stop(paste0("Cannot save sites to local files because at least one file already exists in ",
+                  lsn_path, " and overwrite = FALSE"))
+    }
+  }
+
+  ## Stop if sites is a single sf data.frame instead of a list
+  if (is.list(sites) && !all(sapply(sites, inherits, "sf"))) {
+    stop("sites must be a named list of one or more sf objects")
+  }
+
+  if(is.null(names(sites))) {
+    stop("sites list is missing names attribute")
+  }
+  
+    
+  ## Loop over sites, saving afv_col after extracting from the corresponding edge
+  n_sites <- length(sites)
+  for(i in 1:n_sites){
+
+    sites_i <- sites[[i]]
+
+   if(afv_col %in% names(sites_i) & !overwrite){
+      message("A column called", afv_col, "already exists in", names(sites)[i],
+              "and overwrite is set to FALSE. Skipping this set of sites.")
+      next ## skip to next iteration after message
+    } 
+
+    sites_i<- merge(sites_i, edges_df, by = "rid", sort = FALSE)
+
+    ## Write to local file
+    if(save_local) {
+      st_write(sites_i, dsn = paste0(lsn_path, "/", names(sites)[i], ".gpkg"),
+                                     delete_dsn = TRUE, quiet = TRUE)
+    }
+
+    sites[[i]]<- sites_i
+  }
+
+  ## ## Add names to sites list
+  ## if(length(sites) > 1) names(sites) <- names(sites)
+  ## ## If only one set of sites was passed in, convert list to a single
+  ## ## sf object
+  ## if(length(sites) == 1) sites <- sites[[1]]
+  
+
+  return(sites)
+  
+}
