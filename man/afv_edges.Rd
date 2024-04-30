@@ -11,7 +11,7 @@ afv_edges(
   segpi_col,
   afv_col,
   save_local = TRUE,
-  overwrite = FALSE
+  overwrite = TRUE
 )
 }
 \arguments{
@@ -41,7 +41,7 @@ format. Defaults to \code{TRUE}.}
 \item{overwrite}{A logical indicating whether results should be
 overwritten if \code{segpi_col} and/or \code{afv_col} already
 exists in \code{edges}, or edges.gpkg already exists in
-\code{lsn_path} and \code{save_local = TRUE}.}
+\code{lsn_path} and \code{save_local = TRUE}. Default = TRUE.}
 }
 \value{
 An \code{sf} object representing edges in the LSN, with new

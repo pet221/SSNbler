@@ -12,14 +12,14 @@
 #' @param save_local Logical indicating whether the updated \code{edges} should be
 #'   saved to \code{lsn_path} in geopackage format. Defaults to
 #'   \code{TRUE}.
-#' @param overwrite A logical indicating whether results should be overwritten if the upDist column already exists in \code{edges} or edges.gpkg already exists in \code{lsn_path} and \code{save_local = TRUE}. 
+#' @param overwrite A logical indicating whether results should be overwritten if the upDist column already exists in \code{edges} or edges.gpkg already exists in \code{lsn_path} and \code{save_local = TRUE}. Default = TRUE
 #' @param verbose Logical. Indicates whether messages about the
 #'   function progress should be printed to the console. Defaults to
 #'   \code{TRUE}.
 #' @return An \code{sf} object representing edges in the LSN, with a new \code{upDist} column.
 #' @export
 updist_edges <- function(edges, lsn_path, calc_length = FALSE, length_col = NULL,
-                         save_local = TRUE, overwrite = FALSE, verbose = TRUE){
+                         save_local = TRUE, overwrite = TRUE, verbose = TRUE){
 
 
   ## Check inputs ------------------------------------------

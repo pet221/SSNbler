@@ -325,35 +325,64 @@ prediction is desired (e.g., pred1km).
   which are accessed using other `SSNbler` functions.</figcaption>
 </figure>
 
-
-
-
+Once the LSN has been created, the next steps are to calculate the
+spatial information needed to fit spatiat statistical stream-network
+models. 
 
 # Calculating Upstream Distance
 
-After creating the LSN, it is possible to calculate upstream distance,
-which is used to determine flow-connected an flow-unconnected
-distances on a stream network that are later required for fitting
-spatial stream network models [@peterson2010mixed]. The upstream
-distance of edge $j$ is the distance from the stream outlet to the
-upper end of the edge, calculated as the sum of the length of all
-edges starting from the outlet and moving upstream through edge
-$j$. Upstream distance is calculated for each edge using the
+The 'upstream distance' represents the distance between the lowermost
+location on a stream network (i.e. network outlet) and each
+feature. For an edge, the distance is measured to the upstream end
+node of the line feature and for sites it is the point feature
+itself. This information is used to calculate the directional hydrologic distances
+(i.e., distance between locations when movement is restricted to the
+stream network) between observed and prediction locations. 
+
+The upstream distance of edge $j$ is the distance from the stream outlet to the
+upstream end node of each edge, calculated as the sum of the length of all
+edges starting from the outlet and moving upstream through to edge
+$j$. 
+
+The upstream distance for each edge is calculated using the
 `updist_edges()` function, which generally requires a few arguments:
 
-* `edges`: An `sf` object with `LINESTRING` geometry created using `lines_to_lsn()`.
-* `lsn_path`: A path to the directory in which the LSN object is
-  stored via `lines_to_lsn()`. `lsn_path` must contain
-  `relationships.csv`.
+* `edges`: An `sf` object containing the edges in the LSN generated
+  using `lines_to_lsn`.
+* `lsn_path`: LSN pathname where the `edges` and `relationships.csv`
+  are stored. 
+* `calc_length`: A logical indicating whether a column representing
+  line length should be calculated and added to `edges`. It is
+  important to set `calc_length=TRUE` if the line features were edited
+  to remove topological errors.  
+
 
 ```{r}
 edges <- updist_edges(
   edges = edges,
   lsn_path = path,
-  calc_length = TRUE,
-  overwrite = TRUE
+  calc_length = TRUE
 )
 ```
+
+
+
+* `sites`: An `sf` object with `POINT` geometry that contains the
+  observed or prediction locations.
+* `edges`: An `sf` object containing the edges in the LSN generated
+  using `lines_to_lsn`.
+* `snap_tolerance`: A numeric distance in map units. Sites whose
+  distance to the nearest edge feature is less than are equal to `snap_tolerance`
+  are snapped to the relevant edge. Sites whose distance to the
+  nearest edge feature is greater than `snap_tolerance` are not
+  snapped to an edge or included in the output. 
+* `save_local`: If TRUE (the default), the snapped sites are written
+  to `lsn_path`. 
+* `lsn_path`: Pathname specifying where to store the snapped sites in
+  geopackage format. This is typically the LSN directory where the
+  `edges` are stored. 
+
+
 
 Two columns are added to `edges` and `edges.gpkg`: `Length`, the
 length of each edge; and `upDist`, the upstream distance of each edge.

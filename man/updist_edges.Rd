@@ -10,7 +10,7 @@ updist_edges(
   calc_length = FALSE,
   length_col = NULL,
   save_local = TRUE,
-  overwrite = FALSE,
+  overwrite = TRUE,
   verbose = TRUE
 )
 }
@@ -30,7 +30,7 @@ attribute table that contains the length of the edge segment. Required when \cod
 saved to \code{lsn_path} in geopackage format. Defaults to
 \code{TRUE}.}
 
-\item{overwrite}{A logical indicating whether results should be overwritten if the upDist column already exists in \code{edges} or edges.gpkg already exists in \code{lsn_path} and \code{save_local = TRUE}.}
+\item{overwrite}{A logical indicating whether results should be overwritten if the upDist column already exists in \code{edges} or edges.gpkg already exists in \code{lsn_path} and \code{save_local = TRUE}. Default = TRUE}
 
 \item{verbose}{Logical. Indicates whether messages about the
 function progress should be printed to the console. Defaults to

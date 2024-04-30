@@ -21,14 +21,14 @@
 #' @param overwrite A logical indicating whether results should be
 #'   overwritten if \code{segpi_col} and/or \code{afv_col} already
 #'   exists in \code{edges}, or edges.gpkg already exists in
-#'   \code{lsn_path} and \code{save_local = TRUE}.
+#'   \code{lsn_path} and \code{save_local = TRUE}. Default = TRUE.
 #' @return An \code{sf} object representing edges in the LSN, with new
 #'   \code{segpi_col} and \code{afv_col} columns. If \code{save_local
 #'   = TRUE}, the updated version of \code{edges} will be saved as
 #'   \code{edges.gpkg} in \code{lsn_path}.
 #' @export
 afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
-                      save_local = TRUE, overwrite = FALSE){
+                      save_local = TRUE, overwrite = TRUE){
 
   ## Check inputs -------------------------------------------------
   ## Check geometry type
