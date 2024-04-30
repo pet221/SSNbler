@@ -9,13 +9,13 @@
 #' @param lsn_path Pathname to a directory in character format specifying
 #'   where to store the outputs. The directory will be created if it
 #'   does not already exist.
-#' @param snap_tolerance Distance in map units >= 0. Two nodes separated by
-#'   a distance less than or equal to \code{snap_tolerance} are
-#'   assumed to be connected. Defaults to 0.
 #' @param check_topology Logical. If \code{TRUE}, the edges will be
 #'   checked for topological errors and potential node errors will be
 #'   flagged in an output file called
 #'   \code{node_errors.gpkg}. Defaults to \code{TRUE}.
+#' @param snap_tolerance Distance in map units >= 0. Two nodes separated by
+#'   a distance less than or equal to \code{snap_tolerance} are
+#'   assumed to be connected. Defaults to 0.
 #' @param topo_tolerance Distance in map units >= 0. Only used if
 #'   \code{check_topology = TRUE}. Two nodes on the network separated
 #'   by a distance less than or equal to \code{topo_tolerance} are
@@ -89,9 +89,9 @@
 #' @export
 #' 
 lines_to_lsn <- function(streams, lsn_path,
+                         check_topology = TRUE,
                          snap_tolerance = 0,
                          topo_tolerance = 0, 
-                         check_topology = TRUE,
                          remove_ZM = FALSE,
                          overwrite = FALSE,
                          verbose = TRUE) {
