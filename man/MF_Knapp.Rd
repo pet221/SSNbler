@@ -5,7 +5,7 @@
 \alias{MF_Knapp}
 \title{#' MF_Knapp: Prediction locations on Knapp Creek, in the Middle Fork Basin, Idaho.}
 \format{
-An object of class \code{sf} (inherits from \code{data.frame}) with 1273 rows and 12 columns.
+An object of class \code{sf} (inherits from \code{data.frame}) with 1273 rows and 10 columns.
 }
 \source{
 \code{MF_Knapp} are unpublished United States Forest Service data.
@@ -20,7 +20,7 @@ MF_Knapp
 The \code{sf} data.frame contains 1273 point features and 8 columns:
 \itemize{
 \item COMID: Common identifier of an NHD feature or relationship
-\item CDRAINAG: Cumulative drainage area (km2)
+\item CDRAINAG: Cumulative drainage area (km2) for the downstream node of the edge the site resides on
 \item AREAWTMAP: Area weighted mean annual precipitation (mm) at lowermost
 location on the line segment where the site resides
 \item SLOPE: Slope of the line segment (cm/cm) where the site resides
@@ -33,6 +33,8 @@ from 1980-2009 across 10 COOP air stations within the domain
 from 1980-2009 across 10 COOP air stations within the domain.
 MWMT = maximum 7-day moving average of the maximum daily temperature
 (i.e. maximum of all the 7-day maximums)
+\item rcaAreaKm2: Reach contributing area (km2) for the downstream node of the edge feature the site resides on. RCA area is the land area draining directly into each line segment.
+\item h2oAreaKm2: Watershed area (km2) for the downstream node of the edge feature the site resides on
 }
 }
 \keyword{datasets}

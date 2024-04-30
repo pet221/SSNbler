@@ -5,17 +5,17 @@
 \title{Snap sites to edges in a Landscape Network}
 \usage{
 sites_to_lsn(
-  in_sites,
+  sites,
   edges,
   snap_tolerance,
   save_local = TRUE,
-  output = NULL,
+  lsn_path = NULL,
   overwrite = FALSE,
   verbose = TRUE
 )
 }
 \arguments{
-\item{in_sites}{An \code{sf} object with POINT geometery, typically
+\item{sites}{An \code{sf} object with POINT geometery, typically
 representing observed data or prediction locations.}
 
 \item{edges}{An \code{sf} object with LINESTING geometry created
@@ -25,19 +25,19 @@ using \code{\link{lines_to_lsn}}.}
 are <= this distance from an edge feature will snapped to the
 closest location on the edge. When the distance between the site
 and all edges is > \code{snap_tolerance}, the point feature is not
-snapped or included in the output.}
+snapped or included in the lsn_path.}
 
 \item{save_local}{Logical indicating whether the outputs should be
 saved to a local directory in geopackage format. Defaults to
 \code{TRUE}.}
 
-\item{output}{Pathname in character format, including the .gpkg extension,
+\item{lsn_path}{Pathname in character format, including the .gpkg extension,
 specifying where to store the snapped sites in geopackage
 format. This is typically a directory created by
 \code{\link{lines_to_lsn}}. Required if \code{save_local = TRUE}.}
 
 \item{overwrite}{Logical indicating whether the outputs saved to
-\code{output} should overwrite existing files if they
+\code{lsn_path} should overwrite existing files if they
 exist. Defaults to \code{FALSE}.}
 
 \item{verbose}{Logical indicating whether progress messages should
@@ -45,15 +45,12 @@ be printed to the console. Defaults to \code{TRUE}}
 }
 \value{
 An \code{sf} object with POINT geometry containing the
-features from \code{in_sites} that were found within the
+features from \code{sites} that were found within the
 \code{snap_tolerance} distance to the closest edge. In addition to
-the original columns in \code{in_sites}, two new columns are
-added. The first, rid, is a unique identifier for the edge the
-site is snapped to. The second column, ratio, represents the
-proportional length of the edge that lies between the downstream
-end node for the edge and the updated site location. If
+the original columns in \code{sites}, three new columns are
+added: rid, ratio, and snapdist (see Details). If
 \code{save_local = TRUE}, the \code{sf} object is also saved to
-\code{output}.
+\code{lsn_path}.
 }
 \description{
 Incorporates an \code{sf} object containing features
@@ -68,27 +65,29 @@ topological location relative to other features in the LSN.
 The \code{sites_to_lsn} function is used to incorporate
 observed and prediction sites into the LSN. The output is an
 \code{sf} object with POINT geometry, which contains only the
-point features from \code{in_sites} that were found less than the
+point features from \code{sites} that were found less than the
 \code{snap_tolerance} distance from the closest edge
-feature. When an \code{in_sites} point feature meets these
+feature. When an \code{sites} poi
 requirements, it is moved (i.e. snapped) to the closest location
-on an edge feature. Two new columns are also added: rid and
-ratio. The rid column containst the rid for the edge the site has been
-snapped to. The second column, ratio, represents the proportional
-length of the edge found between the downstream end node for
-the edge and the updated/snapped site location. If the distance
-between a point feature and the closest edge is greater than or
-equal to the \code{snap_tolerance}, the feature is not included
-in the output.
+on an edge feature. Three new columns are also added: rid, ratio,
+and snapdist. The rid column containst the rid for the edge the
+site has been snapped to. The rid column represents the edge rid
+the site has been snapped to. The second column, ratio,
+represents the proportional length of the edge found between the
+downstream end node for the edge and the updated/snapped site
+location. The snapdist is the distance in map units that the site
+was moved. If the distance between a point feature and the
+closest edge is greater than or equal to the
+\code{snap_tolerance}, the feature is not included in the output.
 
 The \code{snap_tolerance} must always be >= 0 and must be large
 enough to snap all of the point features to the edges. Using
 \code{snap_tolerance = 0} is not recommended, even when the
-\code{in_sites} features intersect the edge features. Instead, a
+\code{sites} features intersect the edge features. Instead, a
 very small \code{snap_tolerance} value is recommended to ensure
 that differences in the precision of the x and y coordinates and
 the line location do not result in unsnapped point features.
 
-Note that the \code{in_sites} and \code{edges}
+Note that the \code{sites} and \code{edges}
 must have the same projection.
 }
