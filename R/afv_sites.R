@@ -31,6 +31,7 @@
 
 afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
                       lsn_path=NULL, overwrite = FALSE){
+
   ## Check inputs -------------------------------------------
   if(is.null(lsn_path) & save_local == TRUE) {
     stop("lsn_path is required when save_local = TRUE")
@@ -39,11 +40,7 @@ afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
   ## Check lsn_path exists
   if (save_local == TRUE & !file.exists(lsn_path)){
     stop("\n lsn_path does not exist.\n\n")
-  }
-
-  ## Convert edges to df
-  edges_df <- edges[, c("rid", afv_col)]
-  edges_df <- st_drop_geometry(edges_df)
+  } 
   
   ## Can we overwrite sites geopackage files if necessary
   if(save_local == TRUE & overwrite == FALSE) {
@@ -70,7 +67,15 @@ afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
   if(is.null(names(sites))) {
     stop("sites list is missing names attribute")
   }
-  
+
+  ## Check for afv_col in edges and subset df if found
+  if(!afv_col %in% colnames(edges)) {
+    stop(paste(afv_col, "not found in edges"))
+  } else { 
+    ## Convert edges to df
+    edges_df <- edges[, c("rid", afv_col)]
+    edges_df <- st_drop_geometry(edges_df)
+  }
     
   ## Loop over sites, saving afv_col after extracting from the corresponding edge
   n_sites <- length(sites)
@@ -78,10 +83,15 @@ afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
 
     sites_i <- sites[[i]]
 
-   if(afv_col %in% names(sites_i) & !overwrite){
-      message("A column called", afv_col, "already exists in", names(sites)[i],
-              "and overwrite is set to FALSE. Skipping this set of sites.")
-      next ## skip to next iteration after message
+    if(afv_col %in% names(sites_i)){
+      if(overwrite == FALSE) {
+        message("A column called", afv_col, "already exists in", names(sites)[i],
+                "and overwrite is set to FALSE. Skipping this set of sites.")
+        next ## skip to next iteration after message
+      } else {
+        ind<- colnames(sites_i) == afv_col
+        sites_i<- sites_i[,!ind]
+      }   
     } 
 
     sites_i<- merge(sites_i, edges_df, by = "rid", sort = FALSE)
