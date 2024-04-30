@@ -19,7 +19,7 @@
 #' @param overwrite A logical indicating whether results should be
 #'   overwritten if the upDist column already exists in \code{sites}
 #'   or sites.gpkg already exists in \code{lsn_path} and
-#'   \code{save_local = TRUE}.
+#'   \code{save_local = TRUE}. Default = TRUE.
 #' @return One or more \code{sf} object(s) with all the original
 #'   data from \code{sites}, along with a new \code{upDist} column in
 #'   each \code{sites sf} object. A named list is returned. If
@@ -29,7 +29,7 @@
 #' @export
 #' 
 updist_sites <- function(sites, edges, length_col, lsn_path, save_local = TRUE,
-                         overwrite = FALSE){
+                         overwrite = TRUE){
 
   ## Check inputs -------------------------------------------
   ## Check lsn_path exists when save_local = TRUE

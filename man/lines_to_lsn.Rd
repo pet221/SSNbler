@@ -7,9 +7,9 @@
 lines_to_lsn(
   streams,
   lsn_path,
+  check_topology = TRUE,
   snap_tolerance = 0,
   topo_tolerance = 0,
-  check_topology = TRUE,
   remove_ZM = FALSE,
   overwrite = FALSE,
   verbose = TRUE
@@ -23,6 +23,11 @@ representing streams.}
 where to store the outputs. The directory will be created if it
 does not already exist.}
 
+\item{check_topology}{Logical. If \code{TRUE}, the edges will be
+checked for topological errors and potential node errors will be
+flagged in an output file called
+\code{node_errors.gpkg}. Defaults to \code{TRUE}.}
+
 \item{snap_tolerance}{Distance in map units >= 0. Two nodes separated by
 a distance less than or equal to \code{snap_tolerance} are
 assumed to be connected. Defaults to 0.}
@@ -32,11 +37,6 @@ assumed to be connected. Defaults to 0.}
 by a distance less than or equal to \code{topo_tolerance} are
 flagged as potential topological errors in the network. Defaults
 to 0.}
-
-\item{check_topology}{Logical. If \code{TRUE}, the edges will be
-checked for topological errors and potential node errors will be
-flagged in an output file called
-\code{node_errors.gpkg}. Defaults to \code{TRUE}.}
 
 \item{remove_ZM}{Logical. If \code{TRUE}, Z and M dimensions are
 removed from streams, if they exist. Default is \code{FALSE}.}

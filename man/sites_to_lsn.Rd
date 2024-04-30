@@ -70,9 +70,8 @@ point features from \code{sites} that were found less than the
 feature. When an \code{sites} poi
 requirements, it is moved (i.e. snapped) to the closest location
 on an edge feature. Three new columns are also added: rid, ratio,
-and snapdist. The rid column containst the rid for the edge the
-site has been snapped to. The rid column represents the edge rid
-the site has been snapped to. The second column, ratio,
+and snapdist. The rid column contains the rid for the edge the
+site has been snapped to. The second column, ratio,
 represents the proportional length of the edge found between the
 downstream end node for the edge and the updated/snapped site
 location. The snapdist is the distance in map units that the site

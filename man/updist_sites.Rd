@@ -10,7 +10,7 @@ updist_sites(
   length_col,
   lsn_path,
   save_local = TRUE,
-  overwrite = FALSE
+  overwrite = TRUE
 )
 }
 \arguments{
@@ -38,7 +38,7 @@ format. File basenames are taken from the names assigned to the
 \item{overwrite}{A logical indicating whether results should be
 overwritten if the upDist column already exists in \code{sites}
 or sites.gpkg already exists in \code{lsn_path} and
-\code{save_local = TRUE}.}
+\code{save_local = TRUE}. Default = TRUE.}
 }
 \value{
 One or more \code{sf} object(s) with all the original

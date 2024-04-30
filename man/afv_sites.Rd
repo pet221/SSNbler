@@ -10,7 +10,7 @@ afv_sites(
   afv_col,
   save_local = TRUE,
   lsn_path = NULL,
-  overwrite = FALSE
+  overwrite = TRUE
 )
 }
 \arguments{
@@ -38,7 +38,7 @@ specified if \code{save_local = TRUE}.}
 \item{overwrite}{A logical indicating whether results should be
 overwritten if \code{afv_col} already exists in \code{sites}
 or sites.gpkg already exists in \code{lsn_path} and
-\code{save_local = TRUE}.}
+\code{save_local = TRUE}. Default = TRUE.}
 }
 \value{
 One or more \code{sf} object(s) with all the original data

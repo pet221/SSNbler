@@ -19,7 +19,7 @@
 #' @param overwrite A logical indicating whether results should be
 #'   overwritten if \code{afv_col} already exists in \code{sites}
 #'   or sites.gpkg already exists in \code{lsn_path} and
-#'   \code{save_local = TRUE}.
+#'   \code{save_local = TRUE}. Default = TRUE.
 #' 
 #' @return One or more \code{sf} object(s) with all the original data
 #'   from \code{sites}, along with a new \code{afv_col} column in each
@@ -30,7 +30,7 @@
 #' @export
 
 afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
-                      lsn_path=NULL, overwrite = FALSE){
+                      lsn_path=NULL, overwrite = TRUE){
 
   ## Check inputs -------------------------------------------
   if(is.null(lsn_path) & save_local == TRUE) {
