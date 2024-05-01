@@ -20,10 +20,10 @@ test_that("workflow works", {
   expect_s3_class(edges, "sf")
   
   obs <- sites_to_lsn(
-    in_sites = MF_obs,
+    sites = MF_obs,
     edges = edges,
     save_local = TRUE,
-    output = paste0(path, "/obs.gpkg"),
+    lsn_path = paste0(path, "/obs.gpkg"),
     snap_tolerance = 100,
     overwrite = TRUE,
     verbose = TRUE
@@ -31,10 +31,10 @@ test_that("workflow works", {
   expect_s3_class(obs, "sf")
   
   preds <- sites_to_lsn(
-    in_sites = MF_pred1km,
+    sites = MF_pred1km,
     edges = edges,
     save_local = TRUE,
-    output = paste0(path, "/pred1km.gpkg"),
+    lsn_path = paste0(path, "/pred1km.gpkg"),
     snap_tolerance = 1,
     overwrite = TRUE,
     verbose = TRUE
@@ -89,7 +89,7 @@ test_that("workflow works", {
   expect_s3_class(site.list$pred1km, "sf")
   
   ################## additive function value
-  ssn_object <- lsn_to_ssn(
+  ssn_object <- ssn_assemble(
     edges = edges,
     lsn_path = path,
     obs_sites = site.list$obs,

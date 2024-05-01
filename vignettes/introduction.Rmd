@@ -123,7 +123,7 @@ ggplot() +
 
 SSN objects contain all the spatial, topological, and attribute information required to fit a
 spatial stream network model [@peterson2014stars]. They rely on a
-landscape network (LSN; Figure \@ref(fig:valid-nodes), which is a directional graph used to
+landscape network (LSN), which is a directional graph used to
 represent geographic and topological relationships 
 [@theobald2006functional]. Streams data are represented as a collection of directed `edges`, where
 the directionality is determined by the digitized direction of the
@@ -139,10 +139,9 @@ valid node categories in a LSN:
     an excessive number of pseudonodes can slow down geoprocessing
     operations for large datasets.
 
-<figure>
-  <img src="./figures/valid_nodes.png" alt="Valid Nodes" />
-  <figcaption>Figure 1: A landscape network (LSN). Nodes are denoted by blue circles, with the node category labelled. Edges are denoted by black arrows, with the arrow indicating flow direction (i.e. digitized direction).</figcaption>
-</figure>
+```{r, fig.cap = "A landscape network (LSN). Nodes are denoted by blue circles, with the node category labelled. Edges are denoted by black arrows, with the arrow indicating flow direction (i.e., digitized direction)", fig.alt = "Valid Nodes", fig.align = "center", echo = FALSE}
+knitr::include_graphics(paste0(system.file(package = "SSNbler"), "/figures/valid_nodes.png"))
+```
 
 Each edge is associated with two nodes, which correspond to the
 upstream and downstream endpoints of the edge. When more than one edge
@@ -312,8 +311,8 @@ spatial and topological relationships are accurately represented in
 the LSN and the subsequent spatial statistical models.
 
 The LSN created using `lines_to_lsn()` and `sites_to_lsn()` is stored in memory and also in a local folder
-defined using `lsn_path` (Figure \@ref(fig:LSN Storage)). The LSN contains at least six components
-(ref figure). The edges, nodes, and observed sites contain the spatial
+defined using `lsn_path`. The LSN contains at least six components
+. The edges, nodes, and observed sites contain the spatial
 features and attribute data *within* each dataset, while the three
 tables (nodexy, noderelatonships, and relationships) describe the
 relationships *between* edges and sites. These tables are not stored
@@ -321,12 +320,9 @@ in memory, but are accessed by subsequent `SSNbler`
 functions. Prediction datasets may also be included in the LSN if
 prediction is desired (e.g., pred1km).
 
-<figure>
-  <img src="./figures/LSN_storage.png" alt="LSN Storage" />
-  <figcaption>Figure 2: LSN components are stored in 1) memory as sf
-  objects and 2) a local LSN directory as geopackages and csv files,
-  which are accessed using other `SSNbler` functions.</figcaption>
-</figure>
+```{r, fig.cap = "LSN components are stored in 1) memory as sf objects and 2) a local LSN directory as geopackages and csv files, which are accessed using other `SSNbler` functions", fig.alt="LSN Storage", fig.align = "center", echo = FALSE}
+knitr::include_graphics(paste0(system.file(package = "SSNbler"), "/figures/LSN_storage.png"))
+```
 
 Once the LSN has been created, the next steps are to calculate the
 spatial information needed to fit spatiat statistical stream-network
@@ -499,7 +495,7 @@ about `SSN2`, visit the package website at
 library(SSN2)
 ssn_create_distmat(mf04p_copy)
 ssn_mod <- ssn_lm(
-  formula = Summer_mn ~ AREAWTMAP,
+  formula = Summer_mn ~ ELEV_DEM + AREAWTMAP,
   ssn.object = mf04p_copy,
   tailup_type = "exponential",
   taildown_type = "spherical",
