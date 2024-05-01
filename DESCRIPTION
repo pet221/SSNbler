@@ -1,5 +1,5 @@
 Package: SSNbler
-Title: Create and Assemble SSN Objects for use with SSN2
+Title: Create and Assemble SSN Objects in R
 Version: 0.0.1
 Authors@R: c(
 	   person(given = "Erin",
@@ -15,7 +15,7 @@ Authors@R: c(
            		email = "Dumelle.Michael@epa.gov",
            		comment = c(ORCID = "0000-0002-3393-5529"))
 	   )
-Description: SSNbler imports, creates and assembles data needed to fit spatial-statistical stream-network models using the SSN2 package. Streams, observations, and prediction locations are represented as simple features and specific tools have been provided to define topological relationships between features; calculate the hydrologic distances (with flow-direction preserved) and the spatial additive function used to weight converging stream segments; and export the topological, spatial, and attribute information to an SSN object, which can be efficiently stored, accessed and analysed in R. 
+Description: SSNbler imports, creates and assembles data needed to fit spatial-statistical stream-network models using the SSN2 R package. Streams, observations, and prediction locations are represented as simple features and specific tools have been provided to define topological relationships between features; calculate the hydrologic distances (with flow-direction preserved) and the spatial additive function used to weight converging stream segments; and export the topological, spatial, and attribute information to an SSN object, which can be efficiently stored, accessed and analysed in R. 
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
