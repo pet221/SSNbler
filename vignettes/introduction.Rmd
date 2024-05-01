@@ -236,9 +236,10 @@ generally requires these arguments:
   snapped to an edge or included in the output. 
 * `save_local`: If TRUE (the default), the snapped sites are written
   to `lsn_path`. 
-* `lsn_path`: Pathname specifying where to store the snapped sites in
-  geopackage format. This is typically the LSN directory where the
-  `edges` are stored. 
+* `lsn_path`: A path to the directory in where the LSN created via `lines_to_lsn()`
+  is stored.
+* `lsn_ext`: Extension name of the snapped sites in `lsn_path` as geopackage format 
+  (i.e., must include the geopackage extension). 
   
 The `sites_to_lsn` function is run using the following code: 
 
@@ -246,13 +247,14 @@ The `sites_to_lsn` function is run using the following code:
 obs <- sites_to_lsn(
   sites = MF_obs,
   edges = edges,
-  lsn_path = paste0(path, "/obs.gpkg"),
+  lsn_path = path,
+  lsn_ext = "obs.gpkg",
   snap_tolerance = 100,
   save_local = TRUE # the default
 )
 ```
 
-The `sites_to_lsn()` function writes `obs.gpkg` to `lsn_path`. The new
+The `sites_to_lsn()` function writes `obs.gpkg` in `lsn_path`. The new
 geopackage contains the original columns in `sites`, as well as three
 new columns: 
 
@@ -286,7 +288,8 @@ IMPORT OTHER TWO PREDICTION DATASETS SO THAT WE CAN CREATE MiddleFork04.ssn
 preds <- sites_to_lsn(
   sites = MF_pred1km,
   edges = edges,
-  lsn_path = paste0(path, "/pred1km.gpkg"),
+  lsn_path = path,
+  lsn_ext = "pred1km.gpkg",
   snap_tolerance = 100
 )
 ```

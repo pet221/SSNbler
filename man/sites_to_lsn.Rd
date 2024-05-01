@@ -10,6 +10,7 @@ sites_to_lsn(
   snap_tolerance,
   save_local = TRUE,
   lsn_path = NULL,
+  lsn_ext = NULL,
   overwrite = FALSE,
   verbose = TRUE
 )
@@ -31,10 +32,11 @@ snapped or included in the lsn_path.}
 saved to a local directory in geopackage format. Defaults to
 \code{TRUE}.}
 
-\item{lsn_path}{Pathname in character format, including the .gpkg extension,
-specifying where to store the snapped sites in geopackage
-format. This is typically a directory created by
+\item{lsn_path}{Pathname to the LSN. This is typically a directory created by
 \code{\link{lines_to_lsn}}. Required if \code{save_local = TRUE}.}
+
+\item{lsn_ext}{Extension (in character format) that indicates where in \code{lsn_path} to store
+the snapped sites in geopackage format (must include the .gpkg extension).}
 
 \item{overwrite}{Logical indicating whether the outputs saved to
 \code{lsn_path} should overwrite existing files if they
@@ -67,7 +69,7 @@ observed and prediction sites into the LSN. The output is an
 \code{sf} object with POINT geometry, which contains only the
 point features from \code{sites} that were found less than the
 \code{snap_tolerance} distance from the closest edge
-feature. When an \code{sites} poi
+feature. When an \code{sites} point feature meets these
 requirements, it is moved (i.e. snapped) to the closest location
 on an edge feature. Three new columns are also added: rid, ratio,
 and snapdist. The rid column contains the rid for the edge the

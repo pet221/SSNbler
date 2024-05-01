@@ -23,7 +23,8 @@ test_that("workflow works", {
     sites = MF_obs,
     edges = edges,
     save_local = TRUE,
-    lsn_path = paste0(path, "/obs.gpkg"),
+    lsn_path = path,
+    lsn_ext = "obs.gpkg",
     snap_tolerance = 100,
     overwrite = TRUE,
     verbose = TRUE
@@ -34,7 +35,8 @@ test_that("workflow works", {
     sites = MF_pred1km,
     edges = edges,
     save_local = TRUE,
-    lsn_path = paste0(path, "/pred1km.gpkg"),
+    lsn_path = path,
+    lsn_ext = "pred1km.gpkg",
     snap_tolerance = 1,
     overwrite = TRUE,
     verbose = TRUE
