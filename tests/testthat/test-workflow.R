@@ -24,7 +24,7 @@ test_that("workflow works", {
     edges = edges,
     save_local = TRUE,
     lsn_path = path,
-    lsn_ext = "obs.gpkg",
+    file_name = "obs.gpkg",
     snap_tolerance = 100,
     overwrite = TRUE,
     verbose = TRUE
@@ -36,7 +36,7 @@ test_that("workflow works", {
     edges = edges,
     save_local = TRUE,
     lsn_path = path,
-    lsn_ext = "pred1km.gpkg",
+    file_name = "pred1km.gpkg",
     snap_tolerance = 1,
     overwrite = TRUE,
     verbose = TRUE
