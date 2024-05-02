@@ -85,7 +85,7 @@ path <- paste0(tempdir(), "/streamsdata")
 ```
 Then we can read the relevant data into our R session using the
 `st_read` function from the `sf` package:
-```{r}
+```{r, results = "hide"}
 library(sf)
 MF_streams <- st_read(paste0(path, "/MF_streams.gpkg"))
 MF_obs <- st_read(paste0(path, "/MF_obs.gpkg"))
@@ -109,7 +109,7 @@ prediction sites using the `ggplot2` package.
 We load the `ggplot2` package and visualize the stream network, with
 prediction and observed locations: 
 
-```{r}
+```{r, fig.cap = "Middle Fork Streams", fig.alt = "Middle Fork Streams", fig.align = "center", out.width = "90%"}
 library(ggplot2)
 
 ggplot() +
@@ -656,10 +656,10 @@ about `SSN2`, visit the package website at
 
 ```{r}
 library(SSN2)
-ssn_create_distmat(mf04p_copy)
+ssn_create_distmat(mf04_ssn)
 ssn_mod <- ssn_lm(
   formula = Summer_mn ~ ELEV_DEM + AREAWTMAP,
-  ssn.object = mf04p_copy,
+  ssn.object = mf04_ssn,
   tailup_type = "exponential",
   taildown_type = "spherical",
   euclid_type = "gaussian",
@@ -670,9 +670,7 @@ summary(ssn_mod)
 
 # Function Glossary
 
-\textcolor{red}{Create a table relating SSNbler functions to STARS
-tools and openSTARS functions?}
-
+*Create a table relating SSNbler functions to STARS tools and openSTARS functions?*
 
 Here we list and provide brief descriptions for some commonly used
 `SSNbler` functions to create and assemble SSN objects:
@@ -685,6 +683,13 @@ Here we list and provide brief descriptions for some commonly used
 -   `afv_sites()`: More text.
 -   `ssn_assemble()`: Text.
 -   Others?: More text.
+
+# From STARS and openSTARS to SSNbler
+
+| `STARS` Function Name | `openSTARS` Function Name | `SSNbler` Function Name |
+|:----------------------|:--------------------------|:------------------------|
+| text                  | text                      | `lines_to_lsn()`        |
+| text                  | text                      | `sites_to_lsn()`        |
 
 # R Code Appendix {.unnumbered}
 
