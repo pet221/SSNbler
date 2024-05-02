@@ -10,7 +10,7 @@ sites_to_lsn(
   snap_tolerance,
   save_local = TRUE,
   lsn_path = NULL,
-  lsn_ext = NULL,
+  file_name = NULL,
   overwrite = FALSE,
   verbose = TRUE
 )
@@ -35,8 +35,8 @@ saved to a local directory in geopackage format. Defaults to
 \item{lsn_path}{Pathname to the LSN. This is typically a directory created by
 \code{\link{lines_to_lsn}}. Required if \code{save_local = TRUE}.}
 
-\item{lsn_ext}{Extension (in character format) that indicates where in \code{lsn_path} to store
-the snapped sites in geopackage format (must include the .gpkg extension).}
+\item{file_name}{Filename for output sites, which are saved to \code{lsn_path}
+in geopackage format (must include the .gpkg extension).}
 
 \item{overwrite}{Logical indicating whether the outputs saved to
 \code{lsn_path} should overwrite existing files if they

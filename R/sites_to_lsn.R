@@ -20,8 +20,8 @@
 #'   \code{TRUE}.
 #' @param lsn_path Pathname to the LSN. This is typically a directory created by
 #'   \code{\link{lines_to_lsn}}. Required if \code{save_local = TRUE}.
-#' @param lsn_ext Extension (in character format) that indicates where in \code{lsn_path} to store
-#'   the snapped sites in geopackage format (must include the .gpkg extension).
+#' @param file_name Filename for output sites, which are saved to \code{lsn_path}
+#'   in geopackage format (must include the .gpkg extension).
 #' @param overwrite Logical indicating whether the outputs saved to
 #'   \code{lsn_path} should overwrite existing files if they
 #'   exist. Defaults to \code{FALSE}.
@@ -66,18 +66,33 @@
 #' 
 #' @export
 sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
-                         lsn_path = NULL, lsn_ext = NULL, overwrite = FALSE, 
+                         lsn_path = NULL, file_name = NULL, overwrite = FALSE, 
                          verbose = TRUE){
   
   
   ## Check some inputs --------------------------------------------
   if(save_local == TRUE & is.null(lsn_path)) {
     stop(paste("lsn_path argument must be defined if save_local = TRUE"))
-  }  
+  }
+
+  ## Check file_name
+  f.ext.shp <- substr(file_name, nchar(file_name)-3, nchar(file_name)) == ".shp"
+  f.ext.gpkg <- substr(file_name, nchar(file_name)-4, nchar(file_name)) == ".gpkg"
+
+  if(f.ext.shp == TRUE) {
+    file_name<- paste0(substr(file_name, 1, nchar(file_name)-4), ".gpkg")
+    warning(paste0("file_name changed to ", file_name))
+  }
+  if(f.ext.shp == FALSE & f.ext.gpkg == FALSE) {
+    file_name <- paste0(file_name, ".gpkg")
+  }
   
-  ## store "new" lsn path that combnies lsn path with lsn extension
+    
+
+  
+  ## store "new" lsn path that combines lsn path with lsn extension
   ## old lsn path had both together
-  lsn_path <- paste0(lsn_path, "/", lsn_ext)
+  lsn_path <- paste0(lsn_path, "/", file_name)
   
   ## stop if lsn_path file exists and overwrite == FALSE
   if(file.exists(lsn_path) & overwrite == FALSE) {

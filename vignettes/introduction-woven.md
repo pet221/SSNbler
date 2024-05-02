@@ -1,7 +1,7 @@
 ---
 title: "An Introduction to SSNbler: Assembling Spatial Stream Network (SSN) Objects in R"
 author: "Erin E Peterson, Michael Dumelle, Alan Pearse, Jay Ver Hoef and Dan Teleki"
-bibliography: '`r system.file("references.bib", package="SSNbler")`'
+bibliography: 'C:/MySoftware/R/R-4.4.0/library/SSNbler/references.bib'
 output:
   html_document:
     theme: flatly
@@ -20,17 +20,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r setup, include = FALSE}
-# # jss style
-# knitr::opts_chunk$set(prompt=TRUE, echo = TRUE, highlight = FALSE, continue = " + ", comment = "")
-# options(replace.assign=TRUE, width=90, prompt="R> ")
 
-# rmd style
-knitr::opts_chunk$set(collapse = FALSE, comment = "#>", warning = FALSE, message = FALSE)
-
-# load packages
-library(SSNbler)
-```
 
 # Background
 
@@ -64,9 +54,10 @@ contains a few data sets we use here:
     `MF_streams`. This prediction dataset represents locations where
     predictions of some response variable (i.e., dependent variable) may be
     desired. 
-	`MF_CapeHorn`: An `sf` object with `POINT` geometry containing
-    unsampled locations spaced at 10 meter intervals throughout
-    Cape Horn Creek in`MF_streams`. 
+
+There are two additional prediction data sets, `MF_CapeHorn` and `MF_Knapp`, that
+contain unsampled locations on the Middle Fork where
+predictions may be desired.
 
 These datasets are dynamically loaded with `SSNbler`. In this
 vignette, however, we demonstrate a more realistic workflow for the
@@ -79,18 +70,58 @@ Fork data are also installed with `SSNbler` and can be found in the
 this folder, we copy it to R's temporary
 directory and store the path to this folder:
 
-```{r}
+
+```r
 copy_streams_to_temp()
 path <- paste0(tempdir(), "/streamsdata")
 ```
 Then we can read the relevant data into our R session using the
 `st_read` function from the `sf` package:
-```{r}
+
+```r
 library(sf)
 MF_streams <- st_read(paste0(path, "/MF_streams.gpkg"))
+```
+
+```
+#> Reading layer `MF_streams' from data source 
+#>   `C:\Users\erin\AppData\Local\Temp\RtmpCmfWw1\streamsdata\MF_streams.gpkg' 
+#>   using driver `GPKG'
+#> Simple feature collection with 163 features and 9 fields
+#> Geometry type: LINESTRING
+#> Dimension:     XY
+#> Bounding box:  xmin: -1531385 ymin: 914394.3 xmax: -1498448 ymax: 933487.5
+#> Projected CRS: USA_Contiguous_Albers_Equal_Area_Conic
+```
+
+```r
 MF_obs <- st_read(paste0(path, "/MF_obs.gpkg"))
+```
+
+```
+#> Reading layer `MF_obs' from data source 
+#>   `C:\Users\erin\AppData\Local\Temp\RtmpCmfWw1\streamsdata\MF_obs.gpkg' 
+#>   using driver `GPKG'
+#> Simple feature collection with 45 features and 16 fields
+#> Geometry type: POINT
+#> Dimension:     XY
+#> Bounding box:  xmin: -1530805 ymin: 920324.3 xmax: -1503079 ymax: 931036.6
+#> Projected CRS: USA_Contiguous_Albers_Equal_Area_Conic
+```
+
+```r
 MF_pred1km <- st_read(paste0(path, "/MF_pred1km.gpkg"))
-MF_CapeHOrn <- st_read(paste0(path, "/MF_CapeHorn.gpkg"))
+```
+
+```
+#> Reading layer `MF_pred1km' from data source 
+#>   `C:\Users\erin\AppData\Local\Temp\RtmpCmfWw1\streamsdata\MF_pred1km.gpkg' 
+#>   using driver `GPKG'
+#> Simple feature collection with 175 features and 9 fields
+#> Geometry type: POINT
+#> Dimension:     XY
+#> Bounding box:  xmin: -1530631 ymin: 914920.7 xmax: -1500020 ymax: 933466.4
+#> Projected CRS: USA_Contiguous_Albers_Equal_Area_Conic
 ```
 Notice that the line and point features have `LINESTRING`
 and `POINT` geometry types, which are required in `SSNbler`. If
@@ -109,17 +140,17 @@ prediction sites using the `ggplot2` R package.
 We load the `ggplot2` R package and visualize the stream network, with
 prediction and observed locations: 
 
-```{r}
+
+```r
 library(ggplot2)
 
 ggplot() +
   geom_sf(data = MF_streams) +
-  geom_sf(data = MF_CapeHorn, color = "gold", size = 1.7) +
   geom_sf(data = MF_pred1km, colour = "purple", size = 1.7) +
   geom_sf(data = MF_obs, color = "blue", size = 2) 
-  
-
 ```
+
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
 
 # The Landscape Network
 
@@ -141,8 +172,9 @@ valid node categories in a LSN:
     an excessive number of pseudonodes can slow down geoprocessing
     operations for large datasets.
 
-```{r, fig.cap = "A landscape network (LSN). Nodes are denoted by blue circles, with the node category labelled. Edges are denoted by black arrows, with the arrow indicating flow direction (i.e., digitized direction)", fig.alt = "Valid Nodes", fig.align = "center", echo = FALSE}
-knitr::include_graphics(paste0(system.file(package = "SSNbler"), "/figures/valid_nodes.png"))
+
+```
+#> Error in knitr::include_graphics(paste0(system.file(package = "SSNbler"), : Cannot find the file(s): "../../../MySoftware/R/R-4.4.0/library/SSNbler/figures/valid_nodes.png"
 ```
 
 Each edge is associated with two nodes, which correspond to the
@@ -176,7 +208,8 @@ function, which generally requires at least a few arguments:
 
 The `MF_streams` data has an Albers Equal Area Conic projection (EPSG
 102003) measured in meters. We create the LSN associated with `MF_streams` by running 
-```{r}
+
+```r
 edges <- lines_to_lsn(
   streams = MF_streams,
   lsn_path = path,
@@ -245,14 +278,15 @@ generally requires these arguments:
   
 The `sites_to_lsn` function is run using the following code: 
 
-```{r}
+
+```r
 obs <- sites_to_lsn(
   sites = MF_obs,
   edges = edges,
   lsn_path = path,
-  file_name = "obs2",
+  lsn_ext = "obs.gpkg",
   snap_tolerance = 100,
-  save_local = TRUE
+  save_local = TRUE # the default
 )
 ```
 
@@ -286,7 +320,8 @@ spatial stream-network model:
 
 IMPORT OTHER TWO PREDICTION DATASETS SO THAT WE CAN CREATE MiddleFork04.ssn
 
-```{r}
+
+```r
 preds <- sites_to_lsn(
   sites = MF_pred1km,
   edges = edges,
@@ -325,8 +360,9 @@ in memory, but are accessed by subsequent `SSNbler`
 functions. Prediction datasets may also be included in the LSN if
 prediction is desired (e.g., pred1km).
 
-```{r, fig.cap = "LSN components are stored in 1) memory as sf objects and 2) a local LSN directory as geopackages and csv files, which are accessed using other `SSNbler` functions", fig.alt="LSN Storage", fig.align = "center", echo = FALSE}
-knitr::include_graphics(paste0(system.file(package = "SSNbler"), "/figures/LSN_storage.png"))
+
+```
+#> Error in knitr::include_graphics(paste0(system.file(package = "SSNbler"), : Cannot find the file(s): "../../../MySoftware/R/R-4.4.0/library/SSNbler/figures/LSN_storage.png"
 ```
 
 Once the LSN has been created, the next steps are to calculate the
@@ -362,7 +398,8 @@ The upstream distance for each edge is calculated using the
   to remove topological errors.  
 
 
-```{r}
+
+```r
 edges <- updist_edges(
   edges = edges,
   lsn_path = path,
@@ -370,6 +407,12 @@ edges <- updist_edges(
 )
 
 names(edges)
+```
+
+```
+#>  [1] "rid"        "COMID"      "GNIS_NAME"  "REACHCODE"  "FTYPE"     
+#>  [6] "FCODE"      "AREAWTMAP"  "SLOPE"      "rcaAreaKm2" "h2oAreaKm2"
+#> [11] "Length"     "upDist"     "geometry"
 ```
 Two columns are added to `edges` and saved in `edges.gpkg`. `Length`, the
 length of each edge in map units and `upDist` is the upstream distance for each edge.
@@ -387,7 +430,8 @@ for each site using the `updist_sites()` function, which requires a few argument
   processed using `updist_edges()`.
 * `length_col`: The name of the column in `edges` that represents edge length.
 * `lsn_path`: The LSN pathname where the `edges` resides
-```{r}
+
+```r
 site.list <- updist_sites(
   sites = list(obs = obs, pred1km = preds),
   edges = edges,
@@ -396,8 +440,22 @@ site.list <- updist_sites(
 )
 
 names(site.list) ## View site.list names
-names(site.list[["obs"]])  ## View column names in obs
+```
 
+```
+#> [1] "obs"     "pred1km"
+```
+
+```r
+names(site.list[["obs"]])  ## View column names in obs
+```
+
+```
+#>  [1] "rid"        "STREAMNAME" "COMID"      "AREAWTMAP"  "SLOPE"     
+#>  [6] "ELEV_DEM"   "Source"     "Summer_mn"  "MaxOver20"  "C16"       
+#> [11] "C20"        "C24"        "FlowCMS"    "AirMEANc"   "AirMWMTc"  
+#> [16] "rcaAreaKm2" "h2oAreaKm2" "ratio"      "snapdist"   "geometry"  
+#> [21] "upDist"
 ```
 
 # Calculating Additive Function Values (AFVs)
@@ -419,7 +477,8 @@ network. Addition function values are created for each edge using the
 
 We will use the variable `h2oAreaKm2` in `edges`, which represents watershed area, to create the additive function value: 
 
-```{r}
+
+```r
 edges <- afv_edges(
   edges = edges,
   infl_col = "h2oAreaKm2", 
@@ -429,12 +488,27 @@ edges <- afv_edges(
 )
 
 names(edges)
+```
+
+```
+#>  [1] "rid"        "COMID"      "GNIS_NAME"  "REACHCODE"  "FTYPE"     
+#>  [6] "FCODE"      "AREAWTMAP"  "SLOPE"      "rcaAreaKm2" "h2oAreaKm2"
+#> [11] "Length"     "upDist"     "areaPI"     "afvArea"    "geometry"
+```
+
+```r
 summary(edges$afvArea)
+```
+
+```
+#>     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+#> 0.004709 0.026168 0.066095 0.160335 0.169575 1.000000
 ```
 
 Once the additive function values have been added to `edges`, they can
 calculated for the observations and (if relevant) prediction sites:
-```{r}
+
+```r
 site.list <- afv_sites(
   sites = site.list,
   edges = edges,
@@ -444,8 +518,21 @@ site.list <- afv_sites(
 )
 
 names(site.list[["pred1km"]])
-summary(site.list[["pred1km"]]$afvArea)
+```
 
+```
+#>  [1] "rid"        "COMID"      "AREAWTMAP"  "SLOPE"      "ELEV_DEM"  
+#>  [6] "FlowCMS"    "AirMEANc"   "AirMWMTc"   "rcaAreaKm2" "h2oAreaKm2"
+#> [11] "ratio"      "snapdist"   "upDist"     "afvArea"    "geometry"
+```
+
+```r
+summary(site.list[["pred1km"]]$afvArea)
+```
+
+```
+#>     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+#> 0.009894 0.031219 0.047469 0.104969 0.112882 1.000000
 ```
 
 For more on additive function values, see @ver2010moving and
@@ -473,7 +560,8 @@ requires a few arguments:
   does not include an `.ssn` extenstion, it will be added. 
 * `import`: Should the SSN object be automatically imported into *R*?
 
-```{r}
+
+```r
 mf04p_copy <- ssn_assemble(
   edges = edges,
   lsn_path = path,
@@ -496,7 +584,8 @@ taildown, and Gaussian Euclidean covariance functions. To learn more
 about `SSN2`, visit the package website at
 [https://usepa.github.io/SSN2/](https://usepa.github.io/SSN2/).
 
-```{r}
+
+```r
 library(SSN2)
 ssn_create_distmat(mf04p_copy)
 ssn_mod <- ssn_lm(
@@ -508,6 +597,38 @@ ssn_mod <- ssn_lm(
   additive = "afvArea"
 )
 summary(ssn_mod)
+```
+
+```
+#> 
+#> Call:
+#> ssn_lm(formula = Summer_mn ~ ELEV_DEM + AREAWTMAP, ssn.object = mf04p_copy, 
+#>     tailup_type = "exponential", taildown_type = "spherical", 
+#>     euclid_type = "gaussian", additive = "afvArea")
+#> 
+#> Residuals:
+#>      Min       1Q   Median       3Q      Max 
+#> -2.73430 -1.43161 -0.04368  0.83251  1.39377 
+#> 
+#> Coefficients (fixed):
+#>              Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept) 78.214857  12.189379   6.417 1.39e-10 ***
+#> ELEV_DEM    -0.028758   0.005808  -4.952 7.35e-07 ***
+#> AREAWTMAP   -0.008067   0.004125  -1.955   0.0505 .  
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> Pseudo R-squared: 0.4157
+#> 
+#> Coefficients (covariance):
+#>               Effect     Parameter   Estimate
+#>   tailup exponential  de (parsill)  1.348e+00
+#>   tailup exponential         range  8.987e+05
+#>   taildown spherical  de (parsill)  2.647e+00
+#>   taildown spherical         range  1.960e+05
+#>      euclid gaussian  de (parsill)  1.092e-04
+#>      euclid gaussian         range  1.805e+05
+#>               nugget        nugget  1.660e-02
 ```
 
 # Function Glossary
@@ -526,12 +647,105 @@ Here we list and provide brief descriptions for some commonly used
 
 # R Code Appendix {.unnumbered}
 
-```{r get-labels, echo = FALSE}
-labs <- knitr::all_labels()
-labs <- setdiff(labs, c("setup", "get-labels"))
-```
 
-```{r all-code, ref.label=labs, eval = FALSE}
+
+
+```r
+copy_streams_to_temp()
+path <- paste0(tempdir(), "/streamsdata")
+library(sf)
+MF_streams <- st_read(paste0(path, "/MF_streams.gpkg"))
+MF_obs <- st_read(paste0(path, "/MF_obs.gpkg"))
+MF_pred1km <- st_read(paste0(path, "/MF_pred1km.gpkg"))
+library(ggplot2)
+
+ggplot() +
+  geom_sf(data = MF_streams) +
+  geom_sf(data = MF_pred1km, colour = "purple", size = 1.7) +
+  geom_sf(data = MF_obs, color = "blue", size = 2) 
+  
+knitr::include_graphics(paste0(system.file(package = "SSNbler"), "/figures/valid_nodes.png"))
+edges <- lines_to_lsn(
+  streams = MF_streams,
+  lsn_path = path,
+  check_topology = TRUE,
+  snap_tolerance = 1,
+  topo_tolerance = 20,
+  overwrite = TRUE
+)
+obs <- sites_to_lsn(
+  sites = MF_obs,
+  edges = edges,
+  lsn_path = path,
+  lsn_ext = "obs.gpkg",
+  snap_tolerance = 100,
+  save_local = TRUE # the default
+)
+preds <- sites_to_lsn(
+  sites = MF_pred1km,
+  edges = edges,
+  lsn_path = path,
+  lsn_ext = "pred1km.gpkg",
+  snap_tolerance = 100
+)
+knitr::include_graphics(paste0(system.file(package = "SSNbler"), "/figures/LSN_storage.png"))
+edges <- updist_edges(
+  edges = edges,
+  lsn_path = path,
+  calc_length = TRUE
+)
+
+names(edges)
+site.list <- updist_sites(
+  sites = list(obs = obs, pred1km = preds),
+  edges = edges,
+  length_col= "Length",
+  lsn_path = path
+)
+
+names(site.list) ## View site.list names
+names(site.list[["obs"]])  ## View column names in obs
+
+edges <- afv_edges(
+  edges = edges,
+  infl_col = "h2oAreaKm2", 
+  segpi_col = "areaPI",
+  afv_col = "afvArea",
+  lsn_path = path
+)
+
+names(edges)
+summary(edges$afvArea)
+site.list <- afv_sites(
+  sites = site.list,
+  edges = edges,
+  afv_col = "afvArea",
+  save_local = TRUE,
+  lsn_path = path
+)
+
+names(site.list[["pred1km"]])
+summary(site.list[["pred1km"]]$afvArea)
+
+mf04p_copy <- ssn_assemble(
+  edges = edges,
+  lsn_path = path,
+  obs_sites = site.list$obs,
+  preds_list = site.list["pred1km"],
+  ssn_path = paste0(path, "/MiddleFork04.ssn"),
+  import = TRUE
+)
+library(SSN2)
+ssn_create_distmat(mf04p_copy)
+ssn_mod <- ssn_lm(
+  formula = Summer_mn ~ ELEV_DEM + AREAWTMAP,
+  ssn.object = mf04p_copy,
+  tailup_type = "exponential",
+  taildown_type = "spherical",
+  euclid_type = "gaussian",
+  additive = "afvArea"
+)
+summary(ssn_mod)
 ```
 
 # References {.unnumbered}
