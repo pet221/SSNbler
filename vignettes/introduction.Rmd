@@ -31,7 +31,6 @@ knitr::opts_chunk$set(collapse = FALSE, comment = "#>", warning = FALSE, message
 # load packages
 library(SSNbler)
 library(ggplot2)
-library(stringr)
 library(sf)
 library(SSN2)
 ```
@@ -49,15 +48,16 @@ often having a strong influence on observations collected on
 the stream network. @ver2010moving describe how to fit spatial
 statistical models on stream networks (i.e., spatial stream-network
 models) that capture the unique and complex spatial dependencies
-inherent in streams. These stream network models can be fit in **R**
-using the `SSN2` package [@dumelle2024SSN2]. However, users must
-provide the spatial, topological, and attribute data in a specific format called an SSN object in order to fit models
-using `SSN2`. The **R** package `SSNbler` is used to generate, format,
-assemble and validate data in the SSN object for use with `SSN2`.
+inherent in streams. These stream network models can be fit
+using the `SSN2` **R** package [@dumelle2024SSN2]. To use `SSN2`, however, users must
+provide the spatial, topological, and attribute data in a specific format called
+an SSN object. The `SSNbler` **R** package, which we introduce here, is an adaptation
+of the STARS ArcGIS toolset [@peterson2014stars] to the **R** programming language. `SSNbler` generates
+formats, assembles, and validates SSN objects that can be used for statistical
+modeling in `SSN2`.
 
-In this vignette, we provide an overview of using `SSNbler` to create the SSN object
-`MiddleFork04.ssn`, which is shipped with the `SSN2` package. The `SSNbler` package
-contains a few input data sets we use here:
+In this vignette, we use `SSNbler` to create the SSN object
+`MiddleFork04.ssn` used by `SSN2`. `SSNbler` has a few input data sets:
 
 -   `MF_streams`: An `sf` object with `LINESTRING` geometry
     representing a portion of the Middle Fork stream network in Idaho, USA.
@@ -73,15 +73,17 @@ contains a few input data sets we use here:
     654 unsampled locations spaced at 10 meter intervals throughout
     Cape Horn Creek in`MF_streams`. 
 
-These datasets are dynamically loaded with `SSNbler`. Additional
-information about the contents can be found in the helpfiles for each
-dataset. In this vignette, however, we demonstrate a more realistic
-workflow for the user. We start with a collection of spatial datasets
-in geopackage format representing the stream network, observed data,
-and prediction data (optional), which are required to create an SSN
-object used to fit spatial stream-network models. Geopackages
-representing these Middle Fork data are also installed with `SSNbler`
-and can be found in the `streamdata` folder. To prevent `SSNbler`
+Documentation for each data set can be found by running `help()`. For example,
+to learn more about `MF_streams`, run `help("MF_streams, package = "SSNbler")`.
+
+While these data sets come with `SSNbler` and can be loaded via `data()`,
+we focus here on a more realistic
+workflow for the user. We start with a collection of spatial data sets
+installed alongside `SSNbler` in the `streamsdata` folder that represent the Middle Fork stream network. 
+In `streamsdata` are geopackages (more on this later) for
+the stream network, observed data,
+and prediction data (optional) required to create an SSN
+object. To prevent `SSNbler`
 functions from reading and writing to this folder, we copy it to R's
 temporary directory and store the path to this folder:
 
@@ -89,42 +91,43 @@ temporary directory and store the path to this folder:
 copy_streams_to_temp()
 path <- paste0(tempdir(), "/streamsdata")
 ```
-Then we can read the relevant data into our R session using the
-`st_read` function from the `sf` package:
-```{r ImportData, results = "hide", cache = TRUE}
+
+Then we can read in the relevant data using `st_read` from the `sf` **R** 
+package [@pebesma2018sf], which comes installed alongside `SSNbler`:
+```{r ImportData, results = "hide"}
 MF_streams <- st_read(paste0(path, "/MF_streams.gpkg"))
 MF_obs <- st_read(paste0(path, "/MF_obs.gpkg"))
 MF_pred1km <- st_read(paste0(path, "/MF_pred1km.gpkg"))
 MF_CapeHorn <- st_read(paste0(path, "/MF_CapeHorn.gpkg"))
 ```
-Notice that the line and point features have `LINESTRING`
-and `POINT` geometry types, which are required in `SSNbler`. If
+
+The line (`MF_Streams`) and point features (`MF_obs`, `MF_pred1km`, and `MF_CapeHorn`)
+have `LINESTRING` and `POINT` geometry types, which are required in `SSNbler`. If
 these datasets had `MULTILINESTRING` or
 `MULTIPOINT` geometry types, the `sf` function `st_cast` could be used to convert to
 the required geometry types. All of the input data have an Albers Equal Area Conic projection (EPSG
 102003) and distances are measured in meters. It is important that all
-input datasets have the same map projection, which must also be a projected coordinate system, rather
-than a geographic coordinate system (i.e., not Latitude and
+input datasets have the same map projection for (which must be a projected coordinate system and not
+a geographic coordinate system measured in Latitude and
 Longitude). The `sf` function `st_transform` can be used to
-reproject sf objects in *R*. 
+reproject `sf` objects in *R*. 
 
-In this example, the input data are stored in geopackage format. We
-prefer this vector data format over shapefiles because the .dbf file
-where shapefile attributes are stored limits the number of decimal
-places in numeric columns. As a result, critical data required for
-spatial statistical stream-network modelling may be automatically
-truncated when data are *written* to a local file, which produces
-difficult to diagnose errors when models are fit in the `SSN2`
-package. Geopackages do not have this limitation. That being said, any
+We previously mentioned these data are stored in `streamsdata` in a geopackage format.
+Geopackages, like shapefiles, are a way to store spatial data. We
+prefer geopackages to shapefiles for several reasons, one of which results 
+from the fact that shapefiles automatically truncate numeric columns when writing 
+to local files, which can lead to
+difficult to diagnose errors when models are fit in `SSN2`. Geopackages do not have this limitation.
+That being said, any
 spatial data format can be used in `SSNbler` as long as it can be
-imported into *R* and stored as an sf object with LINESTRING or POINT
-geometry.
+imported into *R* and stored as an `sf` object with `LINESTRING` or `POINT`
+geometry. To learn more about geopackages, [visit here](https://www.geopackage.org/).
 
 Before working with any of the input files, we visualize the stream
 network, observed sites, and prediction sites using the `ggplot2`
-package.
+**R** package [@wickham2016ggplot2].
 
-```{r MF_Input_plot, fig.cap = "Middle Fork input data.", fig.alt = "Middle Fork input data", fig.align = "center", out.width = "90%", cache = TRUE}
+```{r mf-input, fig.cap = "The Middle Fork Stream Newtork.", fig.alt = "The Middle Fork Stream Network.", fig.align = "center", out.width = "90%"}
 
 ggplot() +
   geom_sf(data = MF_streams) +
@@ -134,22 +137,23 @@ ggplot() +
   
 
 ```
-Notice that there are two subnetworks in `MF_streams` (black lines). Point
-features in `MF_obs` (blue dots)  and `MF_pred1km` (purple dots) are found on both networks,
-while `MF_CapeHorn` point features (yellow dots) are only found on one
-of the two networks. 
 
+In the Figure above, there are two subnetworks from `MF_Streams` (black lines).
+Point features from `MF_obs` (blue dots) and `MF_pred1km` (purple dots) are 
+found on both networks, while `MF_CapeHorn` point features (yellow dots) are only found on one
+of the two networks.  In `SSN2`, the observed data in `MF_obs` are used to build statistical 
+models and make predictions at the locations in `MF_pred1km` and `MF_CapeHorn`.
 
 # The Landscape Network
 
-SSNbler makes use of a data structure called a Landscape Network
+`SSNbler` makes use of a data structure called a Landscape Network
 (LSN), which is a type of graph used to represent spatial context and
 relationships with additional geographic information
 [@theobald2006functional]. In a LSN, streams are represented as a collection of directed edges, where
 the directionality is determined by the digitized direction of the
 line features. Nodes are located at the end points of edges (i.e., end
 nodes) and represent topologic breaks in the edges. For a more
-detailed description of the LSN, please see @peterson2014stars.
+detailed description of the LSN, see @peterson2014stars.
 
 There are four topologically valid node categories in a LSN:
 
@@ -710,9 +714,8 @@ ggplot() + geom_sf(data = mf04_ssn$edges, color = "medium blue",
           fill = "white", color = "dark grey") +
   geom_sf(data = mf04_ssn$obs, size = 1.7, aes(color = Summer_mn)) +
   scale_color_viridis_c() +
-  labs(color = str_wrap("Summer Mean Temperature (\u00B0C)",
-                              width = 20),
-       linewidth = bquote(atop(Watershed~phantom(),Area~(km^2))))+
+  labs(color = "Temperature",
+       linewidth = "WS Area")+
   theme(legend.text = element_text(size = 8),
         legend.title = element_text(size = 10)) 
   
@@ -771,5 +774,4 @@ labs <- setdiff(labs, c("setup", "get-labels"))
 
 # References {.unnumbered}
 
-::: {#refs}
-:::
+<div id="refs"></div>

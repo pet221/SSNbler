@@ -93,6 +93,8 @@ sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
   ## store "new" lsn path that combines lsn path with lsn extension
   ## old lsn path had both together
   lsn_path <- paste0(lsn_path, "/", file_name)
+  # if needing absolute paths
+  # lsn_path <- normalizePath(paste0(lsn_path, "/", file_name), mustWork = FALSE)
   
   ## stop if lsn_path file exists and overwrite == FALSE
   if(file.exists(lsn_path) & overwrite == FALSE) {
