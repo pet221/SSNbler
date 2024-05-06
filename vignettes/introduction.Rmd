@@ -604,15 +604,15 @@ The key arguments in `ssn_assemble()` include:
   `afv_sites()`.
 * `ssn_path`: The path to a local directory where the files making up
   the new `SSN` object will be saved. If the `ssn_path`
-  does not include a `.ssn` extenstion, it will be added. 
-* `import`: Logical indicating whether the SSN object be automatically imported into *R*.
+  does not include a `.ssn` extension, it will be added. 
+* `import`: Logical indicating whether the SSN object be automatically imported into **R**.
 
 
 ```{r}
 mf04_ssn <- ssn_assemble(
   edges = edges,
   lsn_path = path,
-  obs_sites = site.list[["obs"]],
+  obs_sites = site.list$obs,
   preds_list = site.list[c("pred1km", "CapeHorn")],
   ssn_path = paste0(path, "/MiddleFork04.ssn"),
   import = TRUE,
@@ -623,30 +623,29 @@ names(mf04_ssn)         ## print names of SSN object
 names(mf04_ssn$preds)   ## print names of prediction datasets
 ```
 The outputs of `ssn_assemble()` are stored locally in a directory with
-a `.ssn` extension and in memory as an object of class `SSN` when `import =
-TRUE`. At a minimum, the new `.ssn` directory will contain: 
+a `.ssn` extension and in memory as an object of class `SSN` when `import = TRUE`.
+At a minimum, the new `.ssn` directory will contain: 
 
 1. `edges.gpkg`: edges in geopackage format
 2. `sites.gpkg`: observed sites in geopackage format (if included)
-3. `Prediction datasets` (e.g., CapeHorn.gpkg and pred1km.gpkg) in
+3. `Prediction datasets`: (e.g., `CapeHorn.gpkg` and `pred1km.gpkg`) in
    geopackage format (if included)
 4. `netIDx.dat files`: one text file for each unique subnetwork in edges
    containing information describing the topological relationships
    between edges.
    
 When `import = TRUE`, the spatial data stored in the `.ssn` directory are
-imported into *R* and stored in memory as a `SSN` object. The netIDx.dat files are combined behind the
-scenes into an SQLite database named binaryID.db, which is saved in
+imported into *R* and stored in memory as a `SSN` object. The `netIDx.dat` files are combined behind the scenes into an SQLite database named `binaryID.db`, which is saved in
 the `.ssn` directory. Most users will not need to access the
-binaryID.db or the netIDx.dat files, but a more detailed description
+`binaryID.db` or the `netIDx.dat` files, but a more detailed description
 about how the topological relationships are stored can be found in
 @peterson2014stars. 
 
 The `SSN` object itself is a list containing four elements:
 
-1. `edges`: `sf` object representing edges 
-2. `obs`: `sf` object of observed sites
-3. `preds`: Named list of `sf` objects representing prediction site datasets
+1. `edges`: An `sf` object representing edges.
+2. `obs`: An `sf` object of observed sites.
+3. `preds`: Named list of `sf` objects representing prediction site datasets.
 4. `path`: Character string describing the path to the `.ssn`
    where the `SSN` components are stored locally. 
 
@@ -658,26 +657,24 @@ spatial stream-network modelling workflow.
 The `ssn_assemble` function also adds several important columns to the edges, obs, and
 prediction datasets. 
 
-* edges: 
+* `edges`: 
   * `netID`: A unique network identifier
-* obs and preds: 
+* `obs` and `preds`: 
   * `netID` The network identifier value for the edge the site resides
     on
   * `pid`: A unique identifier for each measurement (i.e., point feature).
-  * `locID`: A unqiue identifer for each location. Note that repeated
-    measurements at a site will have the same locID value, but
-    different pid values. 
+  * `locID`: A unique identifier for each location. Note that repeated
+    measurements at a site will have the same `locID` value, but
+    different `pid` values. 
 
 A `netgeom` (short for network geometry) column is also added to each
 of the sf objects stored within an `SSN` object. The `netgeom` column
 contains a character string describing the position of each line
-(edges) and point (obs and preds) feature in relation to one
-another. The format of the netgeom column differs depending on whether
-it is describing a feature with LINESTRING or POINT geometry. For
-edges, the format of `netgeom` is
+(`edges`) and point (`obs` and `preds`) feature in relation to one
+another. The format of the `netgeom` column differs depending on whether
+it is describing a feature with `LINESTRING` or `POINT` geometry. For
+`edges`, the format of `netgeom` is
 
-
-<center>Centered text</center>
 $$
 \texttt{ENETWORK (netID rid upDist)},
 $$
@@ -690,12 +687,8 @@ The information stored in these columns is used to keep track of the spatial and
 relationships in the network. The data used to define `netgeom` is
 stored in the the edges, observed sites, and prediction sites datasets. We
 store an additional copy of this critical
-information as text in the
-`netgeom` column because it reduces the chances that users will unknowingly make
-changes to these data, which in turn could change how relationships are
-represented in spatial stream-network
-models. 
-
+information as text in the `netgeom` column because it reduces the chances that users will unknowingly make changes to these data, which in turn could change how relationships are
+represented in spatial stream-network models. 
 
 # Plotting a SSN Object
 
@@ -705,23 +698,34 @@ available in the the package `ggplot2`. As an example, we create a
 plot of the SSN object. The edges are displayed in blue, with the
 linewidth proportional to watershed area column, `h2oAreaKm2`. The summer stream
 temperature observations (`Summer_mn`) are shown using the viridis
-color palette, with pred1km locations shown as smaller white dots. 
+color palette, with `pred1km` locations shown as smaller white dots: 
 
-```{r}
-
-ggplot() + geom_sf(data = mf04_ssn$edges, color = "medium blue",
-                   aes(linewidth = h2oAreaKm2)) +
+```{r, fig.cap = "Mean summer stream temperature (Temperature) and watershed area (WS AREA) for the Middle Fork stream network. Prediction locations are white circles.", fig.alt = "Mean summer stream temperature and watershed area.", fig.align = "center", out.width = "90%"}
+ggplot() +
+  geom_sf(
+    data = mf04_ssn$edges,
+    color = "medium blue",
+    aes(linewidth = h2oAreaKm2)
+  ) +
   scale_linewidth(range = c(0.1, 2.5)) + 
-  geom_sf(data = mf04_ssn$preds$pred1km, size = 1.5, shape = 21,
-          fill = "white", color = "dark grey") +
-  geom_sf(data = mf04_ssn$obs, size = 1.7, aes(color = Summer_mn)) +
+  geom_sf(
+    data = mf04_ssn$preds$pred1km,
+    size = 1.5,
+    shape = 21,
+    fill = "white",
+    color = "dark grey"
+  ) +
+  geom_sf(
+    data = mf04_ssn$obs, 
+    size = 1.7,
+    aes(color = Summer_mn)
+  ) +
   scale_color_viridis_c() +
-  labs(color = "Temperature",
-       linewidth = "WS Area")+
-  theme(legend.text = element_text(size = 8),
-        legend.title = element_text(size = 10)) 
-  
-  
+  labs(color = "Temperature", linewidth = "WS Area") +
+  theme(
+    legend.text = element_text(size = 8),
+    legend.title = element_text(size = 10)
+  )
 ```
 
 Notice the different ways the sf objects for the edges, obs, and pred1km datasets are accessed in the SSN object and used for plotting in the calls to `geom_sf`. Any
@@ -731,10 +735,7 @@ components.
 
 # Creating a Spatial Stream Network Model Using SSN2
 
-We can now use the mf04_ssn object to fit a spatial stream-network model relating mean summer
-temperature to elevation (`ELEV_DEM`) and precipitation (`AREAWTMAP`), with the exponential tailup, spherical
-taildown, and Gaussian Euclidean covariance functions. Notice that
-`additive = "afvArea"`, which is the column we created earlier using
+We can now use the mf04_ssn object to fit a spatial stream-network model relating mean summer temperature to elevation (`ELEV_DEM`) and mean annual precipitation (`AREAWTMAP`), with the exponential tailup, spherical taildown, and Gaussian Euclidean covariance functions. Notice that `additive = "afvArea"`, which is the column we created earlier using
 the `afv_edges` and `afv_sites` functions. 
 
 ```{r}
@@ -750,9 +751,8 @@ ssn_mod <- ssn_lm(
 )
 summary(ssn_mod)
 ```
-To learn more
-about fitting spatial stream-network models using the `SSN2` package, visit the package website at
-[https://usepa.github.io/SSN2/](https://usepa.github.io/SSN2/).
+
+There is strong evidence ($p < 0.001$) that elevation is negatively related to mean summer tempearture, while there is moderate evidence ($p \approx 0.05$) that precipitation is negatively related to mean summer temperature. To learn more about fitting spatial stream-network models using the `SSN2` package, visit the package website at [https://usepa.github.io/SSN2/](https://usepa.github.io/SSN2/).
 
 
 <!--# From STARS and openSTARS to SSNbler (ADD Later)
