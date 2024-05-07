@@ -3,7 +3,7 @@
 \docType{data}
 \name{MF_obs}
 \alias{MF_obs}
-\title{#' MF_obs: Water temperature observations in the Middle Fork Basin, Idaho in 2004.}
+\title{MF_obs: Water temperature observations in the Middle Fork Basin, Idaho in 2004.}
 \format{
 An object of class \code{sf} (inherits from \code{data.frame}) with 45 rows and 17 columns.
 }

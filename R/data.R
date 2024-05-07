@@ -26,7 +26,7 @@
 #'
 "MF_streams"
 #'
-#' #' MF_obs: Water temperature observations in the Middle Fork Basin, Idaho in 2004.
+#' MF_obs: Water temperature observations in the Middle Fork Basin, Idaho in 2004.
 #'
 #' \code{MF_obs} is an \code{sf} object with POINT geometry representing water temperature observations and covariates in the Middle Fork Basin, Idaho, USA collected in 2004. 
 #'
@@ -66,7 +66,7 @@
 "MF_obs"
 #'
 #'
-#' #' MF_CapeHorn: Prediction locations on Cape Horn Creek, in the Middle Fork Basin, Idaho.
+#' MF_CapeHorn: Prediction locations on Cape Horn Creek, in the Middle Fork Basin, Idaho.
 #'
 #' \code{MF_CapeHorn} is an \code{sf} object with POINT geometry representing prediction locations and covariates on Cape Horn Creek, Middle Fork Basin, Idaho, USA. 
 #'
@@ -98,7 +98,7 @@
 #' @name MF_CapeHorn
 "MF_CapeHorn"
 #'
-#' #' MF_pred1km: Prediction locations at 1km intervals throughout the Middle Fork Basin, Idaho.
+#' MF_pred1km: Prediction locations at 1km intervals throughout the Middle Fork Basin, Idaho.
 #'
 #' \code{MF_pred1km} is an \code{sf} object with POINT geometry representing prediction locations and covariates distributed at 1km intervals throughout the Middle Fork Basin, Idaho, USA. 
 #'

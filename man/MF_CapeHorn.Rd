@@ -3,7 +3,7 @@
 \docType{data}
 \name{MF_CapeHorn}
 \alias{MF_CapeHorn}
-\title{#' MF_CapeHorn: Prediction locations on Cape Horn Creek, in the Middle Fork Basin, Idaho.}
+\title{MF_CapeHorn: Prediction locations on Cape Horn Creek, in the Middle Fork Basin, Idaho.}
 \format{
 An object of class \code{sf} (inherits from \code{data.frame}) with 654 rows and 10 columns.
 }

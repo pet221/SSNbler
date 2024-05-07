@@ -3,7 +3,7 @@
 \docType{data}
 \name{MF_pred1km}
 \alias{MF_pred1km}
-\title{#' MF_pred1km: Prediction locations at 1km intervals throughout the Middle Fork Basin, Idaho.}
+\title{MF_pred1km: Prediction locations at 1km intervals throughout the Middle Fork Basin, Idaho.}
 \format{
 An object of class \code{sf} (inherits from \code{data.frame}) with 175 rows and 10 columns.
 }

@@ -1,13 +1,40 @@
+##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%####
+## R script for SSNbler_vignette.pdf
+##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%####
+
+## Install and load SSNbler----------------------------------####
+
+##install.packages("remotes") ## Install remotes if needed
+library(remotes)
+
+## Install the latest version of SSNbler from github
+remotes::install_github("pet221/SSNbler", ref = "main")
+
+## Load SSNbler library
 library(SSNbler)
+
+
+## Import the input data ------------------------------------####
+
+## Copy the example dataset to a temporary directory
 copy_streams_to_temp()
 path <- paste0(tempdir(), "/streamsdata")
 
+
+## Load the sf package and import the streams, observation sites, and
+## two prediction datasets
 library(sf)
 MF_streams <- st_read(paste0(path, "/MF_streams.gpkg"))
 MF_obs <- st_read(paste0(path, "/MF_obs.gpkg"))
 MF_pred1km <- st_read(paste0(path, "/MF_pred1km.gpkg"))
 MF_CapeHorn <- st_read(paste0(path, "/MF_CapeHorn.gpkg"))
 
+## Notice that the imported data are of class sf data.frame
+class(MF_obs)
+names(MF_obs)
+
+
+## Plot the data using ggplot2
 library(ggplot2)
 ggplot() +
   geom_sf(data = MF_streams) +
