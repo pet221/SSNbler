@@ -27,10 +27,6 @@ editor_options:
 
 # rmd style
 knitr::opts_chunk$set(collapse = FALSE, comment = "#>", warning = FALSE, message = FALSE)
-
-library(ggplot2)
-library(sf)
-library(SSN2)
 ```
 
 # Background
