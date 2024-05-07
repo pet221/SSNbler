@@ -1,7 +1,7 @@
 ---
 title: "An Introduction to SSNbler: Assembling Spatial Stream Network (SSN) Objects in R"
 author: "Erin E Peterson, Michael Dumelle, Alan R Pearse, Dan Teleki, and Jay M Ver Hoef"
-bibliography: '`r system.file("references.bib", package="SSNbler")`'
+bibliography: "references.bib"
 output:
   html_document:
     theme: flatly
@@ -26,7 +26,12 @@ editor_options:
 # options(replace.assign=TRUE, width=90, prompt="R> ")
 
 # rmd style
-knitr::opts_chunk$set(collapse = FALSE, comment = "#>", warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
+)
 ```
 
 # Background
@@ -130,7 +135,7 @@ Before working with any of the input files, we visualize the stream
 network, observed sites, and prediction sites using the `ggplot2`
 **R** package [@wickham2016ggplot2].
 
-```{r mf-input, fig.cap = "The Middle Fork Stream Newtork.", fig.alt = "The Middle Fork Stream Network.", fig.align = "center", out.width = "90%"}
+```{r mf-input, fig.cap = "The Middle Fork Stream Newtork.", fig.alt = "The Middle Fork Stream Network.", fig.align = "center", out.width = "75%"}
 library(ggplot2)
 ggplot() +
   geom_sf(data = MF_streams) +
@@ -166,8 +171,8 @@ There are four topologically valid node categories in a LSN:
     an excessive number of pseudonodes can slow down geoprocessing
     operations for large datasets.
 
-```{r, fig.cap = "A landscape network (LSN). Nodes are denoted by blue circles, with the node category labelled. Edges are denoted by blackarrows, with the arrow indicating flow direction (i.e., digitizeddirection)", fig.alt = "Valid Nodes", fig.align = "center",echo =FALSE, out.width = "75%"}
-knitr::include_graphics(paste0(system.file(package = "SSNbler"), "/figures/valid_nodes.png"))
+```{r, fig.cap = "A landscape network (LSN). Nodes are denoted by blue circles, with the node category labelled. Edges are denoted by blackarrows, with the arrow indicating flow direction (i.e., digitized direction)", fig.alt = "Valid Nodes", fig.align = "center",echo =FALSE, out.width = "50%"}
+knitr::include_graphics("valid_nodes.png")
 ```
 
 Each edge is associated with two nodes, which correspond to the
@@ -464,7 +469,7 @@ package. If we plot the edges and observations, assigning color based on
 the `upDist` column, it is apparent that the upstream distance
 increases from the outlet to headwater streams, as expected.  
   
-```{r, fig.cap = "Upstream Distance.", fig.alt = "Upstream Distance.", fig.align = "center", out.width = "90%"}
+```{r, fig.cap = "Upstream Distance.", fig.alt = "Upstream Distance.", fig.align = "center", out.width = "75%"}
 ggplot() +
   geom_sf(data = edges, aes(color = upDist)) +
   geom_sf(data = site.list$obs, aes(color = upDist)) +
@@ -698,7 +703,7 @@ linewidth proportional to watershed area column, `h2oAreaKm2`. The summer stream
 temperature observations (`Summer_mn`) are shown using the viridis
 color palette, with `pred1km` locations shown as smaller white dots: 
 
-```{r, fig.cap = "Mean summer stream temperature (Temperature) and watershed area (WS AREA) for the Middle Fork stream network. Prediction locations are white circles.", fig.alt = "Mean summer stream temperature and watershed area.", fig.align = "center", out.width = "90%"}
+```{r, fig.cap = "Mean summer stream temperature (Temperature) and watershed area (WS AREA) for the Middle Fork stream network. Prediction locations are white circles.", fig.alt = "Mean summer stream temperature and watershed area.", fig.align = "center", out.width = "75%"}
 ggplot() +
   geom_sf(
     data = mf04_ssn$edges,

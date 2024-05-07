@@ -21,8 +21,14 @@ Useful links:
 
 Authors:
 \itemize{
-  \item Alan Pearse
   \item Michael Dumelle \email{Dumelle.Michael@epa.gov} (\href{https://orcid.org/0000-0002-3393-5529}{ORCID})
+  \item Alan Pearse
+}
+
+Other contributors:
+\itemize{
+  \item Dan Teleki [contributor]
+  \item Jay M. Ver Hoef \email{jay.verhoef@noaa.gov} (\href{https://orcid.org/0000-0003-4302-6895}{ORCID}) [contributor]
 }
 
 }

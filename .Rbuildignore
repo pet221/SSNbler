@@ -2,4 +2,13 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^inst/tutorials$
+^doc$
+^Meta$
 ^\.github$
+^cran-comments.md$
+^CRAN-RELEASE$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^vignettes/articles$
+^CRAN-SUBMISSION$
