@@ -184,7 +184,9 @@ topologically corrected. Two tutorials have been created with detailed
 instructions about identifying and correcting toplogical errors in the
 LSN, as well as other topological restrictions that are not permitted
 (please see 'Correcting topological errors using SSNbler and QGIS' or
-'Correcting topological errors using SSNbler and ArcGIS Pro').
+'Correcting topological errors using SSNbler and ArcGIS Pro'). These tutorials
+are available for download within the relevant folders on GitHub at
+[this link](https://github.com/pet221/SSNbler/tree/main/inst/tutorials).
 
 ## Building the Landscape Network
 
