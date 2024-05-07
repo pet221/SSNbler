@@ -215,9 +215,12 @@ function, which generally requires these arguments:
 We create a LSN associated with `MF_streams` by running  
 
 ```{r}
+## Set path for new folder for lsn
+lsn.path<-paste0(tempdir(), "/mf04")
+
 edges <- lines_to_lsn(
   streams = MF_streams,
-  lsn_path = path,
+  lsn_path = lsn.path,
   check_topology = TRUE,
   snap_tolerance = 1,
   topo_tolerance = 20,
@@ -294,7 +297,7 @@ We run `sites_to_lsn` for the `MF_obs` (observed) data:
 obs <- sites_to_lsn(
   sites = MF_obs,
   edges = edges,
-  lsn_path = path,
+  lsn_path = lsn.path,
   file_name = "obs",
   snap_tolerance = 100,
   save_local = TRUE,
@@ -331,7 +334,7 @@ using `sites_to_lsn()`. We add the `MF_pred1km` and `MF_capehorn` prediction dat
 preds <- sites_to_lsn(
   sites = MF_pred1km,
   edges = edges,
-  lsn_path = path,
+  lsn_path = lsn.path,
   file_name = "pred1km.gpkg",
   snap_tolerance = 100,
   overwrite = TRUE
@@ -340,7 +343,7 @@ preds <- sites_to_lsn(
 capehorn <- sites_to_lsn(
   sites = MF_CapeHorn,
   edges = edges,
-  lsn_path = path,
+  lsn_path = lsn.path,
   file_name = "CapeHorn.gpkg",
   snap_tolerance = 100,
   overwrite = TRUE
@@ -422,7 +425,7 @@ The upstream distance for each edge is calculated using the
 ```{r}
 edges <- updist_edges(
   edges = edges,
-  lsn_path = path,
+  lsn_path = lsn.path,
   calc_length = TRUE
 )
 
@@ -460,7 +463,7 @@ site.list <- updist_sites(
   sites = list(obs = obs, pred1km = preds, CapeHorn = capehorn),
   edges = edges,
   length_col= "Length",
-  lsn_path = path
+  lsn_path = lsn.path
 )
 
 names(site.list)           ## View output site.list names
@@ -546,7 +549,7 @@ edges <- afv_edges(
   infl_col = "h2oAreaKm2", 
   segpi_col = "areaPI",
   afv_col = "afvArea",
-  lsn_path = path
+  lsn_path = lsn.path
 )
 
 names(edges)            ## Look at edges column names
@@ -581,7 +584,7 @@ site.list <- afv_sites(
   edges = edges,
   afv_col = "afvArea",
   save_local = TRUE,
-  lsn_path = path
+  lsn_path = lsn.path
 )
 
 names(site.list$pred1km)            ## View column names in pred1km
@@ -620,7 +623,7 @@ The key arguments in `ssn_assemble()` include:
 ```{r}
 mf04_ssn <- ssn_assemble(
   edges = edges,
-  lsn_path = path,
+  lsn_path = lsn.path,
   obs_sites = site.list$obs,
   preds_list = site.list[c("pred1km", "CapeHorn")],
   ssn_path = paste0(path, "/MiddleFork04.ssn"),

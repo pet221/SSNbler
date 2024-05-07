@@ -1,8 +1,10 @@
-##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%####
-## R script for SSNbler_vignette.pdf
-##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%####
+#################################################################
+## R script for SSNbler_vignette.pdf ####
+#################################################################
 
-## Install and load SSNbler----------------------------------####
+## --------------------------------------------------------------
+## Install and load SSNbler ####
+## --------------------------------------------------------------
 
 ##install.packages("remotes") ## Install remotes if needed
 library(remotes)
@@ -13,8 +15,9 @@ remotes::install_github("pet221/SSNbler", ref = "main")
 ## Load SSNbler library
 library(SSNbler)
 
-
-## Import the input data ------------------------------------####
+## --------------------------------------------------------------
+## Import and view the input data ####
+## --------------------------------------------------------------
 
 ## Copy the example dataset to a temporary directory
 copy_streams_to_temp()
@@ -33,15 +36,18 @@ MF_CapeHorn <- st_read(paste0(path, "/MF_CapeHorn.gpkg"))
 class(MF_obs)
 names(MF_obs)
 
-
 ## Plot the data using ggplot2
 library(ggplot2)
 ggplot() +
   geom_sf(data = MF_streams) +
   geom_sf(data = MF_CapeHorn, color = "gold", size = 1.7) +
   geom_sf(data = MF_pred1km, colour = "purple", size = 1.7) +
-  geom_sf(data = MF_obs, color = "blue", size = 2) 
+  geom_sf(data = MF_obs, color = "blue", size = 2)
 
+## --------------------------------------------------------------
+## Build the LSN ####
+## --------------------------------------------------------------
+## Build the LSN and take note of the messages printed to the console
 edges <- lines_to_lsn(
   streams = MF_streams,
   lsn_path = path,
@@ -50,6 +56,8 @@ edges <- lines_to_lsn(
   topo_tolerance = 20,
   overwrite = TRUE
 )
+
+list.files(path)
 
 obs <- sites_to_lsn(
   sites = MF_obs,
