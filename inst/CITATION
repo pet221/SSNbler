@@ -3,18 +3,20 @@ bibentry(
   title        = "{SSNbler}: Assemble SSN objects in {R}",
   author       = c(person(given = "Erin",
                           family = "Peterson"),
-                   person(given = "Alan",
-                          family = "Pearse"),
                    person(given = "Michael",
                           family = "Dumelle"),
-                   person(given = "Dan.",
-                          family = "Teleki")),
+                   person(given = "Alan",
+                          family = "Pearse"),
+                   person(given = "Dan",
+                          family = "Teleki"),
+                   person(given = "Jay M.",
+                          family = "Ver Hoef")),
   year         = "2024",
-  note         = "{R} package version 0.1.0",
+  note         = "{R} package version 0.0.1",
 
   header       = "To cite SSNbler in publications use:",
   textVersion  =
-  paste("Peterson EE, Pearse A, Dumelle M. and Teleki D (2024).",
+  paste("Peterson E E., Dumelle, M, Pearse A, Teleki D, and Ver Hoef, J M. (2024).",
         "SSNbler: Assemble SSN objects in R.",
         "R package version 0.1.0")
 )
