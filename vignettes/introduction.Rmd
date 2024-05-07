@@ -12,6 +12,9 @@ output:
       collapsed: no
       smooth_scroll: no
     toc_depth: 3
+header-includes:
+  \usepackage{float}
+  \floatplacement{figure}{H}
 vignette: >
   %\VignetteIndexEntry{An Introduction to SSNbler}
   %\VignetteEncoding{UTF-8}
@@ -26,7 +29,7 @@ editor_options:
 # options(replace.assign=TRUE, width=90, prompt="R> ")
 
 # rmd style
-knitr::opts_chunk$set(collapse = FALSE, comment = "#>", warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(collapse = FALSE, comment = "#>", warning = FALSE, message = FALSE, fig.pos = 'H')
 ```
 
 # Background
@@ -82,7 +85,7 @@ While these datasets come with `SSNbler` and can be loaded via `data()`,
 we focus here on a more realistic
 workflow for the user. We start with a collection of spatial datasets
 installed alongside `SSNbler` in the `streamsdata` folder that represent the Middle Fork stream network. 
-In `streamsdata` are geopackages (more on this later) for
+In `streamsdata` are GeoPackages (more on this later) for
 the stream network, observed data,
 and prediction data (optional) required to create an SSN
 object. To prevent `SSNbler`
@@ -115,22 +118,22 @@ a geographic coordinate system measured in Latitude and
 Longitude). The `sf` function `st_transform` can be used to
 reproject `sf` objects in *R*. 
 
-We previously mentioned these data are stored in `streamsdata` in a geopackage format.
-Geopackages, like shapefiles, are a way to store spatial data. We
-prefer geopackages to shapefiles for several reasons, one of which results 
+We previously mentioned these data are stored in `streamsdata` in a GeoPackage format.
+GeoPackages, like shapefiles, are a way to store spatial data. We
+prefer GeoPackages to shapefiles for several reasons, one of which results 
 from the fact that shapefiles automatically truncate numeric columns when writing 
 to local files, which can lead to
-difficult-to-diagnose errors when models are fit in `SSN2`. Geopackages do not have this limitation.
+difficult-to-diagnose errors when models are fit in `SSN2`. GeoPackages do not have this limitation.
 That being said, any
 spatial data format can be used in `SSNbler` as long as it can be
 imported into *R* and stored as an `sf` object with `LINESTRING` or `POINT`
-geometry. To learn more about geopackages, [visit here](https://www.geopackage.org/).
+geometry. To learn more about GeoPackages, [visit here](https://www.geopackage.org/).
 
 Before working with any of the input files, we visualize the stream
 network, observed sites, and prediction sites using the `ggplot2`
 **R** package [@wickham2016ggplot2].
 
-```{r mf-input, fig.cap = "The Middle Fork Stream Newtork.", fig.alt = "The Middle Fork Stream Network.", fig.align = "center", out.width = "90%"}
+```{r mf-input, fig.cap = "The Middle Fork Stream Network.", fig.alt = "The Middle Fork Stream Network.", fig.align = "center", out.width = "90%"}
 library(ggplot2)
 ggplot() +
   geom_sf(data = MF_streams) +
@@ -217,10 +220,10 @@ edges <- lines_to_lsn(
 
 The `lines_to_lsn()` function writes a minimum of five files to `lsn_path`:
 
-* `nodes.gpkg`: A geopackage with `POINT` geometry features
+* `nodes.gpkg`: A GeoPackage with `POINT` geometry features
   representing LSN nodes. It contains a unique node identifier column,
   `pointid`, and another column  named `nodecat`, which contains the node type (pseudonodes, confluences, sources, outlets).
-* `edges.gpkg`: A geopackage with `LINESTRING` geometry features
+* `edges.gpkg`: A GeoPackage with `LINESTRING` geometry features
   representing LSN edges, which contains all of the columns in
   `streams` and a unique edge (i.e., reach) identifier column named `rid`. 
 * `nodexy.csv`: A comma-separated value (csv) file with the `pointid`
@@ -240,7 +243,7 @@ between edges in the network, while preserving flow direction.
 When `check_topology = TRUE`, `lines_to_lsn()` also checks the
 topology of the network. When potential topological errors are
 identified, they are saved at the location specified by `lsn_path` 
-as a geopackage named `node_errors.gpkg` with `POINT` geometry. 
+as a GeoPackage named `node_errors.gpkg` with `POINT` geometry. 
 
 It is important to pay attention to the output messages from
 `lines_to_lsn()` that are printed to the *R* console. In this example, the
@@ -276,7 +279,7 @@ LSN. `sites_to_lsn()` generally requires these arguments:
 * `lsn_path`: A path to the directory where the LSN created via `lines_to_lsn()`
   is stored.
 * `file_name`: Output file name for the snapped sites, which are saved
-  in `lsn_path` with a geopackage format.
+  in `lsn_path` with a GeoPackage format.
   
 We run `sites_to_lsn` for the `MF_obs` (observed) data: 
 
@@ -292,7 +295,7 @@ obs <- sites_to_lsn(
 )
 ```
 
-`sites_to_lsn()` writes a geopackage named `obs.gpkg` to
+`sites_to_lsn()` writes a GeoPackage named `obs.gpkg` to
 `lsn_path` and also returns these snapped sites as an `sf` object named `obs`. The new
 dataset contains the original columns in `sites` and three new columns: 
 
@@ -367,16 +370,16 @@ functions. Prediction datasets may also be included in the LSN if desired.
 
 | **LSN Component**           | **In Memory**                    | **Local LSN Directory** |
 |:----------------------------|:---------------------------------|:------------------------|
-| edges                       | sf object, `LINESTRING` geometry | geopackage              |
-| observed sites              | sf object, `POINT` geometry      | geopackage              |
-| prediction sites (optional) | sf object, `POINT` geometry      | geopackage              |
-| nodes                       |                                  | geopackage              |
+| edges                       | sf object, `LINESTRING` geometry | GeoPackage              |
+| observed sites              | sf object, `POINT` geometry      | GeoPackage              |
+| prediction sites (optional) | sf object, `POINT` geometry      | GeoPackage              |
+| nodes                       |                                  | GeoPackage              |
 | nodexy table                |                                  | csv file                |
 | noderelationship table      |                                  | csv file                |
 | relationships table         |                                  | csv file                |
 
 Table: LSN components are stored in memory as sf objects and also in a
-local LSN directory as geopackages and comma separated value (csv) files, which are accessed using other SSNbler functions.
+local LSN directory as GeoPackages and comma separated value (csv) files, which are accessed using other SSNbler functions.
 
 Once the LSN has been created, the next steps are to calculate the
 information needed to fit spatial stream-network models. 
@@ -542,7 +545,8 @@ edges <- afv_edges(
 names(edges)            ## Look at edges column names
 summary(edges$afvArea)  ## Summarize the AFV column
 ```
-The AFVs are a product of ratios, which means that the AFVs are always betwen zero and one. The AFV for the most downstream edge in a network will always
+The AFVs are a product of ratios, which means that the AFVs are always
+betwen zero and one ($0 \leq AFV \leq 1$). The AFV for the most downstream edge in a network will always
 be one. If AFVs do not meet this requirement, then an error has
 occurred.
 
@@ -624,10 +628,10 @@ The outputs of `ssn_assemble()` are stored locally in a directory with
 a `.ssn` extension and in memory as an object of class `SSN` when `import = TRUE`.
 At a minimum, the new `.ssn` directory will contain: 
 
-1. `edges.gpkg`: edges in geopackage format
-2. `sites.gpkg`: observed sites in geopackage format (if included)
+1. `edges.gpkg`: edges in GeoPackage format
+2. `sites.gpkg`: observed sites in GeoPackage format (if included)
 3. `Prediction datasets`: (e.g., `CapeHorn.gpkg` and `pred1km.gpkg`) in
-   geopackage format (if included)
+   GeoPackage format (if included)
 4. `netIDx.dat files`: one text file for each unique subnetwork in edges
    containing information describing the topological relationships
    between edges.
@@ -750,7 +754,10 @@ ssn_mod <- ssn_lm(
 summary(ssn_mod)
 ```
 
-There is strong evidence ($p < 0.001$) that elevation is negatively related to mean summer tempearture, while there is moderate evidence ($p \approx 0.05$) that precipitation is negatively related to mean summer temperature. To learn more about fitting spatial stream-network models using the `SSN2` package, visit the package website at [https://usepa.github.io/SSN2/](https://usepa.github.io/SSN2/).
+As expected, there is strong evidence ($p < 0.001$) that elevation is negatively
+related to mean summer tempearture, while there is moderate evidence
+($p \approx 0.05$) that precipitation is negatively related to mean
+summer temperature. To learn more about fitting spatial stream-network models using the `SSN2` package, visit the package website at [https://usepa.github.io/SSN2/](https://usepa.github.io/SSN2/).
 
 
 <!--# From STARS and openSTARS to SSNbler (ADD Later)
