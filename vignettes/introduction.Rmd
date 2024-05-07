@@ -12,6 +12,9 @@ output:
       collapsed: no
       smooth_scroll: no
     toc_depth: 3
+header-includes:
+  \usepackage{float}
+  \floatplacement{figure}{H}
 vignette: >
   %\VignetteIndexEntry{An Introduction to SSNbler}
   %\VignetteEncoding{UTF-8}
@@ -24,6 +27,7 @@ editor_options:
 # # jss style
 # knitr::opts_chunk$set(prompt=TRUE, echo = TRUE, highlight = FALSE, continue = " + ", comment = "")
 # options(replace.assign=TRUE, width=90, prompt="R> ")
+
 
 # rmd style
 knitr::opts_chunk$set(
