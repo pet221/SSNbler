@@ -12,9 +12,6 @@ output:
       collapsed: no
       smooth_scroll: no
     toc_depth: 3
-header-includes:
-  \usepackage{float}
-  \floatplacement{figure}{H}
 vignette: >
   %\VignetteIndexEntry{An Introduction to SSNbler}
   %\VignetteEncoding{UTF-8}
