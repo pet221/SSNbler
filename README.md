@@ -1,5 +1,6 @@
 <!-- badges: start -->
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![R-CMD-check](https://github.com/pet221/SSNbler/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/pet221/SSNbler/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 # SSNbler: Assemble SSN objects in R
