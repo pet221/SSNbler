@@ -5,7 +5,9 @@
 
 # SSNbler: Assemble SSN objects in R
 
-SSNbler imports, creates and assembles data needed to fit spatial-statistical stream-network models using the [SSN2 R package]((https://usepa.github.io/SSN2/)). Streams, observations, and prediction locations are represented as simple features and specific tools have been provided to define topological relationships between features; calculate the hydrologic distances (with flow-direction preserved) and the spatial additive function used to weight converging stream segments; and export the topological, spatial, and attribute information to an SSN object, which can be efficiently stored, accessed and analysed in R.  
+`SSNbler` imports, creates and assembles data needed to fit spatial-statistical stream-network models using the [SSN2 R package]((https://usepa.github.io/SSN2/)). Streams, observations, and prediction locations are represented as simple features and specific tools have been provided to define topological relationships between features; calculate the hydrologic distances (with flow-direction preserved) and the spatial additive function used to weight converging stream segments; and export the topological, spatial, and attribute information to an SSN object, which can be efficiently stored, accessed and analysed in R.  
+
+Learn more about `SSNbler` on [our website](https://pet221.github.io/SSNbler/).
 
 ## Citation
 
@@ -18,16 +20,16 @@ citation(package = "SSNbler")
 #> 
 #> To cite SSNbler in publications use:
 #> 
-#>   Peterson EE, Pearse A, Dumelle M. and Teleki D (2024). SSNbler:
-#>   Assemble SSN objects in R. R package version 0.1.0
+#>   Peterson E. E., Dumelle, M., Pearse A., Teleki D., and Ver Hoef, J. M.
+#>   (2024). SSNbler: Assemble SSN objects in R. R package version 0.0.1
 #> 
 #> A BibTeX entry for LaTeX users is
 #> 
 #>   @Manual{,
 #>     title = {{SSNbler}: Assemble SSN objects in {R}},
-#>     author = {Erin Peterson and Alan Pearse and Michael Dumelle and Dan. Teleki},
+#>     author = {Erin Peterson and Michael Dumelle and Alan Pearse and Dan Teleki and Jay M. {Ver Hoef}},
 #>     year = {2024},
-#>     note = {{R} package version 0.1.0},
+#>     note = {{R} package version 0.0.1},
 #>   }
 ```
 
@@ -60,7 +62,7 @@ More to come.
 
 ## Example Usage
 
-Please see the introductory vignette for a brief example showing how to use `SSNbler`. 
+Please see our [introductory vignette](https://pet221.github.io/SSNbler/articles/introduction.html) for a brief example showing how to use `SSNbler`. 
 
 ## License
 

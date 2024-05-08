@@ -54,6 +54,9 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="news/index.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
@@ -79,7 +82,8 @@
 <div class="section level1">
 <div class="page-header"><h1 id="ssnbler-assemble-ssn-objects-in-r">SSNbler: Assemble SSN objects in R<a class="anchor" aria-label="anchor" href="#ssnbler-assemble-ssn-objects-in-r"></a>
 </h1></div>
-<p>SSNbler imports, creates and assembles data needed to fit spatial-statistical stream-network models using the <a href="(https://usepa.github.io/SSN2/)" class="external-link">SSN2 R package</a>. Streams, observations, and prediction locations are represented as simple features and specific tools have been provided to define topological relationships between features; calculate the hydrologic distances (with flow-direction preserved) and the spatial additive function used to weight converging stream segments; and export the topological, spatial, and attribute information to an SSN object, which can be efficiently stored, accessed and analysed in R.</p>
+<p><code>SSNbler</code> imports, creates and assembles data needed to fit spatial-statistical stream-network models using the <a href="(https://usepa.github.io/SSN2/)" class="external-link">SSN2 R package</a>. Streams, observations, and prediction locations are represented as simple features and specific tools have been provided to define topological relationships between features; calculate the hydrologic distances (with flow-direction preserved) and the spatial additive function used to weight converging stream segments; and export the topological, spatial, and attribute information to an SSN object, which can be efficiently stored, accessed and analysed in R.</p>
+<p>Learn more about <code>SSNbler</code> on <a href="https://pet221.github.io/SSNbler/" class="external-link">our website</a>.</p>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
@@ -89,16 +93,16 @@
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; To cite SSNbler in publications use:</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Peterson EE, Pearse A, Dumelle M. and Teleki D (2024). SSNbler:</span></span>
-<span><span class="co">#&gt;   Assemble SSN objects in R. R package version 0.1.0</span></span>
+<span><span class="co">#&gt;   Peterson E. E., Dumelle, M., Pearse A., Teleki D., and Ver Hoef, J. M.</span></span>
+<span><span class="co">#&gt;   (2024). SSNbler: Assemble SSN objects in R. R package version 0.0.1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; A BibTeX entry for LaTeX users is</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   @Manual{,</span></span>
 <span><span class="co">#&gt;     title = {{SSNbler}: Assemble SSN objects in {R}},</span></span>
-<span><span class="co">#&gt;     author = {Erin Peterson and Alan Pearse and Michael Dumelle and Dan. Teleki},</span></span>
+<span><span class="co">#&gt;     author = {Erin Peterson and Michael Dumelle and Alan Pearse and Dan Teleki and Jay M. {Ver Hoef}},</span></span>
 <span><span class="co">#&gt;     year = {2024},</span></span>
-<span><span class="co">#&gt;     note = {{R} package version 0.1.0},</span></span>
+<span><span class="co">#&gt;     note = {{R} package version 0.0.1},</span></span>
 <span><span class="co">#&gt;   }</span></span></code></pre>
 </div>
 <div class="section level2">
@@ -133,7 +137,7 @@
 <div class="section level2">
 <h2 id="example-usage">Example Usage<a class="anchor" aria-label="anchor" href="#example-usage"></a>
 </h2>
-<p>Please see the introductory vignette for a brief example showing how to use <code>SSNbler</code>.</p>
+<p>Please see our <a href="https://pet221.github.io/SSNbler/articles/introduction.html" class="external-link">introductory vignette</a> for a brief example showing how to use <code>SSNbler</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
@@ -180,7 +184,6 @@
 <li>Erin Peterson <br><small class="roles"> Author, maintainer </small>  </li>
 <li>Michael Dumelle <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-3393-5529" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Alan Pearse <br><small class="roles"> Author </small>  </li>
-<li>Jay M. Ver Hoef <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-4302-6895" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
@@ -199,7 +202,7 @@
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by Erin Peterson, Michael Dumelle, Alan Pearse, Jay M. Ver Hoef.</p>
+<p>Developed by Erin Peterson, Michael Dumelle, Alan Pearse.</p>
 </div>
 
 <div class="pkgdown">
