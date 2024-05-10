@@ -417,15 +417,15 @@ lines_to_lsn <- function(streams, lsn_path,
     if(overwrite == FALSE & file.exists(paste0(lsn_path, "/node_errors.gpkg"))) {
       stop(paste0(lsn_path, "/node_errors.gpkg"), " exists and overwrite == FALSE")
     } else {
-      if(nrow(errors) == 0) {
-        message("No obvious topological errors detected and node_errors.gpkg was NOT created.")
-      }
+      ## if(nrow(errors) == 0) {
+      ##   message("No obvious topological errors detected and node_errors.gpkg was NOT created.")
+      ## }
 
       if(nrow(errors) > 0) {
         if(verbose == TRUE) message(paste0("Saving ", lsn_path, "/node_errors.gpkg"), "\n")
         st_write(errors, paste0(lsn_path, "/node_errors.gpkg"), layer = "node_errors",
                  quiet = TRUE,
-                 delete_dsn = TRUE) 
+                 delete_dsn = TRUE)
       }
     }
   }
@@ -436,6 +436,8 @@ lines_to_lsn <- function(streams, lsn_path,
   if(overwrite == FALSE & file.exists(paste0(lsn_path, "/nodes.gpkg"))) {
     stop(paste0(lsn_path, "/nodes.gpkg"), " exists and overwrite == FALSE")
   } else {
+    n.outlets <- sum(nodexy_sf$nodecat == "Outlet")
+    
     st_write(nodexy_sf, paste0(lsn_path, "/nodes.gpkg"), layer = "nodes",
              quiet = TRUE,
              delete_dsn = TRUE)
@@ -513,9 +515,21 @@ lines_to_lsn <- function(streams, lsn_path,
   
   ## Final message
   if(verbose == TRUE) {
-    message(
-      paste0("FINISHED successfully. Don't forget to manually check for and correct errors in ",
-             lsn_path, "/edges.gpkg before continuing."), "\n")
+    if(nrow(errors) == 0) {
+      message(paste0("\n0 topology errors identified. node_errors.gpkg not written to file.\n\n",
+                     n.outlets,
+                     " Outlets found. Visually check nodecat == Outlet locations in ",
+                     lsn_path, "/nodes.gpkg if found.\n"))
+      } else {
+        message(paste0("\n", nrow(errors),
+                       " topology errors identified. Check ",
+                       lsn_path,
+                       "/node_errors.gpkg and correct errors in edges.gpkg before re-running lines_to_lsn().\n\n",
+                       n.outlets,
+                       " Outlets found. Visually check nodecat == Outlet locations in ",
+                       lsn_path,
+                       "/nodes.gpkg and correct errors if found.\n"))
+      }
   }
 
   return(in_edges)
