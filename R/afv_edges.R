@@ -37,9 +37,9 @@ afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
     stop("Input edges must have LINESTRING geometry") }
 
   ## Make sure geometry column is named geometry rather than geom
-  if(!"geometry" %in% colnames(edges)) {
-    sf::st_geometry(edges) <- "geometry"
-  }
+  ## if(!"geometry" %in% colnames(edges)) {
+  ##   sf::st_geometry(edges) <- "geometry"
+  ## }
 
   ## Check lsn_path exists
   if (!file.exists(lsn_path)){

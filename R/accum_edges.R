@@ -52,9 +52,9 @@ accum_edges <- function(edges, lsn_path, sum_col, acc_col,
     stop("Input edges must have LINESTRING geometry") }
 
   ## Make sure geometry column is named geometry rather than geom
-  if(!"geometry" %in% colnames(edges)) {
-    edges <- st_geometry(edges, rename = "geometry")
-  }
+  ## if(!"geometry" %in% colnames(edges)) {
+  ##   edges <- st_geometry(edges, rename = "geometry")
+  ## }
   
   ## Check lsn_path exists
   if (!file.exists(lsn_path)){

@@ -86,10 +86,7 @@ sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
   if(f.ext.shp == FALSE & f.ext.gpkg == FALSE) {
     file_name <- paste0(file_name, ".gpkg")
   }
-  
-    
 
-  
   ## store "new" lsn path that combines lsn path with lsn extension
   ## old lsn path had both together
   lsn_path <- paste0(lsn_path, "/", file_name)
@@ -112,14 +109,6 @@ sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
   site_geom<- st_as_text(st_geometry(sites)[[1]])
   edge_geom<- st_as_text(st_geometry(edges)[[1]])
   
-  ## Make sure geometry column is named geometry rather than geom
-  if(!"geometry" %in% colnames(sites)) {
-    sf::st_geometry(sites) <- "geometry"
-  }
-  if(!"geometry" %in% colnames(edges)) {
-    sf::st_geometry(edges) <- "geometry"
-  }
-  
   ## Check geometry type
   if(grepl("POINT", site_geom) == FALSE) {
     stop("Input sites must have POINT geometry") }
@@ -137,8 +126,7 @@ sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
   
   if(snap_tolerance == 0) {
     warning("Using a snap_tolerance = 0 may result in a large number of sites that are not snapped. Check the output carefully.")
-  }
-  
+  }  
   
   ## Get number of input sites
   site_no <- nrow(sites)
@@ -156,7 +144,9 @@ sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
   
   ## Try to extract coordinates and use geometry to project points to
   ## lines and extract relative lengths
-  near_edge_coords <- st_coordinates(edges$geometry[near_edge])
+  g.col <- attributes(edges)$sf_col
+  near_edge_coords<- st_coordinates(edges[near_edge,g.col]) 
+  ##old_edge_coords<- st_coordinates(edges$geom[near_edge])
   IDs <- near_edge_coords[,3]
   
   ## Same for the sites
@@ -164,28 +154,14 @@ sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
   
   ## Get index of near_edge elements
   index <- 1:length(near_edge)
-  
-  ## Get coordinates for nearest features
-  # tidy
-  # coords <- edges %>% 
-  #   dplyr::pull(geometry) %>% 
-  #   .[near_edge] %>% 
-  #   st_coordinates() %>% 
-  #   as.data.frame
-  # untidy
-  coords <- as.data.frame(st_coordinates(edges$geometry[near_edge]))
+
+  coords<- as.data.frame(st_coordinates(edges[near_edge,g.col]))
+  ##old_coords <- as.data.frame(st_coordinates(edges$geom[near_edge]))
   
   ## Get list of sfc for each edge segment associated with a site
-  # tidy
-  # segments_list <- coords %>% 
-  #   split(.$L1) %>%
-  #   map(get_segments_vectorized) 
-  # untidy
   segments_list <- lapply(split(coords, coords$L1), get_segments_vectorized)
   
   # tidy
-  # segments_sfc_list <- segments_list %>% map(st_sfc)
-  # untidy
   segments_sfc_list <- lapply(segments_list, st_sfc)
   
   ## Assign CRS to new sfc
@@ -193,10 +169,6 @@ sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
   
   ## Find nearest subsegment on closest edge and return a vector of
   ## sub-segment identifiers
-  # tidy
-  # subseg_list <- 1:nrow(sites) %>%
-  #   map(find_nearest_vectorized, sites = sites, edges = segments_sfc_list)
-  # untidy
   subseg_list <- lapply(1:nrow(sites), find_nearest_vectorized, sites = sites, edges = segments_sfc_list)
   
   # tidy
@@ -205,54 +177,39 @@ sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
   subseg_nearest <- unlist(subseg_list)
   
   ## Do the snapping----
-  
   ## Get closest line sub-segment to each site
   ## returns a list of length nrow(sites).
   ## Each list element is a list of length 1 containing the
   ## sfg for the closest sub-segment 
   if(verbose == TRUE) message("Snapping points to edges\n")
-  # tidy
-  # the_nearest <- index %>%
-  #   map(extract_nearest, subsegs = segments_sfc_list, nearest = subseg_nearest)
-  # untidy
-  the_nearest <- lapply(index, extract_nearest, subsegs = segments_sfc_list, nearest = subseg_nearest)
+  the_nearest <- lapply(index, extract_nearest, subsegs = segments_sfc_list,
+                        nearest = subseg_nearest)
   
   ## v_snapping finds the nearest point on subsegment to original site
   ## locations. Returns a list of length
   ## nrow(sites). Each element contains an sfc LINESTRING object with
   ## 1 sfg LINESTRING containing endnode coordinates for the old site location
   ## and the new site location.
-  # tidy
-  # the_result <- index %>%
-  #   map(v_snapping, sites = sites, nearest_subsegs = the_nearest)
-  # untidy
+  
   the_result <- lapply(index, v_snapping, sites = sites, nearest_subsegs = the_nearest)
   
   ## Get the vector of snap distance by calculating the length of the
   ## line
-  # tidy
-  # snapping_distances <- the_result %>%
-  #   map(st_length) %>%
-  #   unlist %>%
-  #   as.numeric
-  # untidy
   snapping_distances <- as.numeric(unlist(lapply(the_result, st_length)))
   
   ## Returns a list of length nrow(sites), where each element is an
   ## sfc POINT feature geometry for the new site location
-  # tidy
-  # the_result2 <- the_result %>%
-  #   map(v_snapextract)
-  # untidy
   the_result2 <- lapply(the_result, v_snapextract)
   
   ## Convert to an sfc POINT geometry set with nrow(sites) 
   snapped_sf <- do.call(c, the_result2)
-  
+
   ## Overwrite geometry column if lengths < snap_tolerance
   ## this means the point *has been snapped*
   meets_condition <- as.numeric(snapping_distances) <= snap_tolerance
-  sites$geometry[meets_condition] <- snapped_sf[meets_condition]
+  sg.col <- attributes(sites)$sf_column
+  sites[meets_condition, sg.col] <- as.data.frame(snapped_sf[meets_condition])
+  ##sites$geometry[meets_condition] <- snapped_sf[meets_condition]
   
   ## Get matrix of snapped sites as coords
   snapped_sites_as_coords <- st_coordinates(snapped_sf)
@@ -273,38 +230,21 @@ sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
   ## downstream subsegment?  Returns a list of length nrow(sites), with
   ## each element containing a vector of cumulative lengths upstream
   ## for the associated edge
-  # tidy
-  # length_at_start_of_segment <- map(segments_list, v_length) %>%
-  #   map(v_cumsum)
-  # untidy
   length_at_start_of_segment <- lapply(lapply(segments_list, v_length), v_cumsum)
   
   ## Get list containing total length of the associated line segments
-  # tidy
-  # max_length <- map(length_at_start_of_segment, max)
-  # untidy
   max_length <- lapply(length_at_start_of_segment, max)
   
   ## Return list of matrices containing the coordinates for the
   ## endnodes for the nearest subsegment associated with each site
-  # tidy
-  # near_edge_coords <- the_nearest %>%
-  #   map(st_coordinates)
-  # untidy
   near_edge_coords <- lapply(the_nearest, st_coordinates)
   
   #######################################################################
   ## Calculate the distance along the line segment from most
   ## upstream node to the snapped site location. Returns a numeric
   ## vector of length nrow(sites)
-  # tidy
-  # site_along_length <- 1:nrow(sites) %>% 
-  #   map(get_updist, sites = snapped_sites_as_coords,
-  #       sub_idx = subseg_list, sub_near = near_edge_coords,
-  #       lengths = length_at_start_of_segment) %>%
-  #   unlist
-  # untidy
-  site_along_length <- unlist(lapply(1:nrow(sites), get_updist, sites = snapped_sites_as_coords,
+  site_along_length <- unlist(lapply(1:nrow(sites), get_updist,
+                                     sites = snapped_sites_as_coords,
                                      sub_idx = subseg_list, sub_near = near_edge_coords,
                                      lengths = length_at_start_of_segment))
   
@@ -315,19 +255,11 @@ sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
   #######################################################################
   
   ## Add columns to sites
-  # tidy
-  # sites <- sites %>% 
-  #   mutate(rid = site_rid, ratio = ratios, snapdist = snap_dists)
-  # untidy
   sites$rid <- site_rid
   sites$ratio <- ratios
   sites$snapdist <- snap_dists
   
   ## Remove sites that were not snapped
-  # tidy
-  # sites <- sites %>%
-  #   dplyr::filter(!is.na(rid) & !is.na(snapdist))
-  # untidy
   sites <- sites[!is.na(sites$rid) & !is.na(sites$snapdist), , drop = FALSE]
   
   

@@ -120,11 +120,11 @@ lines_to_lsn <- function(streams, lsn_path,
       }
   }
   
-  ## Make sure geometry column is named geometry rather than geom
-  if(!"geometry" %in% colnames(in_edges)) {
-    ##in_edges <- st_geometry(in_edges, rename = "geometry")
-    sf::st_geometry(in_edges)<- "geometry"
-  }
+  ## ## Make sure geometry column is named geometry rather than geom
+  ## if(!"geometry" %in% colnames(in_edges)) {
+  ##   ##in_edges <- st_geometry(in_edges, rename = "geometry")
+  ##   sf::st_geometry(in_edges)<- "geometry"
+  ## }
 
   if(grepl("M", edge_geom) == TRUE & remove_ZM == FALSE) {
     stop("XYM or XYZM geometries are not supported. Set remove_ZM = TRUE to drop Z and/or M dimensions from feature geometries.")
@@ -371,7 +371,9 @@ lines_to_lsn <- function(streams, lsn_path,
 
     ill_int <- points_only[illegal_intersections, ]
     if(nrow(ill_int) > 0) {
-      ill_int<- ill_int[!duplicated(ill_int$geometry),]
+      g.col<- attributes(ill_int)$sf_column
+      ill_int<- ill_int[!duplicated(ill_int[,g.col]),]
+      ##ill_int<- ill_int[!duplicated(ill_int$geometry),]
       ill_int$pointid <- NA
       ill_int$nodecat <- "Confluence"
       ill_int$error = "Intersection Without Node"

@@ -15,10 +15,10 @@ get_segment_pi <- function(edges, lsn_path, infl_col, segpi_col,
     stop(paste0("Missing values are not permitted in ", infl_col))
   }
 
-  ## Make sure geometry column is named geometry rather than geom
-  if(!"geometry" %in% colnames(edges)) {
-    edges <- st_geometry(edges, rename = "geometry")
-  }
+  ## ## Make sure geometry column is named geometry rather than geom
+  ## if(!"geometry" %in% colnames(edges)) {
+  ##   edges <- st_geometry(edges, rename = "geometry")
+  ## }
 
   ## Add the proportional influence field in the edges attribute table
   edges[segpi_col] <- NA

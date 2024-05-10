@@ -77,11 +77,6 @@ ssn_assemble<- function(edges, lsn_path = NULL, obs_sites = NULL,
   edge_geom<- st_as_text(st_geometry(edges)[[1]])
   if(grepl("LINESTRING", edge_geom) == FALSE) {
     stop("Input edges must have LINESTRING geometry") }
-
-  ## Make sure geometry column is named geometry rather than geom
-  if(!"geometry" %in% colnames(edges)) {
-    sf::st_geometry(edges) <- "geometry"
-  }
  
   ## Can we overwrite edges.gpkg if necessary
   if(overwrite == FALSE & file.exists(paste0(ssn_path, "/edges.gpkg"))) {
@@ -132,10 +127,6 @@ ssn_assemble<- function(edges, lsn_path = NULL, obs_sites = NULL,
     if(sum(colnames(obs_sites) %in% c("pid", "locID", "netID")) > 0 & overwrite == FALSE) {
       stop(paste0("Columns pid, locID, and/or netID exist in obs_sites and overwrite = FALSE"))}
 
-    ## Make sure geometry column is named geometry rather than geom
-    if(!"geometry" %in% colnames(obs_sites)) {
-      sf::st_geometry(obs_sites) <- "geometry"
-    }
   } 
   #################################################
   ## Check each set of preds in predlist
@@ -160,11 +151,6 @@ ssn_assemble<- function(edges, lsn_path = NULL, obs_sites = NULL,
       if(sum(colnames(preds_list[[p]]) %in% c("pid", "locID", "netID")) > 0 & overwrite == FALSE) {
         stop(paste0("Columns pid, locID, and/or netID exist in ", names(preds_list)[p],
                     " and overwrite = FALSE"))}
-
-      ## Make sure geometry column is named geometry rather than geom
-      if(!"geometry" %in% colnames(preds_list[[p]])) {
-        sf::st_geometry(preds_list[[p]])<- "geometry"
-      }
     }
   }
   

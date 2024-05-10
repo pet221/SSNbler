@@ -69,7 +69,6 @@ updist_sites <- function(sites, edges, length_col, lsn_path, save_local = TRUE,
   ind<- colnames(edges) == "upDist"
   colnames(edges)[ind]<-"uDist"
   edges<- st_drop_geometry(edges)
-
   
   ## Loop over the sites list
   out_sites <- list()
@@ -79,11 +78,6 @@ updist_sites <- function(sites, edges, length_col, lsn_path, save_local = TRUE,
     ## Get output site name and sf object
     sites_i_name <- names(sites)[i]
     sites_i_sf <- sites[[i]]
-
-    ## Make sure geometry column is named geometry
-    if(!"geometry" %in% colnames(sites_i_sf)) {
-      st_geometry(sites_i_sf) <- "geometry"
-    }
       
     ## Check if upDist column already exists and overwrite is FALSE
     ## If so, skip this iteration in the loop

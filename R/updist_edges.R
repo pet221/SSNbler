@@ -29,11 +29,6 @@ updist_edges <- function(edges, lsn_path, calc_length = FALSE, length_col = NULL
   ## Check geometry type
   if(grepl("LINESTRING", edge_geom) == FALSE) {
     stop("Input edges must have LINESTRING geometry") }
-
-  ## Make sure geometry column is named geometry
-  if(!"geometry" %in% colnames(edges)) {
-   sf::st_geometry(edges)<- "geometry"
-  }
   
   ## Check lsn_path exists
   if (!file.exists(lsn_path)){

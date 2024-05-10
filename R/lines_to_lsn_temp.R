@@ -356,7 +356,9 @@ lines_to_lsn_temp <- function(streams, lsn_path,
     
     ill_int <- points_only[illegal_intersections, ]
     if(nrow(ill_int) > 0) {
-      ill_int<- ill_int[!duplicated(ill_int$geometry),]
+      g.col<- attributes(ill_int)$sf_column
+      ill_int<- ill_int[!duplicated(ill_int[,g.col]),]
+      ##ill_int<- ill_int[!duplicated(ill_int$geometry),]
       ill_int$pointid <- NA
       ill_int$nodecat <- "Confluence"
       ill_int$error = "Intersection Without Node"
