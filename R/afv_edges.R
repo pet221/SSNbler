@@ -36,11 +36,6 @@ afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
   if(grepl("LINESTRING", edge_geom) == FALSE) {
     stop("Input edges must have LINESTRING geometry") }
 
-  ## Make sure geometry column is named geometry rather than geom
-  ## if(!"geometry" %in% colnames(edges)) {
-  ##   sf::st_geometry(edges) <- "geometry"
-  ## }
-
   ## Check lsn_path exists
   if (!file.exists(lsn_path)){
     stop("\n lsn_path does not exist.\n\n")
@@ -88,7 +83,6 @@ afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
   vertex_names <- vertex_attr(rel_as_graph, 'name')
   
   ## Get lists of sub-graphs for each outlet and sub graph rids
-  # sub_graphs <- decompose.graph(rel_as_graph)
   sub_graphs <- decompose(rel_as_graph)
   sub_graph_rids <- lapply(sub_graphs, function(x) as.numeric(vertex_attr(x, 'name')))
   

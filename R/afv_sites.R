@@ -106,14 +106,6 @@ afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
 
     sites[[i]]<- sites_i
   }
-
-  ## ## Add names to sites list
-  ## if(length(sites) > 1) names(sites) <- names(sites)
-  ## ## If only one set of sites was passed in, convert list to a single
-  ## ## sf object
-  ## if(length(sites) == 1) sites <- sites[[1]]
   
-
-  return(sites)
-  
+  return(sites) 
 }
