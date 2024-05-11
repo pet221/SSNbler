@@ -50,11 +50,13 @@ afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
     stop("Cannot save edges to local file because edges.gpkg already exists in lsn_path and overwrite = FALSE")
   }
   ## Does segpi_col already exist in edges when overwrite = FALSE
+  check_names_case_add(names(edges), segpi_col, "edges", "segpi_col")
   if(overwrite == FALSE & sum(colnames(edges) == segpi_col) > 0) {
     stop(paste0(segpi_col, " already exists in edges and overwrite = FALSE"))
   }
 
   ## Does afv_col already exist in edges when overwrite = FALSE
+  check_names_case_add(names(edges), afv_col, "edges", "afv_col")
   if(!overwrite & afv_col %in% names(edges)) {
     stop(paste0(afv_col, " already exists in edges and overwrite is FALSE."))
   }

@@ -74,10 +74,12 @@ updist_sites <- function(sites, edges, length_col, lsn_path, save_local = TRUE,
   out_sites <- list()
   n_sites <- length(sites)
   for(i in 1:n_sites){
-
+    
     ## Get output site name and sf object
     sites_i_name <- names(sites)[i]
     sites_i_sf <- sites[[i]]
+
+    check_names_case(names(sites_i_sf), "upDist", sites_i_name)
       
     ## Check if upDist column already exists and overwrite is FALSE
     ## If so, skip this iteration in the loop

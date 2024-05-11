@@ -82,6 +82,8 @@ afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
   for(i in 1:n_sites){
 
     sites_i <- sites[[i]]
+    
+    check_names_case_add(names(sites_i), afv_col, names(sites)[i], "afv_col")
 
     if(afv_col %in% names(sites_i)){
       if(overwrite == FALSE) {

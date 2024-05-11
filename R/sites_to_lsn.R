@@ -71,6 +71,10 @@ sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
   
   
   ## Check some inputs --------------------------------------------
+  check_names_case(names(sites), "rid", "sites")
+  check_names_case(names(sites), "ratio", "sites")
+  check_names_case(names(sites), "snapdist", "sites")
+  
   if(save_local == TRUE & is.null(lsn_path)) {
     stop(paste("lsn_path argument must be defined if save_local = TRUE"))
   }

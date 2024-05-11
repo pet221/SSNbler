@@ -151,6 +151,7 @@ lines_to_lsn <- function(streams, lsn_path,
   if (inherits(in_edges, "sfc")) n_edges = length(in_edges)
   
   ## Add the field 'rid' (meaning reach identifier) and use it in all scripts as the rid / edgeid
+  check_names_case(names(in_edges), "rid", "streams")
   in_edges$rid <- seq.int(from=1, to=n_edges) ## add and populate 1-based index rid column to edges
 
   ## Write edges to geopackage
