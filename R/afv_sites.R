@@ -98,12 +98,26 @@ afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
 
     sites_i<- merge(sites_i, edges_df, by = "rid", sort = FALSE)
 
+    ind.neg<- st_drop_geometry(sites_i[,afv_col]) <0
+    if(sum(ind.neg) > 0) {
+      stop("negative values produced for afv_col. Go back to edgs_afv() and check infl_col, segpi_col, and afv_col")
+    }
+
     ## Write to local file
     if(save_local) {
       st_write(sites_i, dsn = paste0(lsn_path, "/", names(sites)[i], ".gpkg"),
                                      delete_dsn = TRUE, quiet = TRUE)
     }
-
+   
+    ind.zeros <- st_drop_geometry(sites_i[,afv_col]) == 0
+    sum.zeros<-sum(ind.zeros)
+    
+    if(sum.zeros > 0) {
+      warning(paste0(sum.zeros, "/", nrow(sites_i), " AFV values equal to zero in ",
+                     names(sites)[i],
+                     ". Sites with AFV==0 will have no influence in the tail-up model.\n"))
+    }
+    
     sites[[i]]<- sites_i
   }
   

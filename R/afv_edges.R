@@ -44,23 +44,36 @@ afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
   if(!overwrite & save_local & file.exists(paste0(lsn_path, "/edges.gpkg"))) {
     stop("Cannot save edges to local file because edges.gpkg already exists in lsn_path and overwrite = FALSE")
   }
-  ## Does segpi_col already exist in edges when overwrite = FALSE
+  ## Does segpi_col already exist in edges
   check_names_case_add(names(edges), segpi_col, "edges", "segpi_col")
-  if(overwrite == FALSE & sum(colnames(edges) == segpi_col) > 0) {
-    stop(paste0(segpi_col, " already exists in edges and overwrite = FALSE"))
-  }
+  ## if(overwrite == FALSE & sum(colnames(edges) == segpi_col) > 0) {
+  ##   stop(paste0(segpi_col, " already exists in edges and overwrite = FALSE"))
+  ## }
 
   ## Does afv_col already exist in edges when overwrite = FALSE
   check_names_case_add(names(edges), afv_col, "edges", "afv_col")
-  if(!overwrite & afv_col %in% names(edges)) {
-    stop(paste0(afv_col, " already exists in edges and overwrite is FALSE."))
-  }
+  ## if(!overwrite & afv_col %in% names(edges)) {
+  ##   stop(paste0(afv_col, " already exists in edges and overwrite is FALSE."))
+  ## }
 
-  ## Remove afv_col if it already exists & overwrite = TRUE
-  if(overwrite & afv_col %in% colnames(edges)) {
-    ind <- colnames(edges) == afv_col
-    edges<- edges[,!ind]
+  ## ## Remove afv_col if it already exists & overwrite = TRUE
+  ## if(overwrite & afv_col %in% colnames(edges)) {
+  ##   ind <- colnames(edges) == afv_col
+  ##   edges<- edges[,!ind]
+  ## }
+
+  ## Check infl_col column
+  if(!infl_col %in% colnames(edges)) {
+    stop(paste0(infl_col, " not found in edges"))
   }
+  
+  ind<- st_drop_geometry(edges[, infl_col]) < 0  
+  if(sum(ind) > 0) {
+    stop(paste0(infl_col, " contains negative values, which is not allowed"))
+  }
+  ind <- st_drop_geometry(edges[,infl_col]) == 0
+  sum.zeros <- sum(ind)
+   
 
   ## calculate segment proportional infuence column
   edges<- get_segment_pi(edges = edges, lsn_path = lsn_path,
@@ -154,6 +167,15 @@ afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
              dsn = paste0(lsn_path, "/edges.gpkg"),
              delete_dsn = TRUE,
              quiet = TRUE)
+  }
+
+  ## Print warning
+
+  sum.afv.0 <- sum(st_drop_geometry(results_sf[,afv_col]) == 0)
+  if(sum.afv.0 > 0) {
+    warning(paste0("\n", infl_col, " contains ", sum.zeros, " zeros and ", afv_col,
+                   " contains ", sum.afv.0,
+                   " zeros. If a large number of SITES (not edges) have AFV==0, it will impact the tail-up autocovariance function."))
   }
   
    return(results_sf)
