@@ -95,8 +95,15 @@ where relationships.csv resides, which is created using <code>link[SSNbler]{line
 
 
 <dt>length_col</dt>
-<dd><p>Optional. The name of the column in the <code>edges</code>
-attribute table that contains the length of the edge segment. Required when <code>calc_length = FALSE</code>.</p></dd>
+<dd><p>Optional. If <code>calc_length = FALSE</code>, <code>length_col</code>
+is the name of the column in the <code>edges</code>
+attribute table that contains the length of the edge segment. When
+<code>calc_length = FALSE</code>, <code>length_col</code> is required.
+If <code>calc_length = TRUE</code>, <code>length_col</code> is the name of
+the new column created in <code>edges</code>
+that will store the new length values for
+each feature, in character format.  When <code>calc_length = TRUE</code>,
+the default for <code>length_col</code> is <code>"Length"</code>.</p></dd>
 
 
 <dt>save_local</dt>

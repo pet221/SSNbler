@@ -23,8 +23,15 @@ where relationships.csv resides, which is created using \code{link[SSNbler]{line
 
 \item{calc_length}{A logical indicating whether a column representing line length should be calculated and added to \code{edges}. Default = \code{FALSE}.}
 
-\item{length_col}{Optional. The name of the column in the \code{edges}
-attribute table that contains the length of the edge segment. Required when \code{calc_length = FALSE}.}
+\item{length_col}{Optional. If \code{calc_length = FALSE}, \code{length_col}
+is the name of the column in the \code{edges}
+attribute table that contains the length of the edge segment. When
+\code{calc_length = FALSE}, \code{length_col} is required.
+If \code{calc_length = TRUE}, \code{length_col} is the name of
+the new column created in \code{edges}
+that will store the new length values for
+each feature, in character format.  When \code{calc_length = TRUE},
+the default for \code{length_col} is \code{"Length"}.}
 
 \item{save_local}{Logical indicating whether the updated \code{edges} should be
 saved to \code{lsn_path} in geopackage format. Defaults to
