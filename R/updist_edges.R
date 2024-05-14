@@ -45,16 +45,18 @@ updist_edges <- function(edges, lsn_path, calc_length = FALSE, length_col = NULL
   if(overwrite == FALSE & save_local == TRUE & file.exists(paste0(lsn_path, "/edges.gpkg"))) {
     stop("edges.gpkg already exists in lsn_path and overwrite = FALSE")
   }
+
   ## Can we overwrite upDist column if necessary
+  if(sum(colnames(edges) == "upDist") > 0) {
+     if(overwrite == FALSE) {
+       stop("upDist already exists in edges and overwrite = FALSE")
+     } else { ## Remove upDist
+       edges$upDist<- NULL
+     }
+  }
+  ## Check for duplicate names
   check_names_case(names(edges), "upDist", "edges")
-  # if(sum(colnames(edges) == "upDist") > 0) {
-  #   if(overwrite == FALSE) {
-  #     stop("upDist already exists in edges and overwrite = FALSE")
-  #   } else { ## Remove upDist
-  #     ind <- colnames(edges) == "upDist"
-  #     edges<- edges[,!ind]
-  #   }
-  # }
+  
   
   ## Does length_col contain NAs
   if (calc_length == FALSE) {
@@ -75,17 +77,26 @@ updist_edges <- function(edges, lsn_path, calc_length = FALSE, length_col = NULL
   }
 
   relate_table <- paste0(lsn_path, "/relationships.csv")
-  
-  
+    
   ## Add length column if necessary
   if(calc_length == TRUE){
     if (is.null(length_col)) {
       length_col <- "Length"
     }
-    # if (any(tolower(length_col) == tolower(names(edges)))) {
-    #   stop("The name of length_col matches the name of a variable in edges (ignoring case). Please change length_col or rename the variable in edges.", call. = FALSE)
-    # }
+
+    ## If overwrite is FALSE & length_col exists, stop
+    if(overwrite == FALSE & length_col %in% colnames(edges)) {
+        stop(paste0(length_col, " exists in edges and overwrite == FALSE"))
+    }
+    ## if overwrite == TRUE and length column exists, delete it
+    if(overwrite == TRUE & length_col %in% colnames(edges)) {
+      edges[, length_col] <- NULL
+    }
+    
+    ## Check for duplicate names
     check_names_case_add(names(edges), length_col, "edges", "length_col")
+
+    ## Calculate length
     edges[[length_col]] <- as.vector(st_length(edges))
   }
 
