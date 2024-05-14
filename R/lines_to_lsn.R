@@ -125,6 +125,7 @@ lines_to_lsn <- function(streams, lsn_path,
   ##   ##in_edges <- st_geometry(in_edges, rename = "geometry")
   ##   sf::st_geometry(in_edges)<- "geometry"
   ## }
+  edge.geom.name <- attributes(in_edges)$sf_column
 
   if(grepl("M", edge_geom) == TRUE & remove_ZM == FALSE) {
     stop("XYM or XYZM geometries are not supported. Set remove_ZM = TRUE to drop Z and/or M dimensions from feature geometries.")
@@ -270,8 +271,11 @@ lines_to_lsn <- function(streams, lsn_path,
   node_coords <- node_coords[!ind.dup,]
 
   ## Finish creating the sf object for all edge endpoints
+  ###
   nodexy_sf <- st_as_sf(as.data.frame(nodexy_mat[!ind.dup,]),
-                           coords = c("xcoord", "ycoord"), crs = lst_crs)
+                        coords = c("xcoord", "ycoord"),
+                        crs = lst_crs,
+                        sf_column_name = edge.geom.name)
   
   ## Check topology at this step, if it's been asked for
   if(check_topology){
@@ -416,7 +420,7 @@ lines_to_lsn <- function(streams, lsn_path,
         dangle <- dangle[!ind,]
       }
     }
-    
+   
     ## Add to errors table   
     suppressWarnings(errors <- rbind(errors, ill_int, dangle))
     
