@@ -79,7 +79,7 @@ updist_sites <- function(sites, edges, length_col, lsn_path, save_local = TRUE,
     sites_i_name <- names(sites)[i]
     sites_i_sf <- sites[[i]]
 
-    check_names_case(names(sites_i_sf), "upDist", sites_i_name)
+   
       
     ## Check if upDist column already exists and overwrite is FALSE
     ## If so, skip this iteration in the loop
@@ -87,13 +87,18 @@ updist_sites <- function(sites, edges, length_col, lsn_path, save_local = TRUE,
       message("A column called 'upDist' already exists in", sites_i_name,
               "and overwrite is set to FALSE. This set of sites will be skipped.")
       next
-    } 
+    }
 
     ## Remove the upDist column if it exists before the join with edges
     if("upDist" %in% names(sites_i_sf) & overwrite) {
-      ind<- colnames(sites_i_sf) == "upDist"
-      sites_i_sf <- sites_i_sf[, !ind]
+      ## ind<- colnames(sites_i_sf) == "upDist"
+      ## sites_i_sf <- sites_i_sf[, !ind]
+
+      sites_i_sf$upDist <- NULL
     }
+
+    ## Check for duplicate names
+    check_names_case(names(sites_i_sf), "upDist", sites_i_name)
     
     ## Get the Length and upDist fields from the edges
     sites_i_sf <- merge(sites_i_sf, edges, by = "rid", all.x = TRUE)

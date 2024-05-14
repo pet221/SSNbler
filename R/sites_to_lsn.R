@@ -71,6 +71,16 @@ sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
   
   
   ## Check some inputs --------------------------------------------
+  ## Remove column names assigned by sites_to_lsn if they exist &
+  ## overwrite == TRUE
+  if(overwrite == TRUE & sum(c("rid", "ratio", "snapdist") %in%
+                             colnames(sites) > 0)) {
+    sites$rid <- NULL
+    sites$snapdist <- NULL
+    sites$ratio<-NULL
+  }
+
+  ## Check for duplicate column names
   check_names_case(names(sites), "rid", "sites")
   check_names_case(names(sites), "ratio", "sites")
   check_names_case(names(sites), "snapdist", "sites")

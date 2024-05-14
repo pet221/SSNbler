@@ -82,7 +82,12 @@ afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
   for(i in 1:n_sites){
 
     sites_i <- sites[[i]]
-    
+
+    ## Remove afv_col if it exists and overwrite == TRUE
+    if(overwrite == TRUE & afv_col %in% colnames(sites_i)) {
+      sites_i[, afv_col]<- NULL
+    }
+    ## Check for duplicate names
     check_names_case_add(names(sites_i), afv_col, names(sites)[i], "afv_col")
 
     if(afv_col %in% names(sites_i)){

@@ -149,6 +149,12 @@ lines_to_lsn <- function(streams, lsn_path,
     
   if (inherits(in_edges, "sf")) n_edges = nrow(in_edges)
   if (inherits(in_edges, "sfc")) n_edges = length(in_edges)
+
+  ## If rid file exists and overwrite is TRUE
+  if(overwrite == TRUE & "rid" %in% colnames(in_edges)) {
+    in_edges$rid <- NULL
+  }
+  
   
   ## Add the field 'rid' (meaning reach identifier) and use it in all scripts as the rid / edgeid
   check_names_case(names(in_edges), "rid", "streams")
