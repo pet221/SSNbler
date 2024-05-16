@@ -96,6 +96,16 @@ lines_to_lsn <- function(streams, lsn_path,
                          overwrite = FALSE,
                          verbose = TRUE) {
   
+  # check sf object
+  if (!inherits(streams, "sf")) {
+    stop("streams must be an sf object.", call. = FALSE)
+  }
+  
+  # check empty geometries
+  if (any(st_is_empty(streams))) {
+    stop("streams has at least one empty geometry. Check and/or use sf::st_is_empty() to remove.",
+         call. = FALSE)
+  }
 
   ## bind nodecat variable to function
   nodecat <- NULL

@@ -114,8 +114,20 @@ sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
   }
   
   ## Stop if sites and/or edges are not sf objects
-  if(class(sites)[1] != "sf" | class(edges)[1] != "sf") {
-    stop("Both sites and edges must be of class sf")
+  if( (!inherits(sites, "sf")) || (!inherits(edges, "sf"))) {
+    stop("Both sites and edges must an sf object.", call. = FALSE)
+  }
+  
+  # check empty geometries
+  if (any(st_is_empty(edges))) {
+    stop("edges has at least one empty geometry. Check and/or use sf::st_is_empty() to remove.",
+         call. = FALSE)
+  }
+  
+  # check empty geometries
+  if (any(st_is_empty(sites))) {
+    stop("sites has at least one empty geometry. Check and/or use sf::st_is_empty() to remove.",
+         call. = FALSE)
   }
   
   ## Stop if sites and edges do not have the correct geometry types
