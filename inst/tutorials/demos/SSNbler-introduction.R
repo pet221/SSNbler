@@ -124,7 +124,7 @@ edges <- updist_edges(
   edges = edges,
   lsn_path = lsn.path,
   calc_length = TRUE,
-  save_local = TRUE)
+  save_local = TRUE
 )
 
 ## View edges column names
