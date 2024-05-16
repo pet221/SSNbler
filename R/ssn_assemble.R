@@ -83,11 +83,27 @@ ssn_assemble<- function(edges, lsn_path = NULL, obs_sites = NULL,
     stop("edges.gpkg already exists in ssn_path and overwrite = FALSE")
   }
   
+  ## Can we overwrite columns if necessary
+  if(overwrite == FALSE & sum(colnames(edges) %in% "pid") > 0) {
+    stop("pid already exists in edges and overwrite = FALSE")
+  }
+  ## Check for duplicate names
+  check_names_case(names(edges), "pid", "edges")
+  
+  ## Can we overwrite netID column if necessary
+  if(overwrite == FALSE & sum(colnames(edges) %in% "locID") > 0) {
+    stop("locID already exists in edges and overwrite = FALSE")
+  }
+  ## Check for duplicate names
+  check_names_case(names(edges), "locID", "edges")
+  
   ## Can we overwrite netID column if necessary
   if(overwrite == FALSE & sum(colnames(edges) %in% "netID") > 0) {
     stop("netID already exists in edges and overwrite = FALSE")
   }
-
+  ## Check for duplicate names
+  check_names_case(names(edges), "netID", "edges")
+  
   ## lsn_path
   if (!file.exists(lsn_path)){
     stop("\n lsn_path does not exist.\n\n")
@@ -127,6 +143,11 @@ ssn_assemble<- function(edges, lsn_path = NULL, obs_sites = NULL,
     if(sum(colnames(obs_sites) %in% c("pid", "locID", "netID")) > 0 & overwrite == FALSE) {
       stop(paste0("Columns pid, locID, and/or netID exist in obs_sites and overwrite = FALSE"))}
 
+    ## Check for duplicate names
+    check_names_case(names(obs_sites), "pid", "obs_sites")
+    check_names_case(names(obs_sites), "locID", "obs_sites")
+    check_names_case(names(obs_sites), "netID", "obs_sites")
+    
   } 
   #################################################
   ## Check each set of preds in predlist
@@ -151,6 +172,11 @@ ssn_assemble<- function(edges, lsn_path = NULL, obs_sites = NULL,
       if(sum(colnames(preds_list[[p]]) %in% c("pid", "locID", "netID")) > 0 & overwrite == FALSE) {
         stop(paste0("Columns pid, locID, and/or netID exist in ", names(preds_list)[p],
                     " and overwrite = FALSE"))}
+      
+      ## Check for duplicate names
+      check_names_case(names(preds_list[[p]]), "pid", names(preds_list)[p])
+      check_names_case(names(preds_list[[p]]), "locID", names(preds_list)[p])
+      check_names_case(names(preds_list[[p]]), "netID", names(preds_list)[p])
     }
   }
   
