@@ -21,11 +21,17 @@ ssn_check <- function(ssn.object, afv_col = NULL, verbose = TRUE) {
     stop("ssn.object is not of class SSN")
   }
 
-  ## check that path exists
+  ## check that .ssn folder exists
   if(!file.exists(ssn.object$path)){
-    out.message <- paste0(out.message, ssn.object$path,
-           " does not exist. Use SSN2:ssn_update_path() to update the path to the local .ssn directory.\n")
-    valid<- FALSE
+    stop(paste0(out.message, ssn.object$path,
+           " does not exist. Use SSN2:ssn_update_path() to update the path to the local .ssn directory.\n"))
+  }
+
+  ## check that binaryID.db exists in .ssn directory
+  if(!file.exists(paste0(ssn.object$path, "/binaryID.db"))){
+    out.message <- paste0("binaryID.db file is missing from ",
+                          ssn.object$path, ".\n")
+    valid <- FALSE
   }
 
   ##--------------------------------------------------------
