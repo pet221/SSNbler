@@ -149,7 +149,8 @@ ggplot() +
   geom_sf(data = MF_streams) +
   geom_sf(data = MF_CapeHorn, color = "gold", size = 1.7) +
   geom_sf(data = MF_pred1km, colour = "purple", size = 1.7) +
-  geom_sf(data = MF_obs, color = "blue", size = 2) 
+  geom_sf(data = MF_obs, color = "blue", size = 2) +
+  coord_sf(datum = st_crs(MF_streams))
 ```
 
 In the Figure above, there are two subnetworks from `MF_Streams` (black lines).
@@ -484,6 +485,7 @@ increases from the outlet to headwater streams, as expected.
 ggplot() +
   geom_sf(data = edges, aes(color = upDist)) +
   geom_sf(data = site.list$obs, aes(color = upDist)) +
+  coord_sf(datum = st_crs(MF_streams)) +
   scale_color_viridis_c()
 
 ```
@@ -733,21 +735,19 @@ ggplot() +
   geom_sf(
     data = mf04_ssn$edges,
     color = "medium blue",
-    aes(linewidth = h2oAreaKm2)
-  ) +
+    aes(linewidth = h2oAreaKm2)) +
   scale_linewidth(range = c(0.1, 2.5)) + 
   geom_sf(
     data = mf04_ssn$preds$pred1km,
     size = 1.5,
     shape = 21,
     fill = "white",
-    color = "dark grey"
-  ) +
+    color = "dark grey") +
   geom_sf(
     data = mf04_ssn$obs, 
     size = 1.7,
-    aes(color = Summer_mn)
-  ) +
+    aes(color = Summer_mn)) +
+  coord_sf(datum = st_crs(MF_streams)) +
   scale_color_viridis_c() +
   labs(color = "Temperature", linewidth = "WS Area") +
   theme(
