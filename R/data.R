@@ -3,7 +3,7 @@
 #' \code{MF_streams} is an \code{sf} object with LINESTRING geometry representing a subset of
 #' streams and rivers in the Middle Fork Basin, Idaho, USA. 
 #'
-#' The \code{sf} data.frame contains a set of 163 features and 14 columns: 
+#' The \code{sf} data.frame contains a set of 163 features and 9 columns: 
 #'   \itemize{
 #'     \item COMID: Common identifier of an NHD feature or relationship
 #'     \item GNIS_NAME: Feature name as found in the Geographic Names Information System
@@ -30,11 +30,10 @@
 #'
 #' \code{MF_obs} is an \code{sf} object with POINT geometry representing water temperature observations and covariates in the Middle Fork Basin, Idaho, USA collected in 2004. 
 #'
-#' The \code{sf} data.frame contains 45 point features and 19 columns:
+#' The \code{sf} data.frame contains 45 point features and 16 columns:
 #'   \itemize{
 #'     \item STREAMNAME: Stream name
 #'     \item COMID: Common identifier of an NHD feature or relationship
-#'     \item CDRAINAG: Cumulative drainage area (km2) for the downstream node of the edge the site resides on
 #'     \item AREAWTMAP: Area weighted mean annual precipitation (mm) at lowermost
 #'       location on the line segment where the site resides
 #'     \item SLOPE: Slope of the line segment (cm/cm) where the site resides
@@ -70,10 +69,9 @@
 #'
 #' \code{MF_CapeHorn} is an \code{sf} object with POINT geometry representing prediction locations and covariates on Cape Horn Creek, Middle Fork Basin, Idaho, USA. 
 #'
-#' The \code{sf} data.frame contains 654 point features and 8 columns:
+#' The \code{sf} data.frame contains 654 point features and 9 columns:
 #'   \itemize{
 #'     \item COMID: Common identifier of an NHD feature or relationship
-#'     \item CDRAINAG: Cumulative drainage area (km2) for the downstream node of the edge the site resides on
 #'     \item AREAWTMAP: Area weighted mean annual precipitation (mm) at lowermost
 #'       location on the line segment where the site resides
 #'     \item SLOPE: Slope of the line segment (cm/cm) where the site resides
@@ -102,10 +100,9 @@
 #'
 #' \code{MF_pred1km} is an \code{sf} object with POINT geometry representing prediction locations and covariates distributed at 1km intervals throughout the Middle Fork Basin, Idaho, USA. 
 #'
-#' The \code{sf} data.frame contains 175 point features and 8 columns:
+#' The \code{sf} data.frame contains 175 point features and 9 columns:
 #'   \itemize{
 #'     \item COMID: Common identifier of an NHD feature or relationship
-#'     \item Cumulative drainage area (km2) for the downstream node of the edge the site resides on
 #'     \item AREAWTMAP: Area weighted mean annual precipitation (mm) at lowermost
 #'       location on the line segment where the site resides
 #'     \item SLOPE: Slope of the line segment (cm/cm) where the site resides
@@ -129,3 +126,33 @@
 #'
 #' @name MF_pred1km
 "MF_pred1km"
+
+#' MF_preds: A small set of prediction locations found in the Middle Fork Basin, Idaho.
+#'
+#' \code{MF_preds} is an \code{sf} object with POINT geometry representing prediction locations and covariates distributed at 1km intervals throughout the Middle Fork Basin, Idaho, USA. 
+#'
+#' The \code{sf} data.frame contains 43 point features and 9 columns:
+#'   \itemize{
+#'     \item COMID: Common identifier of an NHD feature or relationship
+#'     \item AREAWTMAP: Area weighted mean annual precipitation (mm) at lowermost
+#'       location on the line segment where the site resides
+#'     \item SLOPE: Slope of the line segment (cm/cm) where the site resides
+#'     \item ELEV_DEM: Elevation at the site based on a 30m DEM
+#'     \item FlowCMS: Average stream flow (cubic meters per sec) for August,
+#'       by year, from 1950-2010 across 9 USGS gauges in the region
+#'     \item AirMEANc: Average mean air temperature (C) from July 15 - August 31,
+#'       from 1980-2009 across 10 COOP air stations within the domain
+#'     \item AirMWMTc: Average maximum air temperature (C) from July 15 - August 31,
+#'       from 1980-2009 across 10 COOP air stations within the domain.
+#'       MWMT = maximum 7-day moving average of the maximum daily temperature
+#'       (i.e. maximum of all the 7-day maximums)
+#'     \item rcaAreaKm2: Reach contributing area (km2) for the downstream node of the edge feature the site resides on. RCA area is the land area draining directly into each line segment.
+#'     \item h2oAreaKm2: Watershed area (km2) for the downstream node of the edge feature the site resides on
+#' }
+#'
+#'@source \code{MF_preds} are unpublished United States Forest Service data. 
+#'
+#' @docType data
+#'
+#' @name MF_preds
+"MF_preds"
