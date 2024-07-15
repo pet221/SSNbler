@@ -36,7 +36,7 @@ saved to a local directory in geopackage format. Defaults to
 \code{\link{lines_to_lsn}}. Required if \code{save_local = TRUE}.}
 
 \item{file_name}{Filename for output sites, which are saved to \code{lsn_path}
-in geopackage format (must include the .gpkg extension).}
+in geopackage format (must include the .gpkg extension). Required if \code{save_local = TRUE}.}
 
 \item{overwrite}{Logical indicating whether the outputs saved to
 \code{lsn_path} should overwrite existing files if they
