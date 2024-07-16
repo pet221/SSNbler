@@ -53,3 +53,96 @@ An \code{sf} object representing edges in the LSN, with new
 Calculate the additive function value for each edge
 feature in a Landscape Network (LSN)
 }
+\details{
+Spatial weights are used when fitting statistical models
+with \code{SSN2} to split the tail-up covariance function upstream of
+network confluences, which allows for the disproportionate
+influence of one upstream edge over another (e.g., a large stream
+channel converges with a smaller one) on downstream
+values. Calculating the spatial weights is a four-step process:
+\enumerate{
+\item calculating the segment proportional influence (PI) values for
+the edges,
+\item calculating the additive function values (AFVs) for
+the edges,
+\item calculating the AFVs for the
+observed and prediction sites, and
+\item calculating the spatial
+weights for observed and prediction sites.
+}
+
+Steps 1) and 2) are undertaken in \code{afv_edges}, Step 3) is
+calculated in \code{\link[=afv_sites]{afv_sites()}}, and Step 4) is calculated in the
+package \code{SSN2} when spatial stream-network models that include the
+tail-up covariance function are fit using \code{\link[SSN2]{ssn_lm}}
+or \code{\link[SSN2]{ssn_glm}}.
+
+The segment PI for each edge, \eqn{\omega_j}, is defined as the
+relative influence of the j-th edge feature on the edge directly
+downstream.  \eqn{\omega_j} is often based on
+cumulative watershed area for the downstream node of each edge,
+which is used as a surrogate for flow volume. However,
+simpler measures could be used, such as Shreve's stream order
+(Shreve 1966) or equal weighting, as long as a value exists for
+every line feature in \code{edges} (i.e., missing data are not
+allowed). It is also preferable to use a column that does not
+contain values equal to zero, which is explained below.
+
+The segment PI values produced in \code{afv_edges()} are
+ratios. Therefore, the sum of the PI values for edges directly
+upstream of a single node always sum to one. Also note that
+\eqn{\omega_j=0} when \eqn{A_j=0}.
+
+The AFVs for the j-th edge, \eqn{AFV_j}, is equal to the product of
+the segment PIs found in the path between the edge and the network
+outlet (i.e., most downstream edge in the network), including edge
+j itself. Therefore, \eqn{0 \le AFV \le 1}. If \eqn{\omega_j=0},
+the AFV values for edges upstream of the j-th edge will also be
+equal to zero. This may not be problematic if the j-th edge is a
+headwater segment without an observed site. However, it can have a
+significant impact on the covariance structure of the tail-up model
+when the j-th edge is found lower in the stream network.
+
+A more detailed description of the segment PIs and the steps used to
+calculate AFVs are provided in Peterson and Ver Hoef (2010;
+Appendix A).
+}
+\examples{
+# Get temporary directory, where the example LSN will be stored
+# locally. 
+temp_dir <- tempdir()
+
+# Build the LSN. When working with your own data, lsn_path will be 
+# a local folder of your choice rather than a temporary directory.
+edges<- lines_to_lsn(
+   streams = MF_streams,
+   lsn_path = temp_dir, 
+   snap_tolerance = 1,
+   check_topology = FALSE,
+   overwrite = TRUE,
+   verbose = FALSE
+)
+
+# Calculate the addtive function value for the edges using a
+# column representing watershed area for the downstream node of
+# each line feature (h2oAreaKm2).
+edges<- afv_edges(
+   edges=edges,
+   infl_col = "h2oAreaKm2", 
+   segpi_col = "areaPI",
+   lsn_path = temp_dir,
+   afv_col = "afvArea",
+   overwrite = TRUE,
+   save_local = FALSE
+)
+
+# Check AFVs stored in new column afvArea to ensure that 0 >= AFV
+# >= 1 and that there are no NULL values.
+summary(edges$afvArea)
+
+}
+\references{
+Peterson, E.E. and Ver Hoef, J.M. (2010) A
+mixed-model moving-average approach to geostatistical modeling in
+stream networks. Ecology 91(3), 644–651.
+}
