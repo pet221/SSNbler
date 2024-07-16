@@ -136,8 +136,8 @@ edges<- afv_edges(
    save_local = FALSE
 )
 
-# Check AFVs stored in new column afvArea to ensure that 0 >= AFV
-# >= 1 and that there are no NULL values.
+# Check AFVs stored in new column afvArea to ensure that 0 <= AFV
+# <= 1 and that there are no NULL values.
 summary(edges$afvArea)
 
 }

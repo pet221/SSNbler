@@ -113,8 +113,8 @@
 #'    save_local = FALSE
 #' )
 #'
-#' # Check AFVs stored in new column afvArea to ensure that 0 >= AFV
-#' # >= 1 and that there are no NULL values.
+#' # Check AFVs stored in new column afvArea to ensure that 0 <= AFV
+#' # <= 1 and that there are no NULL values.
 #' summary(edges$afvArea)
 #' 
 afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
