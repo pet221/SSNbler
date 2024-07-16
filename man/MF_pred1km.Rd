@@ -17,10 +17,9 @@ MF_pred1km
 \code{MF_pred1km} is an \code{sf} object with POINT geometry representing prediction locations and covariates distributed at 1km intervals throughout the Middle Fork Basin, Idaho, USA.
 }
 \details{
-The \code{sf} data.frame contains 175 point features and 8 columns:
+The \code{sf} data.frame contains 175 point features and 9 columns:
 \itemize{
 \item COMID: Common identifier of an NHD feature or relationship
-\item Cumulative drainage area (km2) for the downstream node of the edge the site resides on
 \item AREAWTMAP: Area weighted mean annual precipitation (mm) at lowermost
 location on the line segment where the site resides
 \item SLOPE: Slope of the line segment (cm/cm) where the site resides
