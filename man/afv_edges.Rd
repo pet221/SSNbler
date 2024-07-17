@@ -123,9 +123,9 @@ edges<- lines_to_lsn(
    verbose = FALSE
 )
 
-# Calculate the addtive function value for the edges using a
-# column representing watershed area for the downstream node of
-# each line feature (h2oAreaKm2).
+# Calculate the AFV for the edges using an existing column
+# representing watershed area for the downstream node of each line
+# feature (h2oAreaKm2).
 edges<- afv_edges(
    edges=edges,
    infl_col = "h2oAreaKm2", 
