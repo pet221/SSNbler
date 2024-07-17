@@ -31,15 +31,20 @@
 #'   function progress should be printed to the console. Defaults to
 #'   \code{TRUE}.
 #'
-#' @details \code{updist_edges()} calculates the total distance from
+#' @details \code{updist_edges()} calculates the total hydrologic distance from
 #'   the uppermost location on each edge feature (upstream node) to
 #'   the stream outlet (i.e. the most downstream location in the
 #'   stream network), when movement is restricted to the stream
-#'   network. We refer to this as the total hydrologic distance. Upstream distances are
+#'   network. We refer to this as the upstream distance. Upstream distances are
 #'   measured in the map projection units for the \code{sf} object edges and stored in
 #'   a new column in edges named \code{upDist}.
+#'
+#' The upstream distances stored in \code{upDist} are used to calculate the upstream distance for
+#' sites in [updist_sites()] and the pairwise hydrologic distances used to fit spatial stream network models in
+#' the `SSN2` package. Do not modify the name of the column in any way or the values the \code{upDist}
+#' column contains.
 #' 
-#' @return An \code{sf} object representing edges in the LSN, with a new \code{upDist} column.
+#' @return An \code{sf} object representing edges in the LSN, with a new \code{upDist} column. When \code{calc_length = TRUE} an additional column named \code{length_col}
 #' @export
 #'
 #' @examples
@@ -72,7 +77,7 @@
 #' # Notice that two new columns have been added to edges containing
 #' # line feature length (Length) and the upstream distance (upDist)
 #' names(edges)
-#' summary(edges[,c("Length", "upDist")]
+#' summary(edges[,c("Length", "upDist")])
 #' 
  
 updist_edges <- function(edges, lsn_path = NULL, calc_length = FALSE, length_col = NULL,
