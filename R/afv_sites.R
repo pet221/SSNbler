@@ -20,6 +20,33 @@
 #'   overwritten if \code{afv_col} already exists in \code{sites}
 #'   or sites.gpkg already exists in \code{lsn_path} and
 #'   \code{save_local = TRUE}. Default = TRUE.
+#'
+#' @details Spatial weights are used when fitting statistical models
+#'   with `SSN2` to split the tail up covariance function upstream of
+#'   network confluences, which allows for the disproportionate
+#'   influence of one upstream edge over another (e.g., a large stream
+#'   channel converges with a smaller one) on downstream
+#'   values. Calculating the spatial weights is a four step process:
+#' 1) calculating the segment proportional influence (PI) values for
+#'   the edges,
+#' 2) calculating the additive function values (AFVs) for
+#'   the edges,
+#' 3) calculating the AFVs for the
+#'   observed and prediction sites, and
+#' 4) calculating the spatial
+#'   weights for observed and prediction sites.
+#'
+#' Steps 1) and 2) are undertaken in [afv_edges()], Step 3) is
+#' calculated in \code{afv_sites()}, and Step 4) is calculated in the
+#' package `SSN2` when spatial stream network models that include the
+#' tail up covariance function are fit using \code{\link[SSN2]{ssn_lm}}
+#' or \code{\link[SSN2]{ssn_glm}}.
+#'
+#' The additive function value (AFV) for an observed or
+#'   prediction site is equal to the AFV of the edge the site resides
+#'   on. Therefore, \eqn{0 \le AFV \le 1}. See Peterson and Ver Hoef
+#'   (2010) for a more detailed description of AFVs, how they are
+#'   calculated, and how they are used in the tail up covariance function.
 #' 
 #' @return One or more \code{sf} object(s) with all the original data
 #'   from \code{sites}, along with a new \code{afv_col} column in each
@@ -27,35 +54,117 @@
 #'   \code{save_local = TRUE}, a geopackage for each \code{sf} object
 #'   is saved in \code{lsn_path}. Output file names are assigned based
 #'   on the input \code{sites} attribute \code{names}.
+#'
+#' @references
+#' Peterson, E.E. and Ver Hoef, J.M. (2010) A
+#'   mixed model moving average approach to geostatistical modeling in
+#'   stream networks. Ecology 91(3), 644–651.
 #' @export
+#' 
+#' @examples
+#' #' # Get temporary directory, where the example LSN will be stored
+#' # locally. 
+#' temp_dir <- tempdir()
+
+#' # Build the LSN. When working with your own data, lsn_path will be 
+#' # a local folder of your choice rather than a temporary directory.
+#' edges<- lines_to_lsn(
+#'    streams = MF_streams,
+#'    lsn_path = temp_dir, 
+#'    snap_tolerance = 1,
+#'    check_topology = FALSE,
+#'    overwrite = TRUE,
+#'    verbose = FALSE
+#' )
+#'
+#' # Incorporate observed sites into the LSN
+#' obs<- sites_to_lsn(
+#'    sites = MF_obs,
+#'    edges = edges,
+#'    save_local = FALSE,
+#'    snap_tolerance = 100,
+#'    overwrite = TRUE,
+#'    verbose = FALSE
+#' )
+#'
+#' # Incorporate the prediction dataset, preds, into the LSN
+#' preds<- sites_to_lsn(sites = MF_preds,
+#'    edges = edges,
+#'    save_local = FALSE,
+#'    snap_tolerance = 1,
+#'    overwrite = TRUE,
+#'    verbose = FALSE
+#' )
+#'
+#' # Calculate the AFVs for the edges using a column representing
+#' # watershed area (h2oAreaKm2) for the downstream node of each edge
+#' # feature.
+#' edges<- afv_edges(
+#'    edges=edges,
+#'    infl_col = "h2oAreaKm2", 
+#'    segpi_col = "areaPI",
+#'    lsn_path = temp_dir,
+#'    afv_col = "afvArea",
+#'    overwrite = TRUE,
+#'    save_local = FALSE
+#' )
+#'
+#' # Calculate AFVs for observed sites (obs) and the prediction
+#' # dataset, preds.
+#' site.list<- afv_sites(
+#'    sites = list(obs = obs,
+#'                 preds = preds),
+#'    edges=edges,
+#'    afv_col = "afvArea",
+#'    save_local = FALSE,
+#'    overwrite = TRUE
+#' )
+#'
+#' # Get names of sites in site.list
+#' names(site.list)
+#'
+#' # Check AFVs stored in new column afvArea to ensure that 0 <= AFV
+#' # <= 1 and that there are no NULL values.
+#' summary(site.list$obs$afvArea)
+#' summary(site.list$preds$afvArea)
 
 afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
                       lsn_path=NULL, overwrite = TRUE){
 
   ## Check inputs -------------------------------------------
-  if(is.null(lsn_path) & save_local == TRUE) {
-    stop("lsn_path is required when save_local = TRUE")
-  }
+  ## if(is.null(lsn_path) & save_local == TRUE) {
+  ##   stop("lsn_path is required when save_local = TRUE")
+  ## }
     
-  ## Check lsn_path exists
-  if (save_local == TRUE & !file.exists(lsn_path)){
-    stop("\n lsn_path does not exist.\n\n")
-  } 
-  
-  ## Can we overwrite sites geopackage files if necessary
-  if(save_local == TRUE & overwrite == FALSE) {
-    s.exists<- vector()
-    for(e in 1:length(sites)) {
-      if(file.exists(paste0(lsn_path, "/", names(sites)[e], ".gpkg"))){
-        s.exists[e] <- TRUE
-      } else {
-        s.exists[e]<-FALSE
-      }
+  ## ## Check lsn_path exists
+  ## if (save_local == TRUE & !file.exists(lsn_path)){
+  ##   stop("\n lsn_path does not exist.\n\n")
+  ## }
+
+  if(save_local == TRUE) {
+    ## Check lsn_path
+    if(is.null(lsn_path)) {
+      stop("lsn_path is required when save_local = TRUE")
     }
-    ## Do some sites geopackage files already exist 
-    if(sum(s.exists) > 0) {
-      stop(paste0("Cannot save sites to local files because at least one file already exists in ",
-                  lsn_path, " and overwrite = FALSE"))
+    if(!file.exists(lsn_path)){
+      stop("\n lsn_path does not exist.\n\n")
+    }
+
+    ## Can we overwrite sites geopackage files if necessary
+    if(overwrite == FALSE) {
+      s.exists<- vector()
+      for(e in 1:length(sites)) {
+        if(file.exists(paste0(lsn_path, "/", names(sites)[e], ".gpkg"))){
+          s.exists[e] <- TRUE
+        } else {
+          s.exists[e]<-FALSE
+        }
+      }
+      ## Do some sites geopackage files already exist 
+      if(sum(s.exists) > 0) {
+        stop(paste0("Cannot save sites to local files because at least one file already exists in ",
+                    lsn_path, " and overwrite = FALSE"))
+      }
     }
   }
 

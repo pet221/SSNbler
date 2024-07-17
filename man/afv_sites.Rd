@@ -51,3 +51,104 @@ on the input \code{sites} attribute \code{names}.
 \description{
 Calculate additive function values for sites in a LSN
 }
+\details{
+Spatial weights are used when fitting statistical models
+with \code{SSN2} to split the tail up covariance function upstream of
+network confluences, which allows for the disproportionate
+influence of one upstream edge over another (e.g., a large stream
+channel converges with a smaller one) on downstream
+values. Calculating the spatial weights is a four step process:
+\enumerate{
+\item calculating the segment proportional influence (PI) values for
+the edges,
+\item calculating the additive function values (AFVs) for
+the edges,
+\item calculating the AFVs for the
+observed and prediction sites, and
+\item calculating the spatial
+weights for observed and prediction sites.
+}
+
+Steps 1) and 2) are undertaken in \code{\link[=afv_edges]{afv_edges()}}, Step 3) is
+calculated in \code{afv_sites()}, and Step 4) is calculated in the
+package \code{SSN2} when spatial stream network models that include the
+tail up covariance function are fit using \code{\link[SSN2]{ssn_lm}}
+or \code{\link[SSN2]{ssn_glm}}.
+
+The additive function value (AFV) for an observed or
+prediction site is equal to the AFV of the edge the site resides
+on. Therefore, \eqn{0 \le AFV \le 1}. See Peterson and Ver Hoef
+(2010) for a more detailed description of AFVs, how they are
+calculated, and how they are used in the tail up covariance function.
+}
+\examples{
+#' # Get temporary directory, where the example LSN will be stored
+# locally. 
+temp_dir <- tempdir()
+# Build the LSN. When working with your own data, lsn_path will be 
+# a local folder of your choice rather than a temporary directory.
+edges<- lines_to_lsn(
+   streams = MF_streams,
+   lsn_path = temp_dir, 
+   snap_tolerance = 1,
+   check_topology = FALSE,
+   overwrite = TRUE,
+   verbose = FALSE
+)
+
+# Incorporate observed sites into the LSN
+obs<- sites_to_lsn(
+   sites = MF_obs,
+   edges = edges,
+   save_local = FALSE,
+   snap_tolerance = 100,
+   overwrite = TRUE,
+   verbose = FALSE
+)
+
+# Incorporate the prediction dataset, preds, into the LSN
+preds<- sites_to_lsn(sites = MF_preds,
+   edges = edges,
+   save_local = FALSE,
+   snap_tolerance = 1,
+   overwrite = TRUE,
+   verbose = FALSE
+)
+
+# Calculate the AFVs for the edges using a column representing
+# watershed area (h2oAreaKm2) for the downstream node of each edge
+# feature.
+edges<- afv_edges(
+   edges=edges,
+   infl_col = "h2oAreaKm2", 
+   segpi_col = "areaPI",
+   lsn_path = temp_dir,
+   afv_col = "afvArea",
+   overwrite = TRUE,
+   save_local = FALSE
+)
+
+# Calculate AFVs for observed sites (obs) and the prediction
+# dataset, preds.
+site.list<- afv_sites(
+   sites = list(obs = obs,
+                preds = preds),
+   edges=edges,
+   afv_col = "afvArea",
+   save_local = FALSE,
+   overwrite = TRUE
+)
+
+# Get names of sites in site.list
+names(site.list)
+
+# Check AFVs stored in new column afvArea to ensure that 0 <= AFV
+# <= 1 and that there are no NULL values.
+summary(site.list$obs$afvArea)
+summary(site.list$preds$afvArea)
+}
+\references{
+Peterson, E.E. and Ver Hoef, J.M. (2010) A
+mixed model moving average approach to geostatistical modeling in
+stream networks. Ecology 91(3), 644–651.
+}
