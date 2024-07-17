@@ -20,14 +20,96 @@
 #'   overwritten if the upDist column already exists in \code{sites}
 #'   or sites.gpkg already exists in \code{lsn_path} and
 #'   \code{save_local = TRUE}. Default = TRUE.
+#'
+#' #' @details \code{updist_sites()} calculates the total hydrologic distance from
+#'   each observed or prediction point feature to
+#'   the stream outlet (i.e. the most downstream location in the
+#'   stream network), when movement is restricted to the stream
+#'   network. We refer to this as the upstream distance.
+#'
+#' Upstream distances are measured in the map projection units for the
+#'   \code{sf} object containing the point features and stored in a
+#'   new column named \code{upDist}.
+#'
+#' The upstream distances stored in \code{upDist} are used to
+#' calculate the pairwise hydrologic distances used to fit spatial
+#' stream network models in the \code{SSN2} package. Do not modify the name
+#' of the column in any way or the values the \code{upDist} column
+#' contains.
+#' 
 #' @return One or more \code{sf} object(s) with all the original
 #'   data from \code{sites}, along with a new \code{upDist} column in
-#'   each \code{sites sf} object. A named list is returned. If
-#'   \code{save_local = TRUE}, a geopackage for each \code{sf} object
+#'   each sites \code{sf} object. A named list is returned. If
+#'   \code{save_local = TRUE}, a GeoPackage for each \code{sf} object
 #'   is saved in \code{lsn_path}. Output file names are assigned based
 #'   on the input \code{sites} attribute \code{names}.
 #' @export
+#'
+#' @examples
+#' # Get temporary directory, where the example LSN will be stored
+#' # locally. 
+#' temp_dir <- tempdir()
+
+#' # Build the LSN. When working with your own data, lsn_path will be 
+#' # a local folder of your choice rather than a temporary directory.
+#' edges<- lines_to_lsn(
+#'    streams = MF_streams,
+#'    lsn_path = temp_dir, 
+#'    snap_tolerance = 1,
+#'    check_topology = FALSE,
+#'    overwrite = TRUE,
+#'    verbose = FALSE
+#' )
+#'
+#' # Incorporate observed sites, MF_obs, into LSN
+#' obs<- sites_to_lsn(
+#'    sites = MF_obs,
+#'    edges = edges,
+#'    save_local = FALSE,
+#'    snap_tolerance = 100,
+#'    overwrite = TRUE,
+#'    verbose = FALSE
+#' )
+#'
+#' # Incorporate prediction dataset, MF_preds, into LSN
+#' preds<- sites_to_lsn(
+#'    sites = MF_preds,
+#'    edges = edges,
+#'    save_local = FALSE,
+#'    snap_tolerance = 1,
+#'    overwrite = TRUE,
+#'    verbose = FALSE
+#' )
+#'
+#' # Calculate upstream distance for edges
+#' edges<- updist_edges(
+#'    edges = edges,
+#'    lsn_path = temp_dir,
+#'    calc_length = TRUE,
+#'    length_col = "Length",
+#'    overwrite = TRUE,
+#'    save_local = FALSE,
+#'    verbose = FALSE
+#' )
 #' 
+#' # Calculate upstream distance for observed sites (obs) and one
+#' # prediction dataset (preds)
+#' site.list<- updist_sites(
+#'    sites = list(obs = obs,
+#'                 preds = preds),
+#'    edges = edges,
+#'    length_col= "Length",
+#'    lsn_path = temp_dir,
+#'    save_local = FALSE,
+#'    overwrite = TRUE
+#' )
+#'
+#' # Summarize the new column upDist in obs
+#' summary(site.list$obs$upDist)
+#'
+#' # Summarize the new column upDist in preds
+#' summary(site.list$preds$upDist)
+#'
 updist_sites <- function(sites, edges, length_col, lsn_path, save_local = TRUE,
                          overwrite = TRUE){
 
