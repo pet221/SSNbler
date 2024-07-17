@@ -1,31 +1,81 @@
 #' @title Get upstream distance for edges in a LSN
-#' @description Calculate the distance from the stream outlet to the
-#'   upstream node of each edge segment (i.e. upstream distance) in
+#' @description Calculate the distance from the stream outlet
+#'   (i.e. the most downstream location on the stream network) to the
+#'   upstream node of each edge feature (i.e. upstream distance) in
 #'   the Landscape Network (LSN)
 #' @param edges An \code{sf} object with LINESTING geometry created
 #'   using \code{\link{lines_to_lsn}}.
-#' @param lsn_path Local pathname to a directory in character format specifying
-#'   where relationships.csv resides, which is created using \code{link[SSNbler]{lines_to_lsn}}.
-#' @param calc_length A logical indicating whether a column representing line length should be calculated and added to \code{edges}. Default = \code{FALSE}. 
-#' @param length_col Optional. If \code{calc_length = FALSE}, \code{length_col}
-#'   is the name of the column in the \code{edges}
-#'   attribute table that contains the length of the edge segment. When
-#'   \code{calc_length = FALSE}, \code{length_col} is required.
-#'   If \code{calc_length = TRUE}, \code{length_col} is the name of
-#'   the new column created in \code{edges}
-#'   that will store the new length values for
-#'   each feature, in character format.  When \code{calc_length = TRUE},
-#'   the default for \code{length_col} is \code{"Length"}.
-#' @param save_local Logical indicating whether the updated \code{edges} should be
-#'   saved to \code{lsn_path} in geopackage format. Defaults to
-#'   \code{TRUE}.
-#' @param overwrite A logical indicating whether results should be overwritten if the upDist column already exists in \code{edges} or edges.gpkg already exists in \code{lsn_path} and \code{save_local = TRUE}. Default = TRUE
+#' @param lsn_path Local pathname to a directory in character format
+#'   specifying where relationships.csv resides, which is created
+#'   using \code{\link[SSNbler]{lines_to_lsn}}.
+#' @param calc_length A logical indicating whether a column
+#'   representing line length should be calculated and added to
+#'   \code{edges}. Default = \code{FALSE}.
+#' @param length_col Optional. If \code{calc_length = FALSE},
+#'   \code{length_col} is the name of the column in the \code{edges}
+#'   attribute table that contains the length of the edge
+#'   feature. When \code{calc_length = FALSE}, \code{length_col} is
+#'   required. If \code{calc_length = TRUE}, \code{length_col} is the
+#'   name of the new column created in \code{edges} that will store
+#'   the new length values for each feature, in character format.
+#'   When \code{calc_length = TRUE} and \code{length_col = NULL}, the default for \code{length_col}
+#'   is \code{"Length"}.
+#' @param save_local Logical indicating whether the updated
+#'   \code{edges} should be saved to \code{lsn_path} in geopackage
+#'   format. Defaults to \code{TRUE}.
+#' @param overwrite A logical indicating whether results should be
+#'   overwritten if the upDist column already exists in \code{edges}
+#'   or edges.gpkg already exists in \code{lsn_path} and
+#'   \code{save_local = TRUE}. Default = TRUE
 #' @param verbose Logical. Indicates whether messages about the
 #'   function progress should be printed to the console. Defaults to
 #'   \code{TRUE}.
+#'
+#' @details \code{updist_edges()} calculates the total distance from
+#'   the uppermost location on each edge feature (upstream node) to
+#'   the stream outlet (i.e. the most downstream location in the
+#'   stream network), when movement is restricted to the stream
+#'   network. We refer to this as the total hydrologic distance. Upstream distances are
+#'   measured in the map projection units for the \code{sf} object edges and stored in
+#'   a new column in edges named \code{upDist}.
+#' 
 #' @return An \code{sf} object representing edges in the LSN, with a new \code{upDist} column.
 #' @export
-updist_edges <- function(edges, lsn_path, calc_length = FALSE, length_col = NULL,
+#'
+#' @examples
+#' # Get temporary directory, where the example LSN will be stored
+#' # locally. 
+#' temp_dir <- tempdir()
+
+#' # Build the LSN. When working with your own data, lsn_path will be 
+#' # a local folder of your choice rather than a temporary directory.
+#' edges<- lines_to_lsn(
+#'    streams = MF_streams,
+#'    lsn_path = temp_dir, 
+#'    snap_tolerance = 1,
+#'    check_topology = FALSE,
+#'    overwrite = TRUE,
+#'    verbose = FALSE
+#' )
+#'
+#' # Calculate upstream distance for edges
+#' edges<- updist_edges(
+#'    edges = edges,
+#'    lsn_path = temp_dir,
+#'    calc_length = TRUE,
+#'    length_col = "Length",
+#'    overwrite = TRUE,
+#'    save_local = FALSE,
+#'    verbose = FALSE
+#' )
+#'
+#' # Notice that two new columns have been added to edges containing
+#' # line feature length (Length) and the upstream distance (upDist)
+#' names(edges)
+#' summary(edges[,c("Length", "upDist")]
+#' 
+ 
+updist_edges <- function(edges, lsn_path = NULL, calc_length = FALSE, length_col = NULL,
                          save_local = TRUE, overwrite = TRUE, verbose = TRUE){
 
 
@@ -38,12 +88,14 @@ updist_edges <- function(edges, lsn_path, calc_length = FALSE, length_col = NULL
     stop("Input edges must have LINESTRING geometry") }
   
   ## Check lsn_path exists
-  if (!file.exists(lsn_path)){
-    stop("\n lsn_path does not exist.\n\n")
-  }
-  ## Can we overwrite edges.gpkg if necessary
-  if(overwrite == FALSE & save_local == TRUE & file.exists(paste0(lsn_path, "/edges.gpkg"))) {
-    stop("edges.gpkg already exists in lsn_path and overwrite = FALSE")
+  if(save_local == TRUE) {
+    if (!file.exists(lsn_path)){
+      stop("\n lsn_path does not exist.\n\n")
+    }
+    ## Can we overwrite edges.gpkg if necessary
+    if(overwrite == FALSE & file.exists(paste0(lsn_path, "/edges.gpkg"))) {
+      stop("edges.gpkg already exists in lsn_path and overwrite = FALSE")
+    }
   }
 
   ## Can we overwrite upDist column if necessary
@@ -104,7 +156,7 @@ updist_edges <- function(edges, lsn_path, calc_length = FALSE, length_col = NULL
   if(verbose == TRUE) message("\n\nImporting relationships.csv table")
   rel <- read.csv(relate_table)
   
-  ## Get vector of rid values for outlet outlet segment(s)
+  ## Get vector of rid values for outlet segment(s)
   if(verbose == TRUE) message("\nIdentifying outlet segments\n")
   outlet <- identify_outlet_segment(rel, edges)
   n_outlets <- length(outlet) ## no. of outlets == no. of networks
