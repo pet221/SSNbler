@@ -1,4 +1,4 @@
-#' Snap sites to edges in a Landscape Network
+#' Incorporate sites into a Landscape Network
 #' @description Incorporates an \code{sf} object containing features
 #'   with POINT geometry into a landscape network (LSN), which is a
 #'   topological data model of streams/rivers represented as a
@@ -33,7 +33,7 @@
 #'   \code{sf} object with POINT geometry, which contains only the
 #'   point features from \code{sites} that were found less than the
 #'   \code{snap_tolerance} distance from the closest edge
-#'   feature. When an \code{sites} point feature meets these
+#'   feature. When a \code{sites} point feature meets these
 #'   requirements, it is moved (i.e. snapped) to the closest location
 #'   on an edge feature. Three new columns are also added: rid, ratio,
 #'   and snapdist. The rid column contains the rid for the edge the
@@ -45,7 +45,7 @@
 #'   closest edge is greater than or equal to the
 #'   \code{snap_tolerance}, the feature is not included in the output.
 #'
-#'   The \code{snap_tolerance} must always be >= 0 and must be large
+#'   The \code{snap_tolerance} must always be \eqn{\ge 0} and must be large
 #' enough to snap all of the point features to the edges. Using
 #' \code{snap_tolerance = 0} is not recommended, even when the
 #' \code{sites} features intersect the edge features. Instead, a
@@ -65,6 +65,43 @@
 #'   \code{lsn_path}.
 #' 
 #' @export
+#' @examples
+#' # Get temporary directory, where the example LSN will be stored
+#' # locally. 
+#' temp_dir <- tempdir()
+
+#' # Build the LSN. When working with your own data, lsn_path will be 
+#' # a local folder of your choice rather than a temporary directory.
+#' edges<- lines_to_lsn(
+#'    streams = MF_streams,
+#'    lsn_path = temp_dir, 
+#'    snap_tolerance = 1,
+#'    check_topology = FALSE,
+#'    overwrite = TRUE,
+#'    verbose = FALSE
+#' )
+#'
+#' # # Incorporate observed sites, MF_obs, into LSN
+#' obs<- sites_to_lsn(
+#'    sites = MF_obs,
+#'    edges = edges,
+#'    save_local = FALSE,
+#'    snap_tolerance = 100,
+#'    overwrite = TRUE,
+#'    verbose = FALSE
+#' )
+#' # Notice that 3 new columns have been added to obs
+#' names(obs)
+#'
+#' # Incorporate prediction dataset, MF_preds, into LSN
+#' preds<- sites_to_lsn(sites = MF_preds,
+#'    edges = edges,
+#'    save_local = FALSE,
+#'    snap_tolerance = 1,
+#'    overwrite = TRUE,
+#'    verbose = FALSE
+#' )
+#' 
 sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
                          lsn_path = NULL, file_name = NULL, overwrite = FALSE, 
                          verbose = TRUE){
