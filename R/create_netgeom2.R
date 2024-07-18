@@ -8,7 +8,7 @@
 #' @param type Character string defining geometry type of
 #'   \code{sf_data}. Default = \code{NULL}.
 #' @param overwrite Logical indicating whether existing data should be
-#'   overwritten if present. Default = \code{TRUE}.
+#'   overwritten if present. Default = \code{FALSE}.
 #'
 #' @details Most users will not need to run \code{create_netgeom2}
 #'   themselves because it is called internally when \code{lsn_to_ssn}
@@ -51,14 +51,46 @@
 #' 
 #' @export
 
-create_netgeom2 <- function(sf_data, type = NULL, overwrite = TRUE) {
+
+create_netgeom2 <- function(sf_data, type = NULL, overwrite = FALSE) {
+
+  ## check sf object
+  if (!inherits(sf_data, "sf")) {
+    stop("sf_data must be an sf object.", call. = FALSE)
+  }
+
+  ## Can we overwrite netgeom if it exists?
+  if("netgeom" %in% colnames(sf_data) & overwrite == FALSE){
+    stop("netgeom column is present in sf_data and overwrite = FALSE")
+  }
+
+  ## Check type argument
+  if(type != "POINT" & type != "LINESTRING") {
+    stop("type argument must be set to POINT or LINESTRING")
+  }
+   
   if (type == "POINT") {
+    ## Check that columns exist
+    c.names<- c("netID", "rid", "upDist", "ratio", "pid", "locID")
+    ind<- !c.names %in% colnames(sf_data)
+    if(sum(ind) > 0) {
+      stop(paste0("columns ", paste(c.names[ind], collapse = ", "), " not found in sf_data"))
+    }
+    ## Create netgeom
     sf_data[, "netgeom"] <- paste0("SNETWORK (", paste(
       sf_data$netID, sf_data$rid, sf_data$upDist,
       sf_data$ratio, sf_data$pid, sf_data$locID
     ), ")", sep = "")
   }
   if(type == "LINESTRING") {
+    ## Check that columns exist
+    c.names<- c("netID", "rid", "upDist")
+    ind<- !c.names %in% colnames(sf_data)
+    if(sum(ind) > 0) {
+      stop(paste0("columns ", paste(c.names[ind], collapse = ", "), " not found in sf_data"))
+    }
+
+    ## Create netgeom
     sf_data[, "netgeom"] <- paste0("ENETWORK (", paste(
       sf_data$netID,
       sf_data$rid,
