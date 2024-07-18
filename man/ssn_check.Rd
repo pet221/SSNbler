@@ -4,10 +4,12 @@
 \alias{ssn_check}
 \title{Check a SSN object}
 \usage{
-ssn_check(ssn.object, afv_col = NULL, verbose = TRUE)
+ssn_check(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TRUE)
 }
 \arguments{
 \item{ssn.object}{A \code{SSN} object created using \code{\link[SSNbler]{ssn_assemble}} or imported using \code{\link[SSN2]{ssn_import}}.}
+
+\item{check_obs}{A logical indicating whether the observations should be checked. Default = \code{TRUE}.}
 
 \item{afv_col}{Character vector containing  names of columns containing additive function values. The Default = \code{NULL}.}
 

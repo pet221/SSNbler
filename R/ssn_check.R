@@ -2,7 +2,8 @@
 #' 
 #' @description Check a \code{SSN} object to ensure that it contains valid spatial, topological, and attribute information needed to fit spatial statistical stream network models using the \code{SSN2} package.
 #' 
-#' @param ssn.object A \code{SSN} object created using \code{\link[SSNbler]{ssn_assemble}} or imported using \code{\link[SSN2]{ssn_import}}. 
+#' @param ssn.object A \code{SSN} object created using \code{\link[SSNbler]{ssn_assemble}} or imported using \code{\link[SSN2]{ssn_import}}.
+#' @param check_obs A logical indicating whether the observations should be checked. Default = \code{TRUE}.
 #' @param afv_col Character vector containing  names of columns containing additive function values. The Default = \code{NULL}.
 #' @param verbose Logical \code{TRUE/FALSE} indicating whether details describing the checks are printed to the console. If \code{verbose = FALSE}, a logical \code{TRUE/FALSE} is returned indicating whether the \code{SSN} object passed all of the checks. Default = \code{TRUE}. 
 #' 
@@ -11,7 +12,7 @@
 #' @export
 #'
 
-ssn_check <- function(ssn.object, afv_col = NULL, verbose = TRUE) {
+ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TRUE) {
 
   out.message<- "\n"
   valid <- TRUE
@@ -72,56 +73,6 @@ ssn_check <- function(ssn.object, afv_col = NULL, verbose = TRUE) {
     out.message<- paste0(out.message, "edges netgeom column not found\n")
     valid<- FALSE
   }
-
-  ## Check rid ----------------------------------------
-  ## if("rid" %in% colnames(ssn.object$edges)) {
-  ##   if(!class(ssn.object$edges$rid)== "numeric") {
-  ##     out.message <- paste0(out.message, "edges column rid is not numeric\n")
-  ##     valid<- FALSE
-  ##   }
-  ##   if(sum(duplicated(ssn.object$edges$rid)) >0) {
-  ##     out.message <- paste0(out.message, "duplicates found in edges column rid\n")
-  ##     valid<- FALSE
-  ##   }
-
-  ##   if(sum(is.na(ssn.object$edges$rid)) > 0) {
-  ##    out.message <- paste0(out.message, "rid column contains NAs\n")
-  ##     valid<- FALSE
-  ##   }    
-  ## } else {
-  ##   out.message <- paste0(out.message, "rid column is missing from edges\n")
-  ##   valid<- FALSE
-  ## }
-
-  ## Check netID----------------------------------------
-  ## if("netID" %in% colnames(ssn.object$edges)) {
-  ##   if(!class(ssn.object$edges$netID) == "numeric") {
-  ##     out.message <- paste0(out.message, "edges column netID is not numeric\n")
-  ##     valid<- FALSE
-  ##   }
-  ##   if(sum(is.na(ssn.object$edges$netID)) > 0) {
-  ##     out.message <- paste0(out.message, "netID column contains NAs\n")
-  ##     valid<- FALSE
-  ##   }   
-  ## } else {
-  ##   out.message <- paste0(out.message, "netID column missing from edges\n")
-  ##   valid<- FALSE
-  ## }
-    
-  ## ## Check upDist---------------------------------------
-  ## if("upDist" %in% colnames(ssn.object$edges)) {
-  ##   if(!class(ssn.object$edges$upDist) == "numeric") {
-  ##     out.message <- paste0(out.message, "edges column upDist is not numeric\n")
-  ##     valid<- FALSE
-  ##   }
-  ##   if(sum(is.na(ssn.object$edges$upDist)) > 0) {
-  ##     out.message<- paste0(out.message, "upDist column contains NAs\n")
-  ##     valid<- FALSE
-  ##   }    
-  ## } else {
-  ##   out.message <- paste0(out.message, "upDist column missing from edges\n")
-  ##   valid<- FALSE
-  ## }
     
   ## Check AFV cols-----------------------------------------
   if(!is.null(afv_col)) {
@@ -159,179 +110,77 @@ ssn_check <- function(ssn.object, afv_col = NULL, verbose = TRUE) {
   ##--------------------------------------------------------
   ## check obs
   ##--------------------------------------------------------
+
+  if(check_obs == TRUE) {
   
-  ## Check class of obs
-  if (!inherits(ssn.object$obs, "sf")) {
-    stop("obs are not of class sf")
-  }
-  
-  ## Check geometry of obs
-  obs_geom<- st_as_text(st_geometry(ssn.object$obs)[[1]])
-  if(grepl("POINT", obs_geom) == FALSE) {
-    out.message <- paste0(out.message, "obs do not have POINT geometry\n")
-    valid<- FALSE
-  }
-
-  ## check for empty geometries ----------------
-  empty.obs<- sum(st_is_empty(ssn.object$obs))
-
-  if(empty.obs > 0) {
-    out.message <- paste0(out.message,"obs contain missing geometries. Use sf:st_is_empty() to identify these point features.\n")
-    valid<- FALSE
-  }
-
-  ## Check netgeom----------------------------------------------
-  if("netgeom" %in% colnames(ssn.object$obs)) {
-
-    ## Check contents of netgeom
-    ng.message<- check_netgeom(ssn.object$obs, type = "obs", verbose = TRUE)
-    if(!is.null(ng.message)) {
-      out.message<- paste0(out.message, ng.message)
-      valid <- FALSE
+    ## Check class of obs
+    if (!inherits(ssn.object$obs, "sf")) {
+      stop("obs are not of class sf")
     }
     
-  } else {
-    out.message<- paste0(out.message, "obs netgeom column not found\n")
-    valid<- FALSE
-  }
+    ## Check geometry of obs
+    obs_geom<- st_as_text(st_geometry(ssn.object$obs)[[1]])
+    if(grepl("POINT", obs_geom) == FALSE) {
+      out.message <- paste0(out.message, "obs do not have POINT geometry\n")
+      valid<- FALSE
+    }
 
+    ## check for empty geometries ----------------
+    empty.obs<- sum(st_is_empty(ssn.object$obs))
 
-  ## ## Check pid --------------------------------------
-  ##  if("pid" %in% colnames(ssn.object$obs)) {
-  ##   if(!class(ssn.object$obs$pid)== "numeric") {
-  ##     out.message <- paste0(out.message, "obs column pid is not an integer\n")
-  ##     valid<- FALSE
-  ##   }
-  ##   if(sum(duplicated(ssn.object$obs$pid)) > 0) {
-  ##     out.message <- paste0(out.message, "duplicates found in obs pid\n")
-  ##     valid<- FALSE
-  ##   }
+    if(empty.obs > 0) {
+      out.message <- paste0(out.message,
+                            "obs contain missing geometries. Use sf:st_is_empty() to identify these point features.\n")
+      valid<- FALSE
+    }
 
-  ##   if(sum(is.na(ssn.object$obs$pid)) >0) {
-  ##    out.message <- paste0(out.message, "obs pid column contains NAs\n")
-  ##     valid<- FALSE
-  ##   }
-    
-  ## } else {
-  ##   out.message <- paste0(out.message, "obs pid column is missing\n")
-  ##   valid<- FALSE
-  ## }
-
-  ## ## Check locID --------------------------------------
-  ##  if("locID" %in% colnames(ssn.object$obs)) {
-  ##   if(!class(ssn.object$obs$locID)== "integer") {
-  ##     out.message <- paste0(out.message, "obs column locID is not an integer\n")
-  ##     valid<- FALSE
-  ##   }
-
-  ##   if(sum(is.na(ssn.object$obs$locID)) > 0) {
-  ##    out.message <- paste0(out.message, "obs locID column contains NAs\n")
-  ##     valid<- FALSE
-  ##   }
-    
-  ## } else {
-  ##   out.message <- paste0(out.message, "obs locID column is missing\n")
-  ##   valid<- FALSE
-  ## }
-
-  ## ## Check ratio -------------------------------
-  ## if("ratio" %in% colnames(ssn.object$obs)) {
-  ##   if(!class(ssn.object$obs$ratio)== "numeric") {
-  ##     out.message <- paste0(out.message, "obs column ratio is not numeric\n")
-  ##     valid<- FALSE
-  ##   }
-    
-  ##   if(sum(is.na(ssn.object$obs$ratio)) >0) {
-  ##    out.message <- paste0(out.message, "ratio column contains NAs\n")
-  ##     valid<- FALSE
-  ##   }
-    
-  ## } else {
-  ##   out.message <- paste0(out.message, "ratio column is missing from obs\n")
-  ##   valid<- FALSE
-  ## }
-
- ##   ## Check rid ---------------------------------
- ##  if("rid" %in% colnames(ssn.object$obs)) {
- ##    if(!class(ssn.object$obs$rid)== "integer") {
- ##      out.message <- paste0(out.message, "obs column rid is not an integer\n")
- ##      valid<- FALSE
- ##    }
-    
- ##    if(sum(is.na(ssn.object$obs$rid)) >0) {
- ##     out.message <- paste0(out.message, "rid column contains NAs\n")
- ##      valid<- FALSE
- ##    }
-    
- ##  } else {
- ##    out.message <- paste0(out.message, "rid column is missing from obs\n")
- ##    valid<- FALSE
- ##  }
-
- ## ## Check netID ---------------------------------
- ##  if("netID" %in% colnames(ssn.object$obs)) {
- ##    if(!class(ssn.object$obs$netID) == "numeric") {
- ##      out.message <- paste0(out.message, "obs column netID is not numeric\n")
- ##      valid<- FALSE
- ##    }
- ##    if(sum(is.na(ssn.object$obs$netID)) > 0) {
- ##      out.message <- paste0(out.message, "netID column contains NAs\n")
- ##      valid<- FALSE
- ##    }
-    
- ##  } else {
- ##    out.message <- paste0(out.message, "netID column missing from obs\n")
- ##    valid<- FALSE
- ##  }
-    
- ##  ## Check upDist---------------------------------
- ##  if("upDist" %in% colnames(ssn.object$obs)) {
- ##    if(!class(ssn.object$obs$upDist) == "numeric") {
- ##      out.message <- paste0(out.message, "obs column upDist is not numeric\n")
- ##      valid<- FALSE
- ##    }
- ##    if(sum(is.na(ssn.object$obs$upDist)) >0) {
- ##      out.message<- paste0(out.message, "upDist column contains NAs\n")
- ##      valid<- FALSE
- ##    }
-    
- ##  } else {
- ##    out.message <- paste0(out.message, "upDist column missing from obs\n")
- ##    valid<- FALSE
- ##  }
-
-  ## Check AFV cols ---------------------------------
-  if(!is.null(afv_col)) {
-
-    obs.df <- st_drop_geometry(ssn.object$obs)
-
-    for(i in 1:length(afv_col)) {
-
-      afv_i <- afv_col[i]
-
-      ## Does AFV column exist
-      if(afv_i %in% colnames(ssn.object$obs)) {
-              
-        if(sum(is.na(obs.df[, afv_i])) > 0) {
-          out.message<- paste0(out.message, "obs AFV column, ", afv_i, ", contains NAs\n")
-          valid<- FALSE
-        }
-
-        if(sum(obs.df[, afv_i] < 0) > 0 |
-           sum(obs.df[, afv_i] > 1) > 0) {
-          out.message<- paste0(out.message, "obs AFV column, ",
-                               afv_i, 
-                               ", contains values < 0 and/or > 1\n")
-          valid <- FALSE
-        }        
-      } else {
-        out.message<- paste0(out.message, "obs AFV column, ", afv_i,
-                             ", not found\n")
+    ## Check netgeom----------------------------------------------
+    if("netgeom" %in% colnames(ssn.object$obs)) {
+      
+      ## Check contents of netgeom
+      ng.message<- check_netgeom(ssn.object$obs, type = "obs", verbose = TRUE)
+      if(!is.null(ng.message)) {
+        out.message<- paste0(out.message, ng.message)
         valid <- FALSE
       }
-    }      
+    
+    } else {
+      out.message<- paste0(out.message, "obs netgeom column not found\n")
+      valid<- FALSE
+    }
+      
+    ## Check AFV cols ---------------------------------
+    if(!is.null(afv_col)) {
+      
+      obs.df <- st_drop_geometry(ssn.object$obs)
+      
+      for(i in 1:length(afv_col)) {
+        
+        afv_i <- afv_col[i]
+        
+        ## Does AFV column exist
+        if(afv_i %in% colnames(ssn.object$obs)) {
+          
+          if(sum(is.na(obs.df[, afv_i])) > 0) {
+            out.message<- paste0(out.message, "obs AFV column, ", afv_i, ", contains NAs\n")
+            valid<- FALSE
+          }
+          
+          if(sum(obs.df[, afv_i] < 0) > 0 |
+             sum(obs.df[, afv_i] > 1) > 0) {
+            out.message<- paste0(out.message, "obs AFV column, ",
+                                 afv_i, 
+                                 ", contains values < 0 and/or > 1\n")
+            valid <- FALSE
+          }        
+        } else {
+          out.message<- paste0(out.message, "obs AFV column, ", afv_i,
+                               ", not found\n")
+          valid <- FALSE
+        }
+      }      
+    }
   }
-
 
   ##---------------------------------------------------------
   ## check preds, if they exist
