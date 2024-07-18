@@ -4,7 +4,7 @@
 \alias{create_netgeom2}
 \title{Create netgeom column in SSN object}
 \usage{
-create_netgeom2(sf_data, type = NULL, overwrite = TRUE)
+create_netgeom2(sf_data, type = NULL, overwrite = FALSE)
 }
 \arguments{
 \item{sf_data}{An \code{sf} object with LINESTING or POINT geometry
@@ -14,7 +14,7 @@ created using \code{link{lsn_to_ssn}} (see Details).}
 \code{sf_data}. Default = \code{NULL}.}
 
 \item{overwrite}{Logical indicating whether existing data should be
-overwritten if present. Default = \code{TRUE}.}
+overwritten if present. Default = \code{FALSE}.}
 }
 \value{
 An \code{sf} object containing the original data from
