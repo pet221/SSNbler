@@ -1,9 +1,8 @@
 createBinaryID <- function(ssn.object, overwrite) {
-
   local_dir(ssn.object$path)
-  
+
   ## If binaryID.db exists
- 
+
   if (file.exists("binaryID.db")) {
     if (overwrite == TRUE) {
       unlink("binaryID.db")

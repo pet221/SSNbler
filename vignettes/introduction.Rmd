@@ -220,7 +220,7 @@ We create a LSN associated with `MF_streams` by running
 
 ```{r}
 ## Set path for new folder for lsn
-lsn.path<-paste0(tempdir(), "/mf04")
+lsn.path <- paste0(tempdir(), "/mf04")
 
 edges <- lines_to_lsn(
   streams = MF_streams,
@@ -433,7 +433,7 @@ edges <- updist_edges(
   calc_length = TRUE
 )
 
-names(edges)           ## View edges column names
+names(edges) ## View edges column names
 ```
 
 Two columns are added to edges and saved in `edges.gpkg`. `Length` represents the
@@ -466,13 +466,12 @@ Upstream distance is calculated for each site using the
 site.list <- updist_sites(
   sites = list(obs = obs, pred1km = preds, CapeHorn = capehorn),
   edges = edges,
-  length_col= "Length",
+  length_col = "Length",
   lsn_path = lsn.path
 )
 
-names(site.list)           ## View output site.list names
-names(site.list$obs)       ## View column names in obs
-
+names(site.list) ## View output site.list names
+names(site.list$obs) ## View column names in obs
 ```
 
 The data stored in `upDist` are later used to calculate the directional hydrologic
@@ -487,7 +486,6 @@ ggplot() +
   geom_sf(data = site.list$obs, aes(color = upDist)) +
   coord_sf(datum = st_crs(MF_streams)) +
   scale_color_viridis_c()
-
 ```
 
 
@@ -562,14 +560,14 @@ summary(edges$h2oAreaKm2) ## Summarize and check for zeros
 
 edges <- afv_edges(
   edges = edges,
-  infl_col = "h2oAreaKm2", 
+  infl_col = "h2oAreaKm2",
   segpi_col = "areaPI",
   afv_col = "afvArea",
   lsn_path = lsn.path
 )
 
-names(edges)            ## Look at edges column names
-summary(edges$afvArea)  ## Summarize the AFV column
+names(edges) ## Look at edges column names
+summary(edges$afvArea) ## Summarize the AFV column
 ```
 The AFVs are a product of ratios, which means that the AFVs are always
 between zero and one ($0 \leq AFV \leq 1$). The AFV for the most downstream edge in a network will always
@@ -605,9 +603,8 @@ site.list <- afv_sites(
   lsn_path = lsn.path
 )
 
-names(site.list$pred1km)            ## View column names in pred1km
-summary(site.list$pred1km$afvArea)  ## Summarize AFVs in pred1km and look for zeros
-
+names(site.list$pred1km) ## View column names in pred1km
+summary(site.list$pred1km$afvArea) ## Summarize AFVs in pred1km and look for zeros
 ```
 Each `sf` dataset in `sites.list` now has an AFV column, `afvArea`, which was
 generated based on cumulative watershed area. All AFVs should meet the
@@ -648,9 +645,9 @@ mf04_ssn <- ssn_assemble(
   import = TRUE,
   overwrite = TRUE
 )
-class(mf04_ssn)         ## Get class
-names(mf04_ssn)         ## print names of SSN object
-names(mf04_ssn$preds)   ## print names of prediction datasets
+class(mf04_ssn) ## Get class
+names(mf04_ssn) ## print names of SSN object
+names(mf04_ssn$preds) ## print names of prediction datasets
 ```
 The outputs of `ssn_assemble()` are stored locally in a directory with
 a `.ssn` extension and in memory as an object of class `SSN` when `import = TRUE`.
@@ -735,18 +732,21 @@ ggplot() +
   geom_sf(
     data = mf04_ssn$edges,
     color = "medium blue",
-    aes(linewidth = h2oAreaKm2)) +
-  scale_linewidth(range = c(0.1, 2.5)) + 
+    aes(linewidth = h2oAreaKm2)
+  ) +
+  scale_linewidth(range = c(0.1, 2.5)) +
   geom_sf(
     data = mf04_ssn$preds$pred1km,
     size = 1.5,
     shape = 21,
     fill = "white",
-    color = "dark grey") +
+    color = "dark grey"
+  ) +
   geom_sf(
-    data = mf04_ssn$obs, 
+    data = mf04_ssn$obs,
     size = 1.7,
-    aes(color = Summer_mn)) +
+    aes(color = Summer_mn)
+  ) +
   coord_sf(datum = st_crs(MF_streams)) +
   scale_color_viridis_c() +
   labs(color = "Temperature", linewidth = "WS Area") +

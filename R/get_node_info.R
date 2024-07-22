@@ -12,15 +12,14 @@ get_node_info <- function(node_coords, from_point, to_point, snap_tolerance) {
     get_each_node_info(x, from_x, from_y, to_x, to_y, snap_tolerance)
   })
   node_info
-
 }
 
 get_each_node_info <- function(node_coords_split, from_x, from_y, to_x, to_y, snap_tolerance) {
   dist_vector_from_x <- (node_coords_split[[1]] - from_x)^2
   dist_vector_from_y <- (node_coords_split[[2]] - from_y)^2
   nodes_vs_from <- sqrt(dist_vector_from_x + dist_vector_from_y)
-  dist_vector_to_x <- (node_coords_split[[1]]  - to_x)^2
-  dist_vector_to_y <- (node_coords_split[[2]]  - to_y)^2
+  dist_vector_to_x <- (node_coords_split[[1]] - to_x)^2
+  dist_vector_to_y <- (node_coords_split[[2]] - to_y)^2
   nodes_vs_to <- sqrt(dist_vector_to_x + dist_vector_to_y)
   ## Summarise the number of node-edge intersections based on this distance matrix
   ## Returns a vector with length==nrow(node_coords) containing number of line

@@ -3,8 +3,8 @@ get_rid_confl <- function(from_point, to_point, snap_tolerance) {
   # from_xy <- do.call(rbind, lapply(from_point, function(x) x[1:2]))
   from_x <- do.call(c, lapply(from_point, function(x) x[1]))
   from_y <- do.call(c, lapply(from_point, function(x) x[2]))
-  # to_xy <- do.call(rbind, lapply(to_point, function(x) x[1:2])) 
-  
+  # to_xy <- do.call(rbind, lapply(to_point, function(x) x[1:2]))
+
   rid_confl <- lapply(to_point, function(x) {
     get_each_rid_confl(x[1:2], from_x, from_y, snap_tolerance)
   })

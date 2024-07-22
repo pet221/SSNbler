@@ -67,30 +67,30 @@ downstream node of each line feature in \code{edges}.
 }
 \examples{
 # Get temporary directory, where the example LSN will be stored
-# locally. 
+# locally.
 temp_dir <- tempdir()
 
-# Build the LSN. When working with your own data, lsn_path will be 
+# Build the LSN. When working with your own data, lsn_path will be
 # a local folder of your choice rather than a temporary directory.
-edges<- lines_to_lsn(
-   streams = MF_streams,
-   lsn_path = temp_dir, 
-   snap_tolerance = 1,
-   check_topology = FALSE,
-   overwrite = TRUE,
-   verbose = FALSE
+edges <- lines_to_lsn(
+  streams = MF_streams,
+  lsn_path = temp_dir,
+  snap_tolerance = 1,
+  check_topology = FALSE,
+  overwrite = TRUE,
+  verbose = FALSE
 )
 
 # Accumulate RCA area (rcaAreaKm2) downstream and store in a new
 # column named WArea_km2
-edges<- accum_edges(
-   edges = edges,
-   lsn_path = temp_dir,
-   sum_col = "rcaAreaKm2",
-   acc_col = "WArea_km2",
-   save_local = FALSE,
-   overwrite = TRUE,
-   verbose = FALSE
+edges <- accum_edges(
+  edges = edges,
+  lsn_path = temp_dir,
+  sum_col = "rcaAreaKm2",
+  acc_col = "WArea_km2",
+  save_local = FALSE,
+  overwrite = TRUE,
+  verbose = FALSE
 )
 
 summary(edges$WArea_km2)

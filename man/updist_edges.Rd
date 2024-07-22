@@ -74,13 +74,13 @@ column contains.
 }
 \examples{
 # Get temporary directory, where the example LSN will be stored
-# locally. 
+# locally.
 temp_dir <- tempdir()
-# Build the LSN. When working with your own data, lsn_path will be 
+# Build the LSN. When working with your own data, lsn_path will be
 # a local folder of your choice rather than a temporary directory.
 edges<- lines_to_lsn(
    streams = MF_streams,
-   lsn_path = temp_dir, 
+   lsn_path = temp_dir,
    snap_tolerance = 1,
    check_topology = FALSE,
    overwrite = TRUE,

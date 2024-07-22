@@ -109,31 +109,31 @@ Appendix A).
 }
 \examples{
 # Get temporary directory, where the example LSN will be stored
-# locally. 
+# locally.
 temp_dir <- tempdir()
 
-# Build the LSN. When working with your own data, lsn_path will be 
+# Build the LSN. When working with your own data, lsn_path will be
 # a local folder of your choice rather than a temporary directory.
-edges<- lines_to_lsn(
-   streams = MF_streams,
-   lsn_path = temp_dir, 
-   snap_tolerance = 1,
-   check_topology = FALSE,
-   overwrite = TRUE,
-   verbose = FALSE
+edges <- lines_to_lsn(
+  streams = MF_streams,
+  lsn_path = temp_dir,
+  snap_tolerance = 1,
+  check_topology = FALSE,
+  overwrite = TRUE,
+  verbose = FALSE
 )
 
 # Calculate the AFV for the edges using an existing column
 # representing watershed area for the downstream node of each line
 # feature (h2oAreaKm2).
-edges<- afv_edges(
-   edges=edges,
-   infl_col = "h2oAreaKm2", 
-   segpi_col = "areaPI",
-   lsn_path = temp_dir,
-   afv_col = "afvArea",
-   overwrite = TRUE,
-   save_local = FALSE
+edges <- afv_edges(
+  edges = edges,
+  infl_col = "h2oAreaKm2",
+  segpi_col = "areaPI",
+  lsn_path = temp_dir,
+  afv_col = "afvArea",
+  overwrite = TRUE,
+  save_local = FALSE
 )
 
 # Check AFVs stored in new column afvArea to ensure that 0 <= AFV

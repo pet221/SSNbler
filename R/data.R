@@ -1,9 +1,9 @@
 #' MF_streams: Middle Fork streams
 #'
 #' \code{MF_streams} is an \code{sf} object with LINESTRING geometry representing a subset of
-#' streams and rivers in the Middle Fork Basin, Idaho, USA. 
+#' streams and rivers in the Middle Fork Basin, Idaho, USA.
 #'
-#' The \code{sf} data.frame contains a set of 163 features and 9 columns: 
+#' The \code{sf} data.frame contains a set of 163 features and 9 columns:
 #'   \itemize{
 #'     \item COMID: Common identifier of an NHD feature or relationship
 #'     \item GNIS_NAME: Feature name as found in the Geographic Names Information System
@@ -16,9 +16,9 @@
 #'     \item h2oAreaKm2: Watershed area (km2) for the lowermost location (downstream end node) on the line segment
 #' }
 #'
-#'@source \code{MF_streams} are a modified version of the United States
+#' @source \code{MF_streams} are a modified version of the United States
 #'   National Hydrography Dataset
-#'   (http://nhd.usgs.gov/). 
+#'   (http://nhd.usgs.gov/).
 #'
 #' @docType data
 #'
@@ -28,7 +28,7 @@
 #'
 #' MF_obs: Water temperature observations in the Middle Fork Basin, Idaho in 2004.
 #'
-#' \code{MF_obs} is an \code{sf} object with POINT geometry representing water temperature observations and covariates in the Middle Fork Basin, Idaho, USA collected in 2004. 
+#' \code{MF_obs} is an \code{sf} object with POINT geometry representing water temperature observations and covariates in the Middle Fork Basin, Idaho, USA collected in 2004.
 #'
 #' The \code{sf} data.frame contains 45 point features and 16 columns:
 #'   \itemize{
@@ -57,7 +57,7 @@
 #'     \item h2oAreaKm2: Watershed area (km2) for the downstream node of the edge feature the site resides on
 #' }
 #'
-#'@source \code{MF_obs} are unpublished United States Forest Service data. 
+#' @source \code{MF_obs} are unpublished United States Forest Service data.
 #'
 #' @docType data
 #'
@@ -67,7 +67,7 @@
 #'
 #' MF_CapeHorn: Prediction locations on Cape Horn Creek, in the Middle Fork Basin, Idaho.
 #'
-#' \code{MF_CapeHorn} is an \code{sf} object with POINT geometry representing prediction locations and covariates on Cape Horn Creek, Middle Fork Basin, Idaho, USA. 
+#' \code{MF_CapeHorn} is an \code{sf} object with POINT geometry representing prediction locations and covariates on Cape Horn Creek, Middle Fork Basin, Idaho, USA.
 #'
 #' The \code{sf} data.frame contains 654 point features and 9 columns:
 #'   \itemize{
@@ -89,7 +89,7 @@
 #'     \item h2oAreaKm2: Watershed area (km2) for the downstream node of the edge feature the site resides on
 #' }
 #'
-#'@source \code{MF_CapeHorn} are unpublished United States Forest Service data. 
+#' @source \code{MF_CapeHorn} are unpublished United States Forest Service data.
 #'
 #' @docType data
 #'
@@ -98,7 +98,7 @@
 #'
 #' MF_pred1km: Prediction locations at 1km intervals throughout the Middle Fork Basin, Idaho.
 #'
-#' \code{MF_pred1km} is an \code{sf} object with POINT geometry representing prediction locations and covariates distributed at 1km intervals throughout the Middle Fork Basin, Idaho, USA. 
+#' \code{MF_pred1km} is an \code{sf} object with POINT geometry representing prediction locations and covariates distributed at 1km intervals throughout the Middle Fork Basin, Idaho, USA.
 #'
 #' The \code{sf} data.frame contains 175 point features and 9 columns:
 #'   \itemize{
@@ -120,7 +120,7 @@
 #'     \item h2oAreaKm2: Watershed area (km2) for the downstream node of the edge feature the site resides on
 #' }
 #'
-#'@source \code{MF_pred1km} are unpublished United States Forest Service data. 
+#' @source \code{MF_pred1km} are unpublished United States Forest Service data.
 #'
 #' @docType data
 #'
@@ -129,7 +129,7 @@
 
 #' MF_preds: A small set of prediction locations found in the Middle Fork Basin, Idaho.
 #'
-#' \code{MF_preds} is an \code{sf} object with POINT geometry representing prediction locations and covariates distributed at 1km intervals throughout the Middle Fork Basin, Idaho, USA. 
+#' \code{MF_preds} is an \code{sf} object with POINT geometry representing prediction locations and covariates distributed at 1km intervals throughout the Middle Fork Basin, Idaho, USA.
 #'
 #' The \code{sf} data.frame contains 43 point features and 9 columns:
 #'   \itemize{
@@ -150,7 +150,7 @@
 #'     \item h2oAreaKm2: Watershed area (km2) for the downstream node of the edge feature the site resides on
 #' }
 #'
-#'@source \code{MF_preds} are unpublished United States Forest Service data. 
+#' @source \code{MF_preds} are unpublished United States Forest Service data.
 #'
 #' @docType data
 #'

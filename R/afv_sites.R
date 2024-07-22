@@ -47,7 +47,7 @@
 #'   on. Therefore, \eqn{0 \le AFV \le 1}. See Peterson and Ver Hoef
 #'   (2010) for a more detailed description of AFVs, how they are
 #'   calculated, and how they are used in the tail up covariance function.
-#' 
+#'
 #' @return One or more \code{sf} object(s) with all the original data
 #'   from \code{sites}, along with a new \code{afv_col} column in each
 #'   \code{sites sf} object. A named list is returned. If
@@ -60,17 +60,17 @@
 #'   mixed model moving average approach to geostatistical modeling in
 #'   stream networks. Ecology 91(3), 644–651.
 #' @export
-#' 
+#'
 #' @examples
 #' #' # Get temporary directory, where the example LSN will be stored
-#' # locally. 
+#' # locally.
 #' temp_dir <- tempdir()
 
-#' # Build the LSN. When working with your own data, lsn_path will be 
+#' # Build the LSN. When working with your own data, lsn_path will be
 #' # a local folder of your choice rather than a temporary directory.
 #' edges<- lines_to_lsn(
 #'    streams = MF_streams,
-#'    lsn_path = temp_dir, 
+#'    lsn_path = temp_dir,
 #'    snap_tolerance = 1,
 #'    check_topology = FALSE,
 #'    overwrite = TRUE,
@@ -101,7 +101,7 @@
 #' # feature.
 #' edges<- afv_edges(
 #'    edges=edges,
-#'    infl_col = "h2oAreaKm2", 
+#'    infl_col = "h2oAreaKm2",
 #'    segpi_col = "areaPI",
 #'    lsn_path = temp_dir,
 #'    afv_col = "afvArea",
@@ -129,52 +129,52 @@
 #' summary(site.list$preds$afvArea)
 
 afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
-                      lsn_path=NULL, overwrite = TRUE){
-
-  
+                      lsn_path = NULL, overwrite = TRUE) {
   # check sf object
   if (any(vapply(sites, function(x) !inherits(x, "sf"), logical(1)))) {
     stop("All sites objects must be sf objects.", call. = FALSE)
   }
-  
+
   # check sf object
   if (!inherits(edges, "sf")) {
     stop("edges must be an sf object.", call. = FALSE)
   }
-  
+
   ## Check inputs -------------------------------------------
   ## if(is.null(lsn_path) & save_local == TRUE) {
   ##   stop("lsn_path is required when save_local = TRUE")
   ## }
-    
+
   ## ## Check lsn_path exists
   ## if (save_local == TRUE & !file.exists(lsn_path)){
   ##   stop("\n lsn_path does not exist.\n\n")
   ## }
 
-  if(save_local == TRUE) {
+  if (save_local == TRUE) {
     ## Check lsn_path
-    if(is.null(lsn_path)) {
+    if (is.null(lsn_path)) {
       stop("lsn_path is required when save_local = TRUE")
     }
-    if(!file.exists(lsn_path)){
+    if (!file.exists(lsn_path)) {
       stop("\n lsn_path does not exist.\n\n")
     }
 
     ## Can we overwrite sites geopackage files if necessary
-    if(overwrite == FALSE) {
-      s.exists<- vector()
-      for(e in 1:length(sites)) {
-        if(file.exists(paste0(lsn_path, "/", names(sites)[e], ".gpkg"))){
+    if (overwrite == FALSE) {
+      s.exists <- vector()
+      for (e in 1:length(sites)) {
+        if (file.exists(paste0(lsn_path, "/", names(sites)[e], ".gpkg"))) {
           s.exists[e] <- TRUE
         } else {
-          s.exists[e]<-FALSE
+          s.exists[e] <- FALSE
         }
       }
-      ## Do some sites geopackage files already exist 
-      if(sum(s.exists) > 0) {
-        stop(paste0("Cannot save sites to local files because at least one file already exists in ",
-                    lsn_path, " and overwrite = FALSE"))
+      ## Do some sites geopackage files already exist
+      if (sum(s.exists) > 0) {
+        stop(paste0(
+          "Cannot save sites to local files because at least one file already exists in ",
+          lsn_path, " and overwrite = FALSE"
+        ))
       }
     }
   }
@@ -184,23 +184,22 @@ afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
     stop("sites must be a named list of one or more sf objects")
   }
 
-  if(is.null(names(sites))) {
+  if (is.null(names(sites))) {
     stop("sites list is missing names attribute")
   }
 
   ## Check for afv_col in edges and subset df if found
-  if(!afv_col %in% colnames(edges)) {
+  if (!afv_col %in% colnames(edges)) {
     stop(paste(afv_col, "not found in edges"))
-  } else { 
+  } else {
     ## Convert edges to df
     edges_df <- edges[, c("rid", afv_col)]
     edges_df <- st_drop_geometry(edges_df)
   }
-    
+
   ## Loop over sites, saving afv_col after extracting from the corresponding edge
   n_sites <- length(sites)
-  for(i in 1:n_sites){
-
+  for (i in 1:n_sites) {
     sites_i <- sites[[i]]
 
     # ## Remove afv_col if it exists and overwrite == TRUE
@@ -210,17 +209,19 @@ afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
     # ## Check for duplicate names
     # check_names_case_add(names(sites_i), afv_col, names(sites)[i], "afv_col")
 
-    if(afv_col %in% names(sites_i)){
-      if(overwrite == FALSE) {
-        message("A column called", afv_col, "already exists in", names(sites)[i],
-                "and overwrite is set to FALSE. Skipping this set of sites.")
+    if (afv_col %in% names(sites_i)) {
+      if (overwrite == FALSE) {
+        message(
+          "A column called", afv_col, "already exists in", names(sites)[i],
+          "and overwrite is set to FALSE. Skipping this set of sites."
+        )
         next ## skip to next iteration after message
       } else {
-        ind<- colnames(sites_i) == afv_col
-        sites_i<- sites_i[,!ind]
-      }   
-    } 
-    
+        ind <- colnames(sites_i) == afv_col
+        sites_i <- sites_i[, !ind]
+      }
+    }
+
     ## If afv_col file exists and overwrite is TRUE (seg_pi is NOT needed in this function)
     if (afv_col %in% colnames(sites_i)) {
       if (overwrite) {
@@ -230,7 +231,7 @@ afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
       }
     }
     check_names_case_add(names(sites_i), afv_col, names(sites)[i], "afv_col")
-    
+
     ## If fid file exists and overwrite is TRUE
     if ("fid" %in% colnames(sites_i)) {
       if (overwrite) {
@@ -241,30 +242,34 @@ afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
     }
     check_names_case(names(sites_i), "fid", names(sites)[i])
 
-    sites_i<- merge(sites_i, edges_df, by = "rid", sort = FALSE)
+    sites_i <- merge(sites_i, edges_df, by = "rid", sort = FALSE)
 
-    ind.neg<- st_drop_geometry(sites_i[,afv_col]) <0
-    if(sum(ind.neg) > 0) {
+    ind.neg <- st_drop_geometry(sites_i[, afv_col]) < 0
+    if (sum(ind.neg) > 0) {
       stop("negative values produced for afv_col. Go back to edgs_afv() and check infl_col, segpi_col, and afv_col")
     }
 
     ## Write to local file
-    if(save_local) {
-      st_write(sites_i, dsn = paste0(lsn_path, "/", names(sites)[i], ".gpkg"),
-                                     delete_dsn = TRUE, quiet = TRUE)
+    if (save_local) {
+      st_write(sites_i,
+        dsn = paste0(lsn_path, "/", names(sites)[i], ".gpkg"),
+        delete_dsn = TRUE, quiet = TRUE
+      )
     }
-   
-    ind.zeros <- st_drop_geometry(sites_i[,afv_col]) == 0
-    sum.zeros<-sum(ind.zeros)
-    
-    if(sum.zeros > 0) {
-      warning(paste0(sum.zeros, "/", nrow(sites_i), " AFV values equal to zero in ",
-                     names(sites)[i],
-                     ". Sites with AFV==0 will have no influence in the tail-up model.\n"))
+
+    ind.zeros <- st_drop_geometry(sites_i[, afv_col]) == 0
+    sum.zeros <- sum(ind.zeros)
+
+    if (sum.zeros > 0) {
+      warning(paste0(
+        sum.zeros, "/", nrow(sites_i), " AFV values equal to zero in ",
+        names(sites)[i],
+        ". Sites with AFV==0 will have no influence in the tail-up model.\n"
+      ))
     }
-    
-    sites[[i]]<- sites_i
+
+    sites[[i]] <- sites_i
   }
-  
-  return(sites) 
+
+  return(sites)
 }
