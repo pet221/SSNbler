@@ -166,7 +166,7 @@ afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
       stop(paste0(segpi_col, " already exists in edges and overwrite = FALSE"), call. = FALSE)
     }
   }
-  check_names_case(names(edges), "segpi_col", "edges")
+  check_names_case(names(edges), segpi_col, "edges")
 
   ## If afv_col file exists and overwrite is TRUE
   if (afv_col %in% colnames(edges)) {
@@ -176,7 +176,7 @@ afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
       stop(paste0(afv_col, " already exists in edges and overwrite = FALSE"), call. = FALSE)
     }
   }
-  check_names_case(names(edges), "afv_col", "edges")
+  check_names_case(names(edges), afv_col, "edges")
 
   ## If fid file exists and overwrite is TRUE
   if ("fid" %in% colnames(edges)) {

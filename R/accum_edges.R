@@ -121,7 +121,7 @@ accum_edges <- function(edges, lsn_path, sum_col, acc_col,
       stop(paste0(acc_col, " already exists in edges and overwrite = FALSE"), call. = FALSE)
     }
   }
-  check_names_case(names(edges), "acc_col", "edges")
+  check_names_case(names(edges), acc_col, "edges")
 
   ## If fid file exists and overwrite is TRUE
   if ("fid" %in% colnames(edges)) {
