@@ -73,6 +73,12 @@ accum_edges <- function(edges, lsn_path, sum_col, acc_col,
                         save_local = TRUE, overwrite = FALSE,
                         verbose = TRUE){
 
+  
+  # check sf object
+  if (!inherits(edges, "sf")) {
+    stop("edges must be an sf object.", call. = FALSE)
+  }
+  
   ## Check inputs ------------------------------------------
   ## Get geometry type as text
   edge_geom<- st_as_text(st_geometry(edges)[[1]])
@@ -104,10 +110,30 @@ accum_edges <- function(edges, lsn_path, sum_col, acc_col,
     }
   }
   
-  ## Does sum_col exist
-  if(sum(colnames(edges) == sum_col) == 0) {
-    stop(paste0(sum_col," not found in edges"))
+  # ## Does sum_col exist
+  # if(sum(colnames(edges) == sum_col) == 0) {
+  #   stop(paste0(sum_col," not found in edges"))
+  # }
+  
+  ## If acc_col file exists and overwrite is TRUE
+  if (acc_col %in% colnames(edges)) {
+    if (overwrite) {
+      edges[, acc_col] <- NULL
+    } else {
+      stop(paste0(acc_col, " already exists in edges and overwrite = FALSE"), call. = FALSE)
+    }
   }
+  check_names_case(names(edges), "acc_col", "edges")
+  
+  ## If fid file exists and overwrite is TRUE
+  if ("fid" %in% colnames(edges)) {
+    if (overwrite) {
+      edges$fid <- NULL
+    } else {
+      stop("fid already exists in edges and overwrite = FALSE", call. = FALSE)
+    }
+  }
+  check_names_case(names(edges), "fid", "edges")
   
   ## Does sum_col contain NAs
   if(sum(is.na(edges[,sum_col])) > 0) {

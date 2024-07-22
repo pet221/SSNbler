@@ -18,8 +18,8 @@ ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TR
   valid <- TRUE
 
   ## check that ssn.object == SSN
-  if(class(ssn.object) != "SSN") {
-    stop("ssn.object is not of class SSN")
+  if(!inherits(ssn.object, "SSN")) {
+    stop("ssn.object is not of class SSN", call. = FALSE)
   }
 
   ## check that .ssn folder exists

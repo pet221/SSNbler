@@ -112,6 +112,17 @@
 #'
 updist_sites <- function(sites, edges, length_col, lsn_path, save_local = TRUE,
                          overwrite = TRUE){
+  
+  
+  # check sf object
+  if (any(vapply(sites, function(x) !inherits(x, "sf"), logical(1)))) {
+    stop("All sites objects must be sf objects.", call. = FALSE)
+  }
+  
+  # check sf object
+  if (!inherits(edges, "sf")) {
+    stop("edges must be an sf object.", call. = FALSE)
+  }
 
   ## Check inputs -------------------------------------------
   ## Check lsn_path exists when save_local = TRUE
@@ -171,16 +182,36 @@ updist_sites <- function(sites, edges, length_col, lsn_path, save_local = TRUE,
       next
     }
 
-    ## Remove the upDist column if it exists before the join with edges
-    if("upDist" %in% names(sites_i_sf) & overwrite) {
-      ## ind<- colnames(sites_i_sf) == "upDist"
-      ## sites_i_sf <- sites_i_sf[, !ind]
-
-      sites_i_sf$upDist <- NULL
+    # ## Remove the upDist column if it exists before the join with edges
+    # if("upDist" %in% names(sites_i_sf) & overwrite) {
+    #   ## ind<- colnames(sites_i_sf) == "upDist"
+    #   ## sites_i_sf <- sites_i_sf[, !ind]
+    # 
+    #   sites_i_sf$upDist <- NULL
+    # }
+    # 
+    # ## Check for duplicate names
+    # check_names_case(names(sites_i_sf), "upDist", sites_i_name)
+    
+    ## If upDist file exists and overwrite is TRUE
+    if ("upDist" %in% colnames(sites_i_sf)) {
+      if (overwrite) {
+        sites_i_sf$upDist <- NULL
+      } else {
+        stop(paste0("upDist already exists in ", sites_i_sf, " and and overwrite = FALSE"), call. = FALSE)
+      }
     }
-
-    ## Check for duplicate names
     check_names_case(names(sites_i_sf), "upDist", sites_i_name)
+
+    ## If fid file exists and overwrite is TRUE
+    if ("fid" %in% colnames(sites_i_sf)) {
+      if (overwrite) {
+        sites_i_sf$fid <- NULL
+      } else {
+        stop(paste0("fid already exists in ", sites_i_sf, " and and overwrite = FALSE"), call. = FALSE)
+      }
+    }
+    check_names_case(names(sites_i_sf), "fid", sites_i_name)
     
     ## Get the Length and upDist fields from the edges
     sites_i_sf <- merge(sites_i_sf, edges, by = "rid", all.x = TRUE)

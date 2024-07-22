@@ -6,7 +6,7 @@ check_netgeom<- function(sf.obj, type, name = NULL, verbose = TRUE) {
 
   ## General checks --------------------------------
   ## Check class
-  if(class(sf.obj$netgeom) != "character") {
+  if(!is.character(sf.obj$netgeom)) {
     valid.message <- paste0(valid.message, 
                             "\n", type,
                             " netgeom column is not in character format\n")

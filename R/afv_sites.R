@@ -131,6 +131,17 @@
 afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
                       lsn_path=NULL, overwrite = TRUE){
 
+  
+  # check sf object
+  if (any(vapply(sites, function(x) !inherits(x, "sf"), logical(1)))) {
+    stop("All sites objects must be sf objects.", call. = FALSE)
+  }
+  
+  # check sf object
+  if (!inherits(edges, "sf")) {
+    stop("edges must be an sf object.", call. = FALSE)
+  }
+  
   ## Check inputs -------------------------------------------
   ## if(is.null(lsn_path) & save_local == TRUE) {
   ##   stop("lsn_path is required when save_local = TRUE")
@@ -192,12 +203,12 @@ afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
 
     sites_i <- sites[[i]]
 
-    ## Remove afv_col if it exists and overwrite == TRUE
-    if(overwrite == TRUE & afv_col %in% colnames(sites_i)) {
-      sites_i[, afv_col]<- NULL
-    }
-    ## Check for duplicate names
-    check_names_case_add(names(sites_i), afv_col, names(sites)[i], "afv_col")
+    # ## Remove afv_col if it exists and overwrite == TRUE
+    # if(overwrite == TRUE & afv_col %in% colnames(sites_i)) {
+    #   sites_i[, afv_col]<- NULL
+    # }
+    # ## Check for duplicate names
+    # check_names_case_add(names(sites_i), afv_col, names(sites)[i], "afv_col")
 
     if(afv_col %in% names(sites_i)){
       if(overwrite == FALSE) {
@@ -209,6 +220,26 @@ afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
         sites_i<- sites_i[,!ind]
       }   
     } 
+    
+    ## If afv_col file exists and overwrite is TRUE (seg_pi is NOT needed in this function)
+    if (afv_col %in% colnames(sites_i)) {
+      if (overwrite) {
+        sites_i[, afv_col] <- NULL
+      } else {
+        stop(paste0(afv_col, " already exists in ", sites_i, " edges and overwrite = FALSE"), call. = FALSE)
+      }
+    }
+    check_names_case_add(names(sites_i), afv_col, names(sites)[i], "afv_col")
+    
+    ## If fid file exists and overwrite is TRUE
+    if ("fid" %in% colnames(sites_i)) {
+      if (overwrite) {
+        sites_i$fid <- NULL
+      } else {
+        stop(paste0("fid", " already exists in ", sites_i, " edges and overwrite = FALSE"), call. = FALSE)
+      }
+    }
+    check_names_case(names(sites_i), "fid", names(sites)[i])
 
     sites_i<- merge(sites_i, edges_df, by = "rid", sort = FALSE)
 

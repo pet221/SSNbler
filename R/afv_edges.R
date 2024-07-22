@@ -120,6 +120,12 @@
 afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
                       save_local = TRUE, overwrite = TRUE){
 
+  
+  # check sf object
+  if (!inherits(edges, "sf")) {
+    stop("edges must be an sf object.", call. = FALSE)
+  }
+  
   ## Check inputs -------------------------------------------------
   ## Check geometry type
   edge_geom<- st_as_text(st_geometry(edges)[[1]]) 
@@ -135,23 +141,53 @@ afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
     stop("Cannot save edges to local file because edges.gpkg already exists in lsn_path and overwrite = FALSE")
   }
 
-  ## Does segpi_col already exist in edges
-  if(overwrite == FALSE & sum(colnames(edges) == segpi_col) > 0) {
-    stop(paste0(segpi_col, " already exists in edges and overwrite = FALSE"))
-  } else {
-    edges[, segpi_col]<- NULL
-  }
-   
-  ## Does afv_col already exist in edges when overwrite = FALSE
-  if(overwrite == FALSE & afv_col %in% names(edges)) {
-    stop(paste0(afv_col, " already exists in edges and overwrite is FALSE."))
-  } else {
-    edges[, afv_col]<- NULL
-  }
+  # ## Does segpi_col already exist in edges
+  # if(overwrite == FALSE & sum(colnames(edges) == segpi_col) > 0) {
+  #   stop(paste0(segpi_col, " already exists in edges and overwrite = FALSE"))
+  # } else {
+  #   edges[, segpi_col]<- NULL
+  # }
+  #  
+  # ## Does afv_col already exist in edges when overwrite = FALSE
+  # if(overwrite == FALSE & afv_col %in% names(edges)) {
+  #   stop(paste0(afv_col, " already exists in edges and overwrite is FALSE."))
+  # } else {
+  #   edges[, afv_col]<- NULL
+  # }
+  # 
+  # ## Check for duplicate names
+  # check_names_case_add(names(edges), segpi_col, "edges", "segpi_col")
+  # check_names_case_add(names(edges), afv_col, "edges", "afv_col")
   
-  ## Check for duplicate names
-  check_names_case_add(names(edges), segpi_col, "edges", "segpi_col")
-  check_names_case_add(names(edges), afv_col, "edges", "afv_col")
+  ## If segpi_col file exists and overwrite is TRUE
+  if (segpi_col %in% colnames(edges)) {
+    if (overwrite) {
+      edges[, segpi_col] <- NULL
+    } else {
+      stop(paste0(segpi_col, " already exists in edges and overwrite = FALSE"), call. = FALSE)
+    }
+  }
+  check_names_case(names(edges), "segpi_col", "edges")
+  
+  ## If afv_col file exists and overwrite is TRUE
+  if (afv_col %in% colnames(edges)) {
+    if (overwrite) {
+      edges[, afv_col] <- NULL
+    } else {
+      stop(paste0(afv_col, " already exists in edges and overwrite = FALSE"), call. = FALSE)
+    }
+  }
+  check_names_case(names(edges), "afv_col", "edges")
+  
+  ## If fid file exists and overwrite is TRUE
+  if ("fid" %in% colnames(edges)) {
+    if (overwrite) {
+      edges$fid <- NULL
+    } else {
+      stop("fid already exists in edges and overwrite = FALSE", call. = FALSE)
+    }
+  }
+  check_names_case(names(edges), "fid", "edges")
   
 
   ## Check infl_col column

@@ -107,21 +107,74 @@ sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
                          verbose = TRUE){
   
   
+  # check sf object
+  if (!inherits(sites, "sf")) {
+    stop("sites must be an sf object.", call. = FALSE)
+  }
+  
+  # check sf object
+  if (!inherits(edges, "sf")) {
+    stop("edges must be an sf object.", call. = FALSE)
+  }
+  
+  
   ## Check some inputs --------------------------------------------
   ## Remove column names assigned by sites_to_lsn if they exist &
   ## overwrite == TRUE
-  if(overwrite == TRUE & sum(c("rid", "ratio", "snapdist") %in%
-                             colnames(sites) > 0)) {
-    sites$rid <- NULL
-    sites$snapdist <- NULL
-    sites$ratio<-NULL
+  # if(overwrite == TRUE & sum(c("rid", "ratio", "snapdist", ) %in%
+  #                            colnames(sites) > 0)) {
+  #   sites$rid <- NULL
+  #   sites$snapdist <- NULL
+  #   sites$ratio<-NULL
+  # }
+  
+  # ## Check for duplicate column names
+  # check_names_case(names(sites), "rid", "sites")
+  # check_names_case(names(sites), "ratio", "sites")
+  # check_names_case(names(sites), "snapdist", "sites")
+  
+  # check bad column names
+  ## If rid file exists and overwrite is TRUE
+  if ("rid" %in% colnames(sites)) {
+    if (overwrite) {
+      sites$rid <- NULL
+    } else {
+      stop("rid already exists in sites and overwrite = FALSE", call. = FALSE)
+    }
   }
-
-  ## Check for duplicate column names
   check_names_case(names(sites), "rid", "sites")
+  
+  ## If ratio file exists and overwrite is TRUE
+  if ("ratio" %in% colnames(sites)) {
+    if (overwrite) {
+      sites$ratio <- NULL
+    } else {
+      stop("ratio already exists in sites and overwrite = FALSE", call. = FALSE)
+    }
+  }
   check_names_case(names(sites), "ratio", "sites")
+  
+  ## If snapdist file exists and overwrite is TRUE
+  if ("snapdist" %in% colnames(sites)) {
+    if (overwrite) {
+      sites$snapdist <- NULL
+    } else {
+      stop("snapdist already exists in sites and overwrite = FALSE", call. = FALSE)
+    }
+  }
   check_names_case(names(sites), "snapdist", "sites")
   
+  ## If fid file exists and overwrite is TRUE
+  if ("fid" %in% colnames(sites)) {
+    if (overwrite) {
+      sites$fid <- NULL
+    } else {
+      stop("fid already exists in sites and overwrite = FALSE", call. = FALSE)
+    }
+  }
+  check_names_case(names(sites), "fid", "sites")
+
+  # save local
   if(save_local == TRUE & is.null(lsn_path)) {
     stop(paste("lsn_path argument must be defined if save_local = TRUE"))
   }

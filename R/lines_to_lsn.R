@@ -158,18 +158,32 @@ lines_to_lsn <- function(streams, lsn_path,
     stop("snap_tolerance and topo_tolerance must be >= 0")
   }
     
-  if (inherits(in_edges, "sf")) n_edges = nrow(in_edges)
-  if (inherits(in_edges, "sfc")) n_edges = length(in_edges)
+  if (inherits(in_edges, "sf")) n_edges <-  nrow(in_edges)
+  if (inherits(in_edges, "sfc")) n_edges <- length(in_edges)
 
+  # check bad column names
   ## If rid file exists and overwrite is TRUE
-  if(overwrite == TRUE & "rid" %in% colnames(in_edges)) {
-    in_edges$rid <- NULL
+  if ("rid" %in% colnames(in_edges)) {
+    if (overwrite) {
+      in_edges$rid <- NULL
+    } else {
+      stop("rid already exists in edges and overwrite = FALSE", call. = FALSE)
+    }
   }
+  check_names_case(names(in_edges), "rid", "streams")
   
+  ## If fid file exists and overwrite is TRUE
+  if ("fid" %in% colnames(in_edges)) {
+    if (overwrite) {
+      in_edges$fid <- NULL
+    } else {
+      stop("fid already exists in edges and overwrite = FALSE", call. = FALSE)
+    }
+  }
+  check_names_case(names(in_edges), "fid", "streams")
   
   ## Add the field 'rid' (meaning reach identifier) and use it in all scripts as the rid / edgeid
-  check_names_case(names(in_edges), "rid", "streams")
-  in_edges$rid <- seq.int(from=1, to=n_edges) ## add and populate 1-based index rid column to edges
+  in_edges$rid <- seq.int(from = 1, to = n_edges) ## add and populate 1-based index rid column to edges
 
   ## Write edges to geopackage
   if(overwrite == FALSE & file.exists(paste0(lsn_path, "/edges.gpkg"))) {

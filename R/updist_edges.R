@@ -84,6 +84,11 @@ updist_edges <- function(edges, lsn_path = NULL, calc_length = FALSE, length_col
                          save_local = TRUE, overwrite = TRUE, verbose = TRUE){
 
 
+  # check sf object
+  if (!inherits(edges, "sf")) {
+    stop("edges must be an sf object.", call. = FALSE)
+  }
+  
   ## Check inputs ------------------------------------------
   ## Get geometry type as text
   edge_geom<- st_as_text(st_geometry(edges)[[1]])
@@ -104,15 +109,35 @@ updist_edges <- function(edges, lsn_path = NULL, calc_length = FALSE, length_col
   }
 
   ## Can we overwrite upDist column if necessary
-  if(sum(colnames(edges) == "upDist") > 0) {
-     if(overwrite == FALSE) {
-       stop("upDist already exists in edges and overwrite = FALSE")
-     } else { ## Remove upDist
-       edges$upDist<- NULL
-     }
+  # if(sum(colnames(edges) == "upDist") > 0) {
+  #    if(overwrite == FALSE) {
+  #      stop("upDist already exists in edges and overwrite = FALSE")
+  #    } else { ## Remove upDist
+  #      edges$upDist<- NULL
+  #    }
+  # }
+  # ## Check for duplicate names
+  # check_names_case(names(edges), "upDist", "edges")
+  
+  ## If upDist file exists and overwrite is TRUE
+  if ("upDist" %in% colnames(edges)) {
+    if (overwrite) {
+      edges$upDist <- NULL
+    } else {
+      stop("upDist already exists in edges and overwrite = FALSE", call. = FALSE)
+    }
   }
-  ## Check for duplicate names
   check_names_case(names(edges), "upDist", "edges")
+  
+  ## If fid file exists and overwrite is TRUE
+  if ("fid" %in% colnames(edges)) {
+    if (overwrite) {
+      edges$fid <- NULL
+    } else {
+      stop("fid already exists in edges and overwrite = FALSE", call. = FALSE)
+    }
+  }
+  check_names_case(names(edges), "fid", "edges")
   
   
   ## Does length_col contain NAs

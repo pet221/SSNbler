@@ -65,6 +65,21 @@ ssn_assemble<- function(edges, lsn_path = NULL, obs_sites = NULL,
                    preds_list = NULL, ssn_path, import = TRUE,
                    overwrite = FALSE, verbose = TRUE) {
 
+  # check sf object
+  if (!inherits(edges, "sf")) {
+    stop("edges must be an sf object.", call. = FALSE)
+  }
+  
+  # check sf object
+  if (!inherits(obs_sites, "sf")) {
+    stop("obs_sites must be an sf object.", call. = FALSE)
+  }
+  
+  # check sf object
+  if (any(vapply(preds_list, function(x) !inherits(x, "sf"), logical(1)))) {
+    stop("All preds objects must be sf objects.", call. = FALSE)
+  }
+
   ## Check all inputs ------------------------------------------------
   if(verbose == TRUE) {
     message("\nChecking inputs\n") }
@@ -83,38 +98,78 @@ ssn_assemble<- function(edges, lsn_path = NULL, obs_sites = NULL,
     stop("edges.gpkg already exists in ssn_path and overwrite = FALSE")
   }
   
-  ## Can overwrite pid column if necessary
-  if(sum(colnames(edges) == "pid") > 0) {
-    if(overwrite == FALSE) {
-      stop("pid already exists in edges and overwrite = FALSE")
-    } else { ## Remove pid
+  # ## Can overwrite pid column if necessary
+  # if(sum(colnames(edges) == "pid") > 0) {
+  #   if(overwrite == FALSE) {
+  #     stop("pid already exists in edges and overwrite = FALSE")
+  #   } else { ## Remove pid
+  #     edges$pid <- NULL
+  #   }
+  # }
+  # ## Check for duplicate names
+  # check_names_case(names(edges), "pid", "edges")
+  # 
+  # ## Can overwrite locID column if necessary
+  # if(sum(colnames(edges) == "locID") > 0) {
+  #   if(overwrite == FALSE) {
+  #     stop("locID already exists in edges and overwrite = FALSE")
+  #   } else { ## Remove locID
+  #     edges$locID <- NULL
+  #   }
+  # }
+  # ## Check for duplicate names
+  # check_names_case(names(edges), "locID", "edges")
+  # 
+  # ## Can overwrite netID column if necessary
+  # if(sum(colnames(edges) == "netID") > 0) {
+  #   if(overwrite == FALSE) {
+  #     stop("netID already exists in edges and overwrite = FALSE")
+  #   } else { ## Remove netID
+  #     edges$netID <- NULL
+  #   }
+  # }
+  # ## Check for duplicate names
+  # check_names_case(names(edges), "netID", "edges")
+  
+  ## If pid file exists and overwrite is TRUE
+  if ("pid" %in% colnames(edges)) {
+    if (overwrite) {
       edges$pid <- NULL
+    } else {
+      stop("pid already exists in edges and overwrite = FALSE", call. = FALSE)
     }
   }
-  ## Check for duplicate names
   check_names_case(names(edges), "pid", "edges")
   
-  ## Can overwrite locID column if necessary
-  if(sum(colnames(edges) == "locID") > 0) {
-    if(overwrite == FALSE) {
-      stop("locID already exists in edges and overwrite = FALSE")
-    } else { ## Remove locID
+  ## If locID file exists and overwrite is TRUE
+  if ("locID" %in% colnames(edges)) {
+    if (overwrite) {
       edges$locID <- NULL
+    } else {
+      stop("locID already exists in edges and overwrite = FALSE", call. = FALSE)
     }
   }
-  ## Check for duplicate names
   check_names_case(names(edges), "locID", "edges")
   
-  ## Can overwrite netID column if necessary
-  if(sum(colnames(edges) == "netID") > 0) {
-    if(overwrite == FALSE) {
-      stop("netID already exists in edges and overwrite = FALSE")
-    } else { ## Remove netID
+  ## If netID file exists and overwrite is TRUE
+  if ("netID" %in% colnames(edges)) {
+    if (overwrite) {
       edges$netID <- NULL
+    } else {
+      stop("netID already exists in edges and overwrite = FALSE", call. = FALSE)
     }
   }
-  ## Check for duplicate names
   check_names_case(names(edges), "netID", "edges")
+  
+  ## If fid file exists and overwrite is TRUE
+  if ("fid" %in% colnames(edges)) {
+    if (overwrite) {
+      edges$fid <- NULL
+    } else {
+      stop("fid already exists in edges and overwrite = FALSE", call. = FALSE)
+    }
+  }
+  check_names_case(names(edges), "fid", "edges")
   
   ## lsn_path
   if (!file.exists(lsn_path)){
@@ -155,38 +210,78 @@ ssn_assemble<- function(edges, lsn_path = NULL, obs_sites = NULL,
     if(sum(colnames(obs_sites) %in% c("pid", "locID", "netID")) > 0 & overwrite == FALSE) {
       stop(paste0("Columns pid, locID, and/or netID exist in obs_sites and overwrite = FALSE"))}
 
-    ## Can overwrite pid column if necessary
-    if(sum(colnames(obs_sites) == "pid") > 0) {
-      if(overwrite == FALSE) {
-        stop("pid already exists in obs_sites and overwrite = FALSE")
-      } else { ## Remove pid
+    # ## Can overwrite pid column if necessary
+    # if(sum(colnames(obs_sites) == "pid") > 0) {
+    #   if(overwrite == FALSE) {
+    #     stop("pid already exists in obs_sites and overwrite = FALSE")
+    #   } else { ## Remove pid
+    #     obs_sites$pid <- NULL
+    #   }
+    # }
+    # ## Check for duplicate names
+    # check_names_case(names(obs_sites), "pid", "obs_sites")
+    # 
+    # ## Can overwrite locID column if necessary
+    # if(sum(colnames(obs_sites) == "locID") > 0) {
+    #   if(overwrite == FALSE) {
+    #     stop("locID already exists in obs_sites and overwrite = FALSE")
+    #   } else { ## Remove locID
+    #     obs_sites$locID <- NULL
+    #   }
+    # }
+    # ## Check for duplicate names
+    # check_names_case(names(obs_sites), "locID", "obs_sites")
+    # 
+    # ## Can overwrite netID column if necessary
+    # if(sum(colnames(obs_sites) == "netID") > 0) {
+    #   if(overwrite == FALSE) {
+    #     stop("netID already exists in obs_sites and overwrite = FALSE")
+    #   } else { ## Remove netID
+    #     obs_sites$netID <- NULL
+    #   }
+    # }
+    # ## Check for duplicate names
+    # check_names_case(names(obs_sites), "netID", "obs_sites")
+    
+    ## If pid file exists and overwrite is TRUE
+    if ("pid" %in% colnames(obs_sites)) {
+      if (overwrite) {
         obs_sites$pid <- NULL
+      } else {
+        stop("pid already exists in obs_sites and overwrite = FALSE", call. = FALSE)
       }
     }
-    ## Check for duplicate names
     check_names_case(names(obs_sites), "pid", "obs_sites")
     
-    ## Can overwrite locID column if necessary
-    if(sum(colnames(obs_sites) == "locID") > 0) {
-      if(overwrite == FALSE) {
-        stop("locID already exists in obs_sites and overwrite = FALSE")
-      } else { ## Remove locID
+    ## If locID file exists and overwrite is TRUE
+    if ("locID" %in% colnames(obs_sites)) {
+      if (overwrite) {
         obs_sites$locID <- NULL
+      } else {
+        stop("locID already exists in obs_sites and overwrite = FALSE", call. = FALSE)
       }
     }
-    ## Check for duplicate names
     check_names_case(names(obs_sites), "locID", "obs_sites")
     
-    ## Can overwrite netID column if necessary
-    if(sum(colnames(obs_sites) == "netID") > 0) {
-      if(overwrite == FALSE) {
-        stop("netID already exists in obs_sites and overwrite = FALSE")
-      } else { ## Remove netID
+    ## If netID file exists and overwrite is TRUE
+    if ("netID" %in% colnames(obs_sites)) {
+      if (overwrite) {
         obs_sites$netID <- NULL
+      } else {
+        stop("netID already exists in obs_sites and overwrite = FALSE", call. = FALSE)
       }
     }
-    ## Check for duplicate names
     check_names_case(names(obs_sites), "netID", "obs_sites")
+    
+    ## If fid file exists and overwrite is TRUE
+    if ("fid" %in% colnames(obs_sites)) {
+      if (overwrite) {
+        obs_sites$fid <- NULL
+      } else {
+        stop("fid already exists in obs_sites and overwrite = FALSE", call. = FALSE)
+      }
+    }
+    check_names_case(names(obs_sites), "fid", "obs_sites")
     
   } 
   #################################################
@@ -213,38 +308,78 @@ ssn_assemble<- function(edges, lsn_path = NULL, obs_sites = NULL,
         stop(paste0("Columns pid, locID, and/or netID exist in ", names(preds_list)[p],
                     " and overwrite = FALSE"))}
       
-      ## Can overwrite pid column if necessary
-      if(sum(colnames(preds_list[[p]]) == "pid") > 0) {
-        if(overwrite == FALSE) {
-          stop("pid already exists in obs_sites and overwrite = FALSE")
-        } else { ## Remove pid
+      # ## Can overwrite pid column if necessary
+      # if(sum(colnames(preds_list[[p]]) == "pid") > 0) {
+      #   if(overwrite == FALSE) {
+      #     stop("pid already exists in obs_sites and overwrite = FALSE")
+      #   } else { ## Remove pid
+      #     preds_list[[p]]$pid <- NULL
+      #   }
+      # }
+      # ## Check for duplicate names
+      # check_names_case(names(preds_list[[p]]), "pid", names(preds_list)[p])
+      # 
+      # ## Can overwrite locID column if necessary
+      # if(sum(colnames(preds_list[[p]]) == "locID") > 0) {
+      #   if(overwrite == FALSE) {
+      #     stop("locID already exists in obs_sites and overwrite = FALSE")
+      #   } else { ## Remove locID
+      #     preds_list[[p]]$locID <- NULL
+      #   }
+      # }
+      # ## Check for duplicate names
+      # check_names_case(names(preds_list[[p]]), "locID", names(preds_list)[p])
+      # 
+      # ## Can overwrite netID column if necessary
+      # if(sum(colnames(preds_list[[p]]) == "netID") > 0) {
+      #   if(overwrite == FALSE) {
+      #     stop("netID already exists in obs_sites and overwrite = FALSE")
+      #   } else { ## Remove netID
+      #     preds_list[[p]]$netID <- NULL
+      #   }
+      # }
+      # ## Check for duplicate names
+      # check_names_case(names(preds_list[[p]]), "netID", names(preds_list)[p])
+      
+      ## If pid file exists and overwrite is TRUE
+      if ("pid" %in% colnames(preds_list[[p]])) {
+        if (overwrite) {
           preds_list[[p]]$pid <- NULL
+        } else {
+          stop(paste0("pid already exists in ", names(preds_list)[p], " and overwrite = FALSE", call. = FALSE))
         }
       }
-      ## Check for duplicate names
-      check_names_case(names(preds_list[[p]]), "pid", names(preds_list)[p])
+      check_names_case(colnames(preds_list[[p]]), "pid", names(preds_list)[p])
       
-      ## Can overwrite locID column if necessary
-      if(sum(colnames(preds_list[[p]]) == "locID") > 0) {
-        if(overwrite == FALSE) {
-          stop("locID already exists in obs_sites and overwrite = FALSE")
-        } else { ## Remove locID
+      ## If locID file exists and overwrite is TRUE
+      if ("locID" %in% colnames(preds_list[[p]])) {
+        if (overwrite) {
           preds_list[[p]]$locID <- NULL
+        } else {
+          stop(paste0("locID already exists in ", names(preds_list)[p], " and overwrite = FALSE", call. = FALSE))
         }
       }
-      ## Check for duplicate names
-      check_names_case(names(preds_list[[p]]), "locID", names(preds_list)[p])
+      check_names_case(colnames(preds_list[[p]]), "locID", names(preds_list)[p])
       
-      ## Can overwrite netID column if necessary
-      if(sum(colnames(preds_list[[p]]) == "netID") > 0) {
-        if(overwrite == FALSE) {
-          stop("netID already exists in obs_sites and overwrite = FALSE")
-        } else { ## Remove netID
+      ## If netID file exists and overwrite is TRUE
+      if ("netID" %in% colnames(preds_list[[p]])) {
+        if (overwrite) {
           preds_list[[p]]$netID <- NULL
+        } else {
+          stop(paste0("netID already exists in ", names(preds_list)[p], " and overwrite = FALSE", call. = FALSE))
         }
       }
-      ## Check for duplicate names
-      check_names_case(names(preds_list[[p]]), "netID", names(preds_list)[p])
+      check_names_case(colnames(preds_list[[p]]), "pid", names(preds_list)[p])
+      
+      ## If fid file exists and overwrite is TRUE
+      if ("fid" %in% colnames(preds_list[[p]])) {
+        if (overwrite) {
+          preds_list[[p]]$fid <- NULL
+        } else {
+          stop(paste0("fid already exists in ", names(preds_list)[p], " and overwrite = FALSE", call. = FALSE))
+        }
+      }
+      check_names_case(colnames(preds_list[[p]]), "fid", names(preds_list)[p])
     }
   }
   
