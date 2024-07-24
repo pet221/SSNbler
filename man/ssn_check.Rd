@@ -21,3 +21,20 @@ Boolean indicating whether the \code{SSN} object is valid. If \code{verbose = TR
 \description{
 Check a \code{SSN} object to ensure that it contains valid spatial, topological, and attribute information needed to fit spatial statistical stream network models using the \code{SSN2} package.
 }
+\examples{
+## Create local temporary copy of MiddleFork04.ssn found in
+## the SSN2 package. Only necessary for this example.
+SSN2::copy_lsn_to_temp()
+
+# Import the SSN object with prediction points, pred1km
+mf04<- SSN2::ssn_import(
+   paste0(tempdir(), "/MiddleFork04.ssn"),
+   predpts = c("pred1km"),
+   overwrite = TRUE
+)
+
+# Check the SSN object, including the additive function column,
+# afvArea
+ssn_check(mf04, afv_col = "afvArea")
+
+}

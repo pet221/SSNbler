@@ -11,7 +11,22 @@
 #'
 #' @export
 #'
-
+#' @examples
+#' ## Create local temporary copy of MiddleFork04.ssn found in
+#' ## the SSN2 package. Only necessary for this example.
+#' SSN2::copy_lsn_to_temp()
+#'
+#' # Import the SSN object with prediction points, pred1km
+#' mf04<- SSN2::ssn_import(
+#'    paste0(tempdir(), "/MiddleFork04.ssn"),
+#'    predpts = c("pred1km"),
+#'    overwrite = TRUE
+#' )
+#'
+#' # Check the SSN object, including the additive function column,
+#' # afvArea
+#' ssn_check(mf04, afv_col = "afvArea")
+#'
 ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TRUE) {
   out.message <- "\n"
   valid <- TRUE
@@ -20,7 +35,7 @@ ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TR
   if (!inherits(ssn.object, "SSN")) {
     stop("ssn.object is not of class SSN", call. = FALSE)
   }
-
+ 
   ## check that .ssn folder exists
   if (!file.exists(ssn.object$path)) {
     stop(paste0(
@@ -192,77 +207,80 @@ ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TR
 
   pred.names <- names(ssn.object$preds)
 
-  for (p in 1:length(pred.names)) {
-    ## Check class of preds
-    if (!inherits(ssn.object$preds[[pred.names[p]]], "sf")) {
-      stop(paste0(pred.names[p], " are not of class sf"))
-    }
+  if(!is.null(pred.names)) {
 
-    ## Check geometry of preds
-    pred_geom <- st_as_text(st_geometry(ssn.object$preds[[pred.names[p]]])[[1]])
-    if (grepl("POINT", pred_geom) == FALSE) {
-      out.message <- paste0(out.message, pred.names[p], " does not have POINT geometry\n")
-      valid <- FALSE
-    }
+    for (p in 1:length(pred.names)) {
+      ## Check class of preds
+      if (!inherits(ssn.object$preds[[pred.names[p]]], "sf")) {
+        stop(paste0(pred.names[p], " are not of class sf"))
+      }
 
-    ## check for empty geometries ----------------
-    empty.preds <- sum(st_is_empty(ssn.object$preds[[pred.names[p]]]))
-
-    if (empty.preds > 0) {
-      out.message <- paste0(
-        out.message, pred.names[p],
-        " contains missing geometries. Use sf:st_is_empty() to identify these point features.\n"
-      )
-      valid <- FALSE
-    }
-
-    ## Check netgeom----------------------------------------------
-    if ("netgeom" %in% colnames(ssn.object$preds[[pred.names[p]]])) {
-      ## Check contents of netgeom
-      ng.message <- check_netgeom(ssn.object$preds[[pred.names[p]]],
-        type = pred.names[p], verbose = TRUE
-      )
-      if (!is.null(ng.message)) {
-        out.message <- paste0(out.message, ng.message)
+      ## Check geometry of preds
+      pred_geom <- st_as_text(st_geometry(ssn.object$preds[[pred.names[p]]])[[1]])
+      if (grepl("POINT", pred_geom) == FALSE) {
+        out.message <- paste0(out.message, pred.names[p], " does not have POINT geometry\n")
         valid <- FALSE
       }
-    } else {
-      out.message <- paste0(out.message, pred.names[p], " netgeom column not found\n")
-      valid <- FALSE
-    }
 
-    ## Check AFV cols ---------------------------------
-    if (!is.null(afv_col)) {
-      pred.df <- st_drop_geometry(ssn.object$preds[[pred.names[p]]])
+      ## check for empty geometries ----------------
+      empty.preds <- sum(st_is_empty(ssn.object$preds[[pred.names[p]]]))
+      
+      if (empty.preds > 0) {
+        out.message <- paste0(
+          out.message, pred.names[p],
+          " contains missing geometries. Use sf:st_is_empty() to identify these point features.\n"
+        )
+        valid <- FALSE
+      }
 
-      for (i in 1:length(afv_col)) {
-        afv_i <- afv_col[i]
-
-        ## Does AFV column exist
-        if (afv_i %in% colnames(ssn.object$preds[[pred.names[p]]])) {
-          if (sum(is.na(pred.df[, afv_i])) > 0) {
-            out.message <- paste0(
-              out.message, pred.names[p], " AFV column, ",
-              afv_i, ", contains NAs\n"
-            )
-            valid <- FALSE
-          }
-
-          if (sum(pred.df[, afv_i] < 0) > 0 |
-            sum(pred.df[, afv_i] > 1) > 0) {
-            out.message <- paste0(
-              out.message, pred.names[p],
-              " AFV column, ", afv_i,
-              ", contains values < 0 and/or > 1\n"
-            )
-            valid <- FALSE
-          }
-        } else {
-          out.message <- paste0(
-            out.message, pred.names[p], " AFV column, ", afv_i,
-            ", not found\n"
-          )
+      ## Check netgeom----------------------------------------------
+      if ("netgeom" %in% colnames(ssn.object$preds[[pred.names[p]]])) {
+        ## Check contents of netgeom
+        ng.message <- check_netgeom(ssn.object$preds[[pred.names[p]]],
+                                    type = pred.names[p], verbose = TRUE
+                                    )
+        if (!is.null(ng.message)) {
+          out.message <- paste0(out.message, ng.message)
           valid <- FALSE
+        }
+      } else {
+        out.message <- paste0(out.message, pred.names[p], " netgeom column not found\n")
+        valid <- FALSE
+      }
+
+      ## Check AFV cols ---------------------------------
+      if (!is.null(afv_col)) {
+        pred.df <- st_drop_geometry(ssn.object$preds[[pred.names[p]]])
+        
+        for (i in 1:length(afv_col)) {
+          afv_i <- afv_col[i]
+          
+          ## Does AFV column exist
+          if (afv_i %in% colnames(ssn.object$preds[[pred.names[p]]])) {
+            if (sum(is.na(pred.df[, afv_i])) > 0) {
+              out.message <- paste0(
+                out.message, pred.names[p], " AFV column, ",
+                afv_i, ", contains NAs\n"
+              )
+              valid <- FALSE
+            }
+            
+            if (sum(pred.df[, afv_i] < 0) > 0 |
+                sum(pred.df[, afv_i] > 1) > 0) {
+              out.message <- paste0(
+                out.message, pred.names[p],
+                " AFV column, ", afv_i,
+                ", contains values < 0 and/or > 1\n"
+              )
+              valid <- FALSE
+            }
+          } else {
+            out.message <- paste0(
+              out.message, pred.names[p], " AFV column, ", afv_i,
+              ", not found\n"
+            )
+            valid <- FALSE
+          }
         }
       }
     }
