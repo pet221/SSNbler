@@ -61,6 +61,100 @@
 #' @return An object of class \code{SSN}.  The function returns an object of class \code{SSN}. The output is also stored locally in \code{ssn_path} (see Details).
 #'
 #' @export
+#' @examples
+#' # Get temporary directory, where the example LSN will be stored
+#' # locally. 
+#' temp_dir <- tempdir()
+
+#' # Build the LSN. When working with your own data, lsn_path will be 
+#' # a local folder of your choice rather than a temporary directory.
+#' edges<- lines_to_lsn(
+#'    streams = MF_streams,
+#'    lsn_path = temp_dir, 
+#'    snap_tolerance = 1,
+#'    check_topology = FALSE,
+#'    overwrite = TRUE,
+#'    verbose = FALSE
+#' )
+#'
+#' # Incorporate observed sites, MF_obs, into LSN
+#' obs<- sites_to_lsn(
+#'    sites = MF_obs,
+#'    edges = edges,
+#'    save_local = FALSE,
+#'    snap_tolerance = 100,
+#'    overwrite = TRUE,
+#'    verbose = FALSE
+#' )
+#'
+#' # Incorporate prediction dataset, MF_preds, into LSN
+#' preds<- sites_to_lsn(sites = MF_preds,
+#'    edges = edges,
+#'    save_local = FALSE,
+#'    snap_tolerance = 1,
+#'    overwrite = TRUE,
+#'    verbose = FALSE
+#' )
+#'
+#' # Calculate the AFV for the edges using
+#' # a column representing watershed area (h2oAreaKm2).
+#' edges<- afv_edges(
+#'    edges=edges,
+#'    infl_col = "h2oAreaKm2", 
+#'    segpi_col = "areaPI",
+#'    lsn_path = temp_dir,
+#'    afv_col = "afvArea",
+#'    overwrite = TRUE,
+#'    save_local = FALSE
+#' )
+#'
+#' # Calculate the AFV for observed sites (obs) and prediction
+#' # dataset, preds.
+#' site.list<- afv_sites(
+#'    sites = list(obs = obs,
+#'                 preds = preds),
+#'    edges=edges,
+#'    afv_col = "afvArea",
+#'    save_local = FALSE,
+#'    overwrite = TRUE
+#' )
+#'
+#' # Calculate upstream distance for edges
+#' edges<- updist_edges(
+#'    edges = edges,
+#'    lsn_path = temp_dir,
+#'    calc_length = TRUE,
+#'    length_col = "Length",
+#'    overwrite = TRUE,
+#'    save_local = FALSE,
+#'    verbose = FALSE
+#' )
+#'
+#' # Calculate upstream distance for observed sites (obs) and one
+#' # prediction dataset (preds)
+#' site.list<- updist_sites(
+#'    sites = site.list,
+#'    edges = edges,
+#'    length_col= "Length",
+#'    lsn_path = temp_dir,
+#'    save_local = FALSE,
+#'    overwrite = TRUE
+#' )
+#'
+#' # Assemble SSN object
+#' ssn.obj<- ssn_assemble(
+#'    edges = edges,
+#'    lsn_path = temp_dir,
+#'    obs_sites = site.list[["obs"]],
+#'    preds_list = site.list[c("preds")],
+#'    ssn_path = paste0(temp_dir, "/example.ssn"),
+#'    import = TRUE,
+#'    overwrite = TRUE
+#' )
+#'
+#' # Summarise SSN object
+#' summary(ssn.obj)
+#' 
 ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
                          preds_list = NULL, ssn_path, import = TRUE,
                          overwrite = FALSE, verbose = TRUE) {
