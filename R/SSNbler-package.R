@@ -12,7 +12,7 @@
 #' @importFrom igraph decompose graph_from_data_frame reverse_edges shortest_paths subcomponent vertex_attr
 #' @importFrom RSQLite dbConnect dbDisconnect dbExistsTable dbListTables dbReadTable dbRemoveTable dbWriteTable SQLite
 #' @importFrom withr local_dir
-#' @importFrom SSN2 copy_lsn_to_temp ssn_get_netgeom ssn_import
+#' @importFrom SSN2 copy_lsn_to_temp create_netgeom ssn_get_netgeom ssn_import
 ## usethis namespace: start
 ## usethis namespace: end
 NULL

@@ -648,7 +648,7 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   edges <- merge(edges, subset(netid_df, select = -get("binaryID")), all.x = TRUE, by = "rid")
 
   ## Add netgeom column
-  edges <- create_netgeom2(edges, type = "LINESTRING", overwrite = TRUE)
+  edges <- create_netgeom(edges, type = "LINESTRING", overwrite = TRUE)
 
   #############################################################################
   ## Add locID and pid to obs_sites attribute table
@@ -725,7 +725,7 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
       )
 
       ## Add netgeom column
-      obs_sites <- create_netgeom2(obs_sites, type = "POINT", overwrite = TRUE)
+      obs_sites <- create_netgeom(obs_sites, type = "POINT", overwrite = TRUE)
 
       if (verbose) {
         message("\nobs_sites")
@@ -755,7 +755,7 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
       )
 
       ## Add netgeom column
-      pred.tmp <- create_netgeom2(pred.tmp, type = "POINT", overwrite = TRUE)
+      pred.tmp <- create_netgeom(pred.tmp, type = "POINT", overwrite = TRUE)
 
       preds_list[[p]] <- pred.tmp
       rm(pred.tmp)

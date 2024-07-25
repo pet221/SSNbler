@@ -9,7 +9,7 @@
 #' @param length_col The name of the column in \code{edges} that
 #'   contains the length of each edge feature.
 #' @param save_local Logical indicating whether the updated
-#'   \code{sites} should be saved to \code{lsn_path} in geopackage
+#'   \code{sites} should be saved to \code{lsn_path} in GeoPackage
 #'   format. File basenames are taken from the names assigned to the
 #'   \code{sites} list. Default is \code{TRUE}.
 #' @param lsn_path Local pathname to a directory in

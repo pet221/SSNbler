@@ -31,7 +31,7 @@ created using \code{link[SSNbler]{lines_to_lsn}}. Must be
 specified if \code{save_local = TRUE}.}
 
 \item{save_local}{Logical indicating whether the updated
-\code{sites} should be saved to \code{lsn_path} in geopackage
+\code{sites} should be saved to \code{lsn_path} in GeoPackage
 format. File basenames are taken from the names assigned to the
 \code{sites} list. Default is \code{TRUE}.}
 

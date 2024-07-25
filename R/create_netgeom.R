@@ -10,11 +10,11 @@
 #' @param overwrite Logical indicating whether existing data should be
 #'   overwritten if present. Default = \code{FALSE}.
 #'
-#' @details Most users will not need to run \code{create_netgeom2}
+#' @details Most users will not need to run \code{create_netgeom}
 #'   themselves because it is called internally when \code{lsn_to_ssn}
 #'   is run or an \code{SSN} is imported using
 #'   \code{link[SSN2]{ssn_import}} found in the \code{SSN2}
-#'   package. For users who do wish to run \code{create_netgeom2}, the
+#'   package. For users who do wish to run \code{create_netgeom}, the
 #'   \code{sf_data} object must represent edges, observed sites, or
 #'   prediction sites in a \code{SSN} object created using
 #'   \code{link{lsn_to_ssn}}.
@@ -29,9 +29,10 @@
 #'   }
 #'
 #' The rid, upDist and netID columns must already be present in edges
-#'   before netgeom is added. These columns are created usining
-#'   \code{link{lines_to_lsn}}, \code{\link{updist_edges}}, and
-#'   \code{link{lsn_to_ssn}}, respectively.
+#'   before netgeom is added. These columns are created using the
+#'   \code{SSNbler} package functions \code{lines_to_lsn},
+#'   \code{updist_edges}, and \code{lsn_to_ssn},
+#'   respectively.
 #'
 #'   For observed or prediction sites, the netgeom format is:
 #'   \itemize{
@@ -50,9 +51,32 @@
 #'   \code{sf_data} and an additional column named netgeom.
 #'
 #' @export
-
-
-create_netgeom2 <- function(sf_data, type = NULL, overwrite = FALSE) {
+#' @examples
+#' ## Create local temporary copy of MiddleFork04.ssn found in
+#' ## the SSN2 package. Only necessary for this example.
+#' SSN2::copy_lsn_to_temp()
+#'
+#' # Import the SSN object with prediction points, pred1km
+#' mf04<- SSN2::ssn_import(
+#'    paste0(tempdir(), "/MiddleFork04.ssn"),
+#'    predpts = c("pred1km"),
+#'    overwrite = TRUE
+#' )
+#'
+#' # Recalculate the netgeom column for the observed sites
+#' sf_obs <- create_netgeom(
+#'     mf04$obs,
+#'     type = "POINT",
+#'     overwrite = TRUE
+#' )
+#'
+#' # Recalculate the netgeom column for the edges
+#' sf_edges <- create_netgeom(
+#'     mf04$edges,
+#'     type = "LINESTRING",
+#'     overwrite = TRUE
+#' )
+create_netgeom <- function(sf_data, type = NULL, overwrite = FALSE) {
   ## check sf object
   if (!inherits(sf_data, "sf")) {
     stop("sf_data must be an sf object.", call. = FALSE)
@@ -73,7 +97,8 @@ create_netgeom2 <- function(sf_data, type = NULL, overwrite = FALSE) {
     c.names <- c("netID", "rid", "upDist", "ratio", "pid", "locID")
     ind <- !c.names %in% colnames(sf_data)
     if (sum(ind) > 0) {
-      stop(paste0("columns ", paste(c.names[ind], collapse = ", "), " not found in sf_data"))
+      stop(paste0("columns ", paste(c.names[ind], collapse = ", "),
+                  " not found in sf_data. Is sf_data part of an SSN object and does it have POINT geometry?"))
     }
     ## Create netgeom
     sf_data[, "netgeom"] <- paste0("SNETWORK (", paste(
@@ -86,7 +111,8 @@ create_netgeom2 <- function(sf_data, type = NULL, overwrite = FALSE) {
     c.names <- c("netID", "rid", "upDist")
     ind <- !c.names %in% colnames(sf_data)
     if (sum(ind) > 0) {
-      stop(paste0("columns ", paste(c.names[ind], collapse = ", "), " not found in sf_data"))
+      stop(paste0("columns ", paste(c.names[ind], collapse = ", "),
+                  " not found in sf_data. Is sf_data part of an SSN object and does it have LINESTRING geometry?"))
     }
 
     ## Create netgeom
