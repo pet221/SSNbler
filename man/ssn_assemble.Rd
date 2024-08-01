@@ -11,6 +11,8 @@ ssn_assemble(
   preds_list = NULL,
   ssn_path,
   import = TRUE,
+  check = TRUE,
+  afv_col = NULL,
   overwrite = FALSE,
   verbose = TRUE
 )
@@ -23,10 +25,10 @@ using \code{\link{lines_to_lsn}} (see Details).}
 specifying where relationships.csv resides, which is created
 using \code{link{lines_to_lsn}}.}
 
-\item{obs_sites}{Optional. A single \code{sf} object with POINT geometry
-created using \code{link{sites_to_lsn}} that represents the
-observation locations (i.e. where data were collected). Default =
-NULL (see Details).}
+\item{obs_sites}{Optional. A single \code{sf} object with POINT
+geometry created using \code{link{sites_to_lsn}} that represents
+the observation locations (i.e. where data were
+collected). Default = NULL (see Details).}
 
 \item{preds_list}{Optional. A list of one or more \code{sf} objects
 representing prediction sites.}
@@ -38,6 +40,16 @@ included.}
 \item{import}{Logical indicating whether the output files should be
 returned as an \code{SSN} object. Defaults to \code{TRUE}.}
 
+\item{check}{Logical indicating whether the validity of the
+\code{SSN} should be checked using \code{[ssn_check]} when
+\code{import = TRUE}. Default = \code{TRUE}.}
+
+\item{afv_col}{Character vector containing the names of the
+additive function value columns that will be checked when
+\code{check = TRUE}. Columns must be present in \code{edges},
+\code{obs_sites} and \code{preds_list}, if all are
+included. Default is \code{NULL}.}
+
 \item{overwrite}{Logical. If \code{TRUE} and \code{ssn_path}
 already exists, the contents of \code{ssn_path} will be
 overwritten. Defaults to \code{FALSE}.}
@@ -47,7 +59,12 @@ function progress should be printed to the console. Defaults to
 \code{TRUE}.}
 }
 \value{
-An object of class \code{SSN}.  The function returns an object of class \code{SSN}. The output is also stored locally in \code{ssn_path} (see Details).
+The components of an \code{SSN} object are written to
+\code{ssn_path} (see Details). When \code{import = TRUE}, the
+function also returns an object of class \code{SSN}. If
+\code{check = TRUE}, the validity of the returned \code{SSN}
+object is checked using \code{[ssn_check]} and results are
+printed to the console.
 }
 \description{
 Create an SSN object from a Landscape Network (LSN).
@@ -88,13 +105,13 @@ A more detailed description of the .ssn directory and its contents is provided i
 }
 \examples{
 # Get temporary directory, where the example LSN will be stored
-# locally. 
+# locally.
 temp_dir <- tempdir()
-# Build the LSN. When working with your own data, lsn_path will be 
+# Build the LSN. When working with your own data, lsn_path will be
 # a local folder of your choice rather than a temporary directory.
 edges<- lines_to_lsn(
    streams = MF_streams,
-   lsn_path = temp_dir, 
+   lsn_path = temp_dir,
    snap_tolerance = 1,
    check_topology = FALSE,
    overwrite = TRUE,
@@ -124,7 +141,7 @@ preds<- sites_to_lsn(sites = MF_preds,
 # a column representing watershed area (h2oAreaKm2).
 edges<- afv_edges(
    edges=edges,
-   infl_col = "h2oAreaKm2", 
+   infl_col = "h2oAreaKm2",
    segpi_col = "areaPI",
    lsn_path = temp_dir,
    afv_col = "afvArea",

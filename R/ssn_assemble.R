@@ -7,10 +7,10 @@
 #' @param lsn_path Local pathname to a directory in character format
 #'   specifying where relationships.csv resides, which is created
 #'   using \code{link{lines_to_lsn}}.
-#' @param obs_sites Optional. A single \code{sf} object with POINT geometry
-#'   created using \code{link{sites_to_lsn}} that represents the
-#'   observation locations (i.e. where data were collected). Default =
-#'   NULL (see Details).
+#' @param obs_sites Optional. A single \code{sf} object with POINT
+#'   geometry created using \code{link{sites_to_lsn}} that represents
+#'   the observation locations (i.e. where data were
+#'   collected). Default = NULL (see Details).
 #' @param preds_list Optional. A list of one or more \code{sf} objects
 #'   representing prediction sites.
 #' @param ssn_path Pathname to an output directory where output files
@@ -18,6 +18,14 @@
 #'   included.
 #' @param import Logical indicating whether the output files should be
 #'   returned as an \code{SSN} object. Defaults to \code{TRUE}.
+#' @param check Logical indicating whether the validity of the
+#'   \code{SSN} should be checked using \code{[ssn_check]} when
+#'   \code{import = TRUE}. Default = \code{TRUE}.
+#' @param afv_col Character vector containing the names of the
+#'   additive function value columns that will be checked when
+#'   \code{check = TRUE}. Columns must be present in \code{edges},
+#'   \code{obs_sites} and \code{preds_list}, if all are
+#'   included. Default is \code{NULL}.
 #' @param overwrite Logical. If \code{TRUE} and \code{ssn_path}
 #'   already exists, the contents of \code{ssn_path} will be
 #'   overwritten. Defaults to \code{FALSE}.
@@ -58,19 +66,24 @@
 #'   }
 #'   A more detailed description of the .ssn directory and its contents is provided in Peterson and Ver Hoef (2014).
 #'
-#' @return An object of class \code{SSN}.  The function returns an object of class \code{SSN}. The output is also stored locally in \code{ssn_path} (see Details).
+#' @return The components of an \code{SSN} object are written to
+#'     \code{ssn_path} (see Details). When \code{import = TRUE}, the
+#'     function also returns an object of class \code{SSN}. If
+#'     \code{check = TRUE}, the validity of the returned \code{SSN}
+#'     object is checked using \code{[ssn_check]} and results are
+#'     printed to the console.
 #'
 #' @export
 #' @examples
 #' # Get temporary directory, where the example LSN will be stored
-#' # locally. 
+#' # locally.
 #' temp_dir <- tempdir()
 
-#' # Build the LSN. When working with your own data, lsn_path will be 
+#' # Build the LSN. When working with your own data, lsn_path will be
 #' # a local folder of your choice rather than a temporary directory.
 #' edges<- lines_to_lsn(
 #'    streams = MF_streams,
-#'    lsn_path = temp_dir, 
+#'    lsn_path = temp_dir,
 #'    snap_tolerance = 1,
 #'    check_topology = FALSE,
 #'    overwrite = TRUE,
@@ -100,7 +113,7 @@
 #' # a column representing watershed area (h2oAreaKm2).
 #' edges<- afv_edges(
 #'    edges=edges,
-#'    infl_col = "h2oAreaKm2", 
+#'    infl_col = "h2oAreaKm2",
 #'    segpi_col = "areaPI",
 #'    lsn_path = temp_dir,
 #'    afv_col = "afvArea",
@@ -154,42 +167,54 @@
 #'
 #' # Summarise SSN object
 #' summary(ssn.obj)
-#' 
+#'
 ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
                          preds_list = NULL, ssn_path, import = TRUE,
-                         overwrite = FALSE, verbose = TRUE) {
-  # check sf object
-  if (!inherits(edges, "sf")) {
-    stop("edges must be an sf object.", call. = FALSE)
-  }
+                         check = TRUE, afv_col = NULL, overwrite = FALSE,
+                         verbose = TRUE) {
 
-  # check sf object
-  if (!inherits(obs_sites, "sf")) {
-    stop("obs_sites must be an sf object.", call. = FALSE)
-  }
 
-  # check sf object
-  if (any(vapply(preds_list, function(x) !inherits(x, "sf"), logical(1)))) {
-    stop("All preds objects must be sf objects.", call. = FALSE)
-  }
 
   ## Check all inputs ------------------------------------------------
-  if (verbose == TRUE) {
+  if(verbose == TRUE) {
     message("\nChecking inputs\n")
   }
 
   obs.exist <- !is.null(obs_sites)
   preds.exist <- !is.null(preds_list)
 
+  ## check if edges is sf object
+  if(!inherits(edges, "sf")) {
+    stop("edges must be an sf object.", call. = FALSE)
+  }
+
+  ## Stop if obs_sites is not a single sf data.frame
+  if(obs.exist) {
+    if(!inherits(obs_sites, "sf")) {
+      if(is.list(obs_sites)) {
+        stop("obs_sites must be a single sf object, not a list.", call. = FALSE)
+      } else {
+        stop("obs_sites must be an sf object.", call. = FALSE)
+      }
+    }
+  }
+
+  ## check preds_list contains sf object(s)
+  if(preds.exist == TRUE) {
+    if(any(vapply(preds_list, function(x) !inherits(x, "sf"), logical(1)))) {
+      stop("All preds objects must be sf objects.", call. = FALSE)
+    }
+  }
+
   ## Edges
   ## geometry type
   edge_geom <- st_as_text(st_geometry(edges)[[1]])
-  if (grepl("LINESTRING", edge_geom) == FALSE) {
+  if(grepl("LINESTRING", edge_geom) == FALSE) {
     stop("Input edges must have LINESTRING geometry")
   }
 
   ## Can we overwrite edges.gpkg if necessary
-  if (overwrite == FALSE & file.exists(paste0(ssn_path, "/edges.gpkg"))) {
+  if(overwrite == FALSE & file.exists(paste0(ssn_path, "/edges.gpkg"))) {
     stop("edges.gpkg already exists in ssn_path and overwrite = FALSE")
   }
 
@@ -227,8 +252,8 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   # check_names_case(names(edges), "netID", "edges")
 
   ## If pid file exists and overwrite is TRUE
-  if ("pid" %in% colnames(edges)) {
-    if (overwrite) {
+  if("pid" %in% colnames(edges)) {
+    if(overwrite) {
       edges$pid <- NULL
     } else {
       stop("pid already exists in edges and overwrite = FALSE", call. = FALSE)
@@ -237,8 +262,8 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   check_names_case(names(edges), "pid", "edges")
 
   ## If locID file exists and overwrite is TRUE
-  if ("locID" %in% colnames(edges)) {
-    if (overwrite) {
+  if("locID" %in% colnames(edges)) {
+    if(overwrite) {
       edges$locID <- NULL
     } else {
       stop("locID already exists in edges and overwrite = FALSE", call. = FALSE)
@@ -247,8 +272,8 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   check_names_case(names(edges), "locID", "edges")
 
   ## If netID file exists and overwrite is TRUE
-  if ("netID" %in% colnames(edges)) {
-    if (overwrite) {
+  if("netID" %in% colnames(edges)) {
+    if(overwrite) {
       edges$netID <- NULL
     } else {
       stop("netID already exists in edges and overwrite = FALSE", call. = FALSE)
@@ -257,8 +282,8 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   check_names_case(names(edges), "netID", "edges")
 
   ## If fid file exists and overwrite is TRUE
-  if ("fid" %in% colnames(edges)) {
-    if (overwrite) {
+  if("fid" %in% colnames(edges)) {
+    if(overwrite) {
       edges$fid <- NULL
     } else {
       stop("fid already exists in edges and overwrite = FALSE", call. = FALSE)
@@ -267,12 +292,12 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   check_names_case(names(edges), "fid", "edges")
 
   ## lsn_path
-  if (!file.exists(lsn_path)) {
+  if(!file.exists(lsn_path)) {
     stop("\n lsn_path does not exist.\n\n")
   }
 
   ## Check for .ssn extension
-  if (substr(ssn_path, nchar(ssn_path) - 3, nchar(ssn_path)) != ".ssn") {
+  if(substr(ssn_path, nchar(ssn_path) - 3, nchar(ssn_path)) != ".ssn") {
     ssn_path <- paste0(ssn_path, ".ssn")
     message(
       "ssn_path folder must have an .ssn extension. ssn_path changed to ",
@@ -281,70 +306,29 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   }
 
   ## Check whether .ssn path exists
-  if (file.exists(ssn_path) & overwrite == FALSE) {
+  if(file.exists(ssn_path) & overwrite == FALSE) {
     stop("\n ssn_path exists and overwrite = FALSE")
   }
 
   ## obs_sites
-  if (obs.exist) {
-    ## Stop if sites is not a single sf data.frame
-    if (!class(obs_sites)[1] == "sf") {
-      if (is.list(obs_sites)) {
-        stop("obs_sites must be a single sf object, not a list of sf data.frames")
-      } else {
-        stop("obs_sites must be an sf object")
-      }
-    }
+  if(obs.exist) {
 
     obs.geom <- st_as_text(st_geometry(obs_sites)[[1]])
-    if (class(obs_sites)[1] != "sf" | grepl("POINT", obs.geom) == FALSE) {
+    if(class(obs_sites)[1] != "sf" | grepl("POINT", obs.geom) == FALSE) {
       stop("obs_sites must be an sf object with POINT geometry")
     }
 
-    if (file.exists(paste0(ssn_path, "/obs.gpkg")) & overwrite == FALSE) {
+    if(file.exists(paste0(ssn_path, "/obs.gpkg")) & overwrite == FALSE) {
       stop("obs.gpkg exists in ssn_path and overwrite == FALSE")
     }
 
-    if (sum(colnames(obs_sites) %in% c("pid", "locID", "netID")) > 0 & overwrite == FALSE) {
+    if(sum(colnames(obs_sites) %in% c("pid", "locID", "netID")) > 0 & overwrite == FALSE) {
       stop(paste0("Columns pid, locID, and/or netID exist in obs_sites and overwrite = FALSE"))
     }
 
-    # ## Can overwrite pid column if necessary
-    # if(sum(colnames(obs_sites) == "pid") > 0) {
-    #   if(overwrite == FALSE) {
-    #     stop("pid already exists in obs_sites and overwrite = FALSE")
-    #   } else { ## Remove pid
-    #     obs_sites$pid <- NULL
-    #   }
-    # }
-    # ## Check for duplicate names
-    # check_names_case(names(obs_sites), "pid", "obs_sites")
-    #
-    # ## Can overwrite locID column if necessary
-    # if(sum(colnames(obs_sites) == "locID") > 0) {
-    #   if(overwrite == FALSE) {
-    #     stop("locID already exists in obs_sites and overwrite = FALSE")
-    #   } else { ## Remove locID
-    #     obs_sites$locID <- NULL
-    #   }
-    # }
-    # ## Check for duplicate names
-    # check_names_case(names(obs_sites), "locID", "obs_sites")
-    #
-    # ## Can overwrite netID column if necessary
-    # if(sum(colnames(obs_sites) == "netID") > 0) {
-    #   if(overwrite == FALSE) {
-    #     stop("netID already exists in obs_sites and overwrite = FALSE")
-    #   } else { ## Remove netID
-    #     obs_sites$netID <- NULL
-    #   }
-    # }
-    # ## Check for duplicate names
-    # check_names_case(names(obs_sites), "netID", "obs_sites")
-
     ## If pid file exists and overwrite is TRUE
-    if ("pid" %in% colnames(obs_sites)) {
-      if (overwrite) {
+    if("pid" %in% colnames(obs_sites)) {
+      if(overwrite) {
         obs_sites$pid <- NULL
       } else {
         stop("pid already exists in obs_sites and overwrite = FALSE", call. = FALSE)
@@ -353,8 +337,8 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
     check_names_case(names(obs_sites), "pid", "obs_sites")
 
     ## If locID file exists and overwrite is TRUE
-    if ("locID" %in% colnames(obs_sites)) {
-      if (overwrite) {
+    if("locID" %in% colnames(obs_sites)) {
+      if(overwrite) {
         obs_sites$locID <- NULL
       } else {
         stop("locID already exists in obs_sites and overwrite = FALSE", call. = FALSE)
@@ -363,8 +347,8 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
     check_names_case(names(obs_sites), "locID", "obs_sites")
 
     ## If netID file exists and overwrite is TRUE
-    if ("netID" %in% colnames(obs_sites)) {
-      if (overwrite) {
+    if("netID" %in% colnames(obs_sites)) {
+      if(overwrite) {
         obs_sites$netID <- NULL
       } else {
         stop("netID already exists in obs_sites and overwrite = FALSE", call. = FALSE)
@@ -373,8 +357,8 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
     check_names_case(names(obs_sites), "netID", "obs_sites")
 
     ## If fid file exists and overwrite is TRUE
-    if ("fid" %in% colnames(obs_sites)) {
-      if (overwrite) {
+    if("fid" %in% colnames(obs_sites)) {
+      if(overwrite) {
         obs_sites$fid <- NULL
       } else {
         stop("fid already exists in obs_sites and overwrite = FALSE", call. = FALSE)
@@ -386,66 +370,30 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   ## Check each set of preds in predlist
   #################################################
 
-  if (preds.exist) {
-    ## Stop if preds_list is a single sf data.frame instead of a list
-    if (is.list(preds_list) && !all(sapply(preds_list, inherits, "sf"))) {
-      stop("preds_list must be a named list of one or more sf objects")
-    }
+  if(preds.exist) {
 
-    for (p in 1:length(preds_list)) {
+    for(p in 1:length(preds_list)) {
+
       p.geom <- st_as_text(st_geometry(preds_list[[p]])[[1]])
 
-      if (class(preds_list[[p]])[1] != "sf" | grepl("POINT", p.geom) == FALSE) {
+      if(class(preds_list[[p]])[1] != "sf" | grepl("POINT", p.geom) == FALSE) {
         stop(paste0(names(preds_list)[p], " must be an sf object with POINT geometry"))
       }
 
-      if (file.exists(paste0(ssn_path, "/", names(preds_list)[p], ".gpkg")) & overwrite == FALSE) {
+      if(file.exists(paste0(ssn_path, "/", names(preds_list)[p], ".gpkg")) & overwrite == FALSE) {
         stop(paste0(names(preds_list), ".gpkg exists in ssn_path and overwrite == FALSE"))
       }
 
-      if (sum(colnames(preds_list[[p]]) %in% c("pid", "locID", "netID")) > 0 & overwrite == FALSE) {
+      if(sum(colnames(preds_list[[p]]) %in% c("pid", "locID", "netID")) > 0 & overwrite == FALSE) {
         stop(paste0(
           "Columns pid, locID, and/or netID exist in ", names(preds_list)[p],
           " and overwrite = FALSE"
         ))
       }
 
-      # ## Can overwrite pid column if necessary
-      # if(sum(colnames(preds_list[[p]]) == "pid") > 0) {
-      #   if(overwrite == FALSE) {
-      #     stop("pid already exists in obs_sites and overwrite = FALSE")
-      #   } else { ## Remove pid
-      #     preds_list[[p]]$pid <- NULL
-      #   }
-      # }
-      # ## Check for duplicate names
-      # check_names_case(names(preds_list[[p]]), "pid", names(preds_list)[p])
-      #
-      # ## Can overwrite locID column if necessary
-      # if(sum(colnames(preds_list[[p]]) == "locID") > 0) {
-      #   if(overwrite == FALSE) {
-      #     stop("locID already exists in obs_sites and overwrite = FALSE")
-      #   } else { ## Remove locID
-      #     preds_list[[p]]$locID <- NULL
-      #   }
-      # }
-      # ## Check for duplicate names
-      # check_names_case(names(preds_list[[p]]), "locID", names(preds_list)[p])
-      #
-      # ## Can overwrite netID column if necessary
-      # if(sum(colnames(preds_list[[p]]) == "netID") > 0) {
-      #   if(overwrite == FALSE) {
-      #     stop("netID already exists in obs_sites and overwrite = FALSE")
-      #   } else { ## Remove netID
-      #     preds_list[[p]]$netID <- NULL
-      #   }
-      # }
-      # ## Check for duplicate names
-      # check_names_case(names(preds_list[[p]]), "netID", names(preds_list)[p])
-
       ## If pid file exists and overwrite is TRUE
-      if ("pid" %in% colnames(preds_list[[p]])) {
-        if (overwrite) {
+      if("pid" %in% colnames(preds_list[[p]])) {
+        if(overwrite) {
           preds_list[[p]]$pid <- NULL
         } else {
           stop(paste0("pid already exists in ", names(preds_list)[p], " and overwrite = FALSE", call. = FALSE))
@@ -454,8 +402,8 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
       check_names_case(colnames(preds_list[[p]]), "pid", names(preds_list)[p])
 
       ## If locID file exists and overwrite is TRUE
-      if ("locID" %in% colnames(preds_list[[p]])) {
-        if (overwrite) {
+      if("locID" %in% colnames(preds_list[[p]])) {
+        if(overwrite) {
           preds_list[[p]]$locID <- NULL
         } else {
           stop(paste0("locID already exists in ", names(preds_list)[p], " and overwrite = FALSE", call. = FALSE))
@@ -464,8 +412,8 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
       check_names_case(colnames(preds_list[[p]]), "locID", names(preds_list)[p])
 
       ## If netID file exists and overwrite is TRUE
-      if ("netID" %in% colnames(preds_list[[p]])) {
-        if (overwrite) {
+      if("netID" %in% colnames(preds_list[[p]])) {
+        if(overwrite) {
           preds_list[[p]]$netID <- NULL
         } else {
           stop(paste0("netID already exists in ", names(preds_list)[p], " and overwrite = FALSE", call. = FALSE))
@@ -474,8 +422,8 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
       check_names_case(colnames(preds_list[[p]]), "pid", names(preds_list)[p])
 
       ## If fid file exists and overwrite is TRUE
-      if ("fid" %in% colnames(preds_list[[p]])) {
-        if (overwrite) {
+      if("fid" %in% colnames(preds_list[[p]])) {
+        if(overwrite) {
           preds_list[[p]]$fid <- NULL
         } else {
           stop(paste0("fid already exists in ", names(preds_list)[p], " and overwrite = FALSE", call. = FALSE))
@@ -486,16 +434,16 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   }
 
   ## Create a .ssn folder for outputs
-  if (!file.exists(ssn_path)) {
+  if(!file.exists(ssn_path)) {
     try(dir.create(ssn_path)) ## create directory
-    if (verbose == TRUE) {
+    if(verbose == TRUE) {
       message("\n", paste0(ssn_path, " created.\n"), appendLF = FALSE)
     }
   } else {
     ## output directory exists, print warning, delete folder and re-create it now
     unlink(ssn_path, recursive = TRUE)
     dir.create(ssn_path) ## re-create directory
-    if (verbose == TRUE) {
+    if(verbose == TRUE) {
       message("\nOutput .ssn directory exists. Directory and contents are being deleted and recreated.\n",
         appendLF = FALSE
       )
@@ -506,12 +454,12 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   ## Create binary IDs
   ## ----------------------------------------------------------------
   ## Create Binary Segment ID
-  if (verbose == TRUE) {
+  if(verbose == TRUE) {
     message("\nCreating binaryID.db\n")
   }
 
   ## Read relationships.csv
-  if (file.exists(paste(lsn_path, "relationships.csv", sep = "/"))) {
+  if(file.exists(paste(lsn_path, "relationships.csv", sep = "/"))) {
     rel <- read.csv(paste(lsn_path, "relationships.csv", sep = "/"))
   } else {
     stop(paste0(
@@ -543,9 +491,9 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
 
   ## Find which outlet is in which subgraph
   outlet_vs_subgraph <- numeric(n_networks)
-  for (k in 1:n_networks) {
+  for(k in 1:n_networks) {
     in_subgraph <- unlist(lapply(rids_net, function(x) outlets[k] %in% x))
-    if (any(in_subgraph)) {
+    if(any(in_subgraph)) {
       outlet_vs_subgraph[k] <- which(in_subgraph)
     } else {
       outlet_vs_subgraph[k] <- NA
@@ -562,9 +510,9 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   ############################################################
   ## Loop through each of the networks,
   ## Assign binary labels to each edge
-  for (j in 1:n_networks) {
+  for(j in 1:n_networks) {
     ## If only one edge in network
-    if (is.na(outlet_vs_subgraph[j])) {
+    if(is.na(outlet_vs_subgraph[j])) {
       results_frame <- data.frame(rid = outlets[j], bid = 1)
     } else {
       ## Create empty vectors to store binary labels
@@ -576,12 +524,12 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
       ## Nested for loop: Each vertex/edge in each network
       ## Investigate for removal later
       ############################################################
-      for (i in 1:length(subgraph_j)) {
+      for(i in 1:length(subgraph_j)) {
         num_connections <- length(subgraph_j[[i]][[1]])
         rid_i <- attributes(subgraph_j[[i]][[1]])$names
-        if (num_connections > 2) stop("Topological error: more than two edges flowing into this confluence.")
-        if (num_connections == 0) next
-        if (num_connections == 2) {
+        if(num_connections > 2) stop("Topological error: more than two edges flowing into this confluence.")
+        if(num_connections == 0) next
+        if(num_connections == 2) {
           rid_record <- c(rid_record, rid_i)
           bin_record <- c(bin_record, binary_label)
         } else {
@@ -598,7 +546,7 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
       ## N.B. edges = vertices
       n_vertices <- length(subgraph_j)
       results <- vector("list", n_vertices - 1)
-      for (k in 1:(n_vertices - 1)) {
+      for(k in 1:(n_vertices - 1)) {
         results[[k]] <- shortest_paths(subgraph_j,
           from = length(subgraph_j),
           to = attributes(subgraph_j[[k]])$name
@@ -637,12 +585,12 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   netid_df$netID <- as.numeric(netid_df$netID)
   netid_df$rid <- as.numeric(netid_df$rid)
 
-  if (verbose) {
+  if(verbose) {
     message("Adding NetID and netgeom to edges \n")
   }
 
   ## ## Drop column for binary ids and join to the edges attribute table
-  if ("netID" %in% colnames(edges)) {
+  if("netID" %in% colnames(edges)) {
     edges <- subset(edges, select = -get("netID"))
   }
   edges <- merge(edges, subset(netid_df, select = -get("binaryID")), all.x = TRUE, by = "rid")
@@ -653,7 +601,7 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   #############################################################################
   ## Add locID and pid to obs_sites attribute table
   #############################################################################
-  if (verbose) {
+  if(verbose) {
     message("\npid, locID, netID, and netgeom added to ...")
   }
 
@@ -661,7 +609,7 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   ## Assign pid values and get unique point locations for
   ## assigning locID
   ## ---------------------------------------------------------
-  if (obs.exist) {
+  if(obs.exist) {
     n_pid <- nrow(obs_sites)
     obs_sites$pid <- seq_len(n_pid)
     all_pids <- obs_sites[, "pid"]
@@ -677,8 +625,8 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
     all_geoms <- NULL
   }
 
-  if (preds.exist) {
-    for (z in 1:length(preds_list)) {
+  if(preds.exist) {
+    for(z in 1:length(preds_list)) {
       ## Assign pid values
       n_preds <- nrow(preds_list[[z]])
       preds_list[[z]]$pid <- n_pid + seq_len(n_preds)
@@ -688,7 +636,7 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
       all_pids <- rbind(all_pids, preds_list[[z]][, "pid"])
 
       ## Remove locID if it exists
-      if ("locID" %in% colnames(preds_list[[z]])) {
+      if("locID" %in% colnames(preds_list[[z]])) {
         preds_list[[z]] <- subset(preds_list[[z]], select = -get("locID"))
       }
 
@@ -699,7 +647,7 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
     }
   }
 
-  if (!is.null(all_geoms)) {
+  if(!is.null(all_geoms)) {
     ## Get unique locations using distinct.sf. Using base R unique()
     ## instead of dplyr::distinct.sf will be too slow for large datasets
     unq_geoms <- distinct(all_geoms)
@@ -713,11 +661,11 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
     all_ids <- st_drop_geometry(all_ids)
 
     ## Add locIDs and netIDs to obs_sites
-    if (obs.exist) {
+    if(obs.exist) {
       obs_sites <- merge(obs_sites, all_ids, all.x = TRUE, by = "pid")
 
       ## Add netID to obs_sites
-      if ("netID" %in% colnames(obs_sites)) {
+      if("netID" %in% colnames(obs_sites)) {
         obs_sites <- subset(obs_sites, select = -get("netID"))
       }
       obs_sites <- merge(obs_sites, subset(netid_df, select = -get("binaryID")),
@@ -727,7 +675,7 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
       ## Add netgeom column
       obs_sites <- create_netgeom(obs_sites, type = "POINT", overwrite = TRUE)
 
-      if (verbose) {
+      if(verbose) {
         message("\nobs_sites")
       }
     }
@@ -738,16 +686,16 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   ##   and pid
   ############################################################
 
-  if (preds.exist) {
+  if(preds.exist) {
     ## Loop through pred sites datasets
-    for (p in 1:length(preds_list)) {
+    for(p in 1:length(preds_list)) {
       ## Assign locIDs to the obs_sites - using unique instead of dplyr::distinct
       ## may be too slow for large datasets
       pred.tmp <- preds_list[[p]]
 
       pred.tmp <- merge(pred.tmp, all_ids, all.x = TRUE, by = "pid")
 
-      if ("netID" %in% colnames(pred.tmp)) {
+      if("netID" %in% colnames(pred.tmp)) {
         pred.tmp <- subset(pred.tmp, select = -get("netID"))
       }
       pred.tmp <- merge(pred.tmp, subset(netid_df, select = -get("binaryID")),
@@ -760,7 +708,7 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
       preds_list[[p]] <- pred.tmp
       rm(pred.tmp)
 
-      if (verbose) {
+      if(verbose) {
         message(paste0("\n", names(preds_list)[p]))
       }
     }
@@ -770,7 +718,7 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   ## Export sf objects to geopackages
   ###########################################################################
 
-  if (verbose) {
+  if(verbose) {
     message(paste("\nSaving files to", ssn_path))
   }
 
@@ -779,7 +727,7 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   )
 
   ## Do not export obs_sites if they do not exist
-  if (obs.exist) {
+  if(obs.exist) {
     st_write(obs_sites, paste(ssn_path, "sites.gpkg", sep = "/"),
       quiet = TRUE
     )
@@ -787,11 +735,11 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
     obs_sites <- NA
   }
 
-  if (preds.exist) {
+  if(preds.exist) {
     ############################################
     ## For loop: write files
     ############################################
-    for (w in 1:length(preds_list)) {
+    for(w in 1:length(preds_list)) {
       st_write(preds_list[[w]],
         dsn = paste0(ssn_path, "/", names(preds_list)[w], ".gpkg"),
         quiet = TRUE
@@ -804,8 +752,8 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   ## ---------------------------------------------------------------
   ## If import = TRUE, construct and return SSN object
   ## ---------------------------------------------------------------
-  if (import) {
-    if (verbose) {
+  if(import) {
+    if(verbose) {
       message("\nCreating SSN object")
     }
 
@@ -815,6 +763,19 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
 
     ## Create Binary ID database
     createBinaryID(ssnlist, overwrite = overwrite)
+
+    ## ## Check the SSN object
+    if(check == TRUE) {
+      message("\nChecking the SSN object")
+
+      if(obs.exist) {
+        check.msg<- ssn_check(ssnlist, afv_col = afv_col)
+      } else {
+        check.msg<- ssn_check(ssnlist, check_obs = FALSE,
+                              afv_col = afv_col)
+      }
+      cat(check.msg)
+    }
 
     return(ssnlist)
   }

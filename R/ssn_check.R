@@ -28,14 +28,14 @@
 #' ssn_check(mf04, afv_col = "afvArea")
 #'
 ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TRUE) {
-  out.message <- "\n"
-  valid <- TRUE
+    out.message <- "\n"
+    valid <- TRUE
 
-  ## check that ssn.object == SSN
-  if (!inherits(ssn.object, "SSN")) {
-    stop("ssn.object is not of class SSN", call. = FALSE)
+    ## check that ssn.object == SSN
+    if (!inherits(ssn.object, "SSN")) {
+        stop("ssn.object is not of class SSN", call. = FALSE)
   }
- 
+
   ## check that .ssn folder exists
   if (!file.exists(ssn.object$path)) {
     stop(paste0(
@@ -104,7 +104,7 @@ ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TR
             out.message, "edges AFV column, ",
             afv_i, ", contains NAs\n"
           )
-          ## valid<- FALSE
+          valid<- FALSE
         }
 
         if (sum(edges.df[, afv_i] < 0) > 0 |
@@ -112,16 +112,16 @@ ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TR
           out.message <- paste0(
             out.message, "edges AFV column, ",
             afv_i,
-            ", contains values < 0 and/or > 1\n"
+            ", contains values < 0 and/or > 1.\n"
           )
-          ## valid <- FALSE
+          valid <- FALSE
         }
       } else {
         out.message <- paste0(
           out.message, "AFV column, ", afv_i,
           ", not found in edges\n"
         )
-        ## valid <- FALSE
+        valid <- FALSE
       }
     }
   }
@@ -224,7 +224,7 @@ ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TR
 
       ## check for empty geometries ----------------
       empty.preds <- sum(st_is_empty(ssn.object$preds[[pred.names[p]]]))
-      
+
       if (empty.preds > 0) {
         out.message <- paste0(
           out.message, pred.names[p],
@@ -251,10 +251,10 @@ ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TR
       ## Check AFV cols ---------------------------------
       if (!is.null(afv_col)) {
         pred.df <- st_drop_geometry(ssn.object$preds[[pred.names[p]]])
-        
+
         for (i in 1:length(afv_col)) {
           afv_i <- afv_col[i]
-          
+
           ## Does AFV column exist
           if (afv_i %in% colnames(ssn.object$preds[[pred.names[p]]])) {
             if (sum(is.na(pred.df[, afv_i])) > 0) {
@@ -264,7 +264,7 @@ ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TR
               )
               valid <- FALSE
             }
-            
+
             if (sum(pred.df[, afv_i] < 0) > 0 |
                 sum(pred.df[, afv_i] > 1) > 0) {
               out.message <- paste0(
