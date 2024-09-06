@@ -585,7 +585,7 @@ lines_to_lsn <- function(streams, lsn_path,
         "\n0 topology errors identified. node_errors.gpkg not written to file.\n\n",
         n.outlets,
         " Outlets found. Visually check nodecat == Outlet locations in ",
-        lsn_path, "/nodes.gpkg if found.\n"
+        lsn_path, "/nodes.gpkg and correct errors if found.\n"
       ))
     } else {
       message(paste0(
