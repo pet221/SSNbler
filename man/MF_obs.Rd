@@ -26,7 +26,7 @@ location on the line segment where the site resides
 \item SLOPE: Slope of the line segment (cm/cm) where the site resides
 \item ELEV_DEM: Elevation at the site based on a 30m DEM
 \item Source: Source of the data - relates to the ID field of the source table
-\item Summer_mn: Overall summer mean termperature (C) of the deployment
+\item Summer_mn: Overall summer mean temperature (C) of the deployment
 \item MaxOver20: Binary variable: 1 represents the maximum summer temperature
 was greater than 20C and 0 indicates that it was less than 20C
 \item C16: Number of times daily stream temperature exceeded 16C

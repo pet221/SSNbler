@@ -20,7 +20,7 @@ using \code{\link{lines_to_lsn}}.}
 
 \item{lsn_path}{Local pathname to a directory in character format
 specifying where relationships.csv resides, which is created
-using \code{link[SSNbler]{lines_to_lsn}}.}
+using \code{\link[SSNbler]{lines_to_lsn}}.}
 
 \item{infl_col}{Name of the existing column in the edges data.frame
 that will be used to generate the segment proportional influence
