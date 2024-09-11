@@ -9,6 +9,26 @@
 
 Learn more about `SSNbler` on [our website](https://pet221.github.io/SSNbler/).
 
+## Installation Instructions
+
+```r
+# install the most recent approved version from CRAN
+install.packages("SSNbler")
+# load the most recent approved version from CRAN
+library(SSNbler)
+```
+
+Install and load the most recent version of`SSNbler` from GitHub by running
+```r
+# Installing from GitHub requires you first install the remotes package
+install.packages("remotes")
+
+# install the most recent version from GitHub
+remotes::install_github("pet221/SSNbler", ref = "main")
+# load the most recent development version from GitHub
+library(SSNbler)
+```
+
 ## Citation
 
 If you use `SSNbler` in a formal publication or report, please cite it. Citing `SSNbler` lets us devote more resources to it in the future. View the `SSNbler` citation by running
@@ -31,19 +51,6 @@ citation(package = "SSNbler")
 #>     year = {2024},
 #>     note = {{R} package version 0.0.1},
 #>   }
-```
-
-## Installation Instructions
-
-Install and load the most recent version of`SSNbler` from GitHub by running
-```r
-# Installing from GitHub requires you first install the remotes package
-install.packages("remotes")
-
-# install the most recent version from GitHub
-remotes::install_github("pet221/SSNbler", ref = "main")
-# load the most recent development version from GitHub
-library(SSNbler)
 ```
 
 ## Example Usage
