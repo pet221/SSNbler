@@ -17,12 +17,12 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Erin Peterson \email{erin@peterson-consulting.com}
+\strong{Maintainer}: Erin Peterson \email{erin@peterson-consulting.com} (\href{https://orcid.org/0000-0003-2992-0372}{ORCID})
 
 Authors:
 \itemize{
   \item Michael Dumelle \email{Dumelle.Michael@epa.gov} (\href{https://orcid.org/0000-0002-3393-5529}{ORCID})
-  \item Alan Pearse
+  \item Alan Pearse (\href{https://orcid.org/0000-0002-4133-8548}{ORCID})
 }
 
 Other contributors:

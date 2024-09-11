@@ -1,11 +1,12 @@
 Package: SSNbler
-Title: Create and Assemble SSN Objects in R
+Title: Assemble SSN Objects in R
 Version: 0.0.1
 Authors@R: c(
 	   person(given = "Erin",
     		 family = "Peterson",
     		 email = "erin@peterson-consulting.com",
-    		 role = c("aut", "cre")),
+    		 role = c("aut", "cre"),
+    		 comment = c(ORCID = "0000-0003-2992-0372")),
 	   person(given = "Michael",
            		family = "Dumelle",
            		role = c("aut"),
@@ -13,7 +14,8 @@ Authors@R: c(
            		comment = c(ORCID = "0000-0002-3393-5529")),
      person(given = "Alan",
            	 family = "Pearse",
-           	 role = "aut"),
+           	 role = "aut",
+           	 comment = c(ORCID = "0000-0002-4133-8548")),
       person(given = "Dan", 
                family = "Teleki",
                role = "ctb"),
