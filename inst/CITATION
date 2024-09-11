@@ -12,11 +12,11 @@ bibentry(
                    person(given = "Jay M.",
                           family = "Ver Hoef")),
   year         = "2024",
-  note         = "{R} package version 0.0.1",
+  note         = "{R} package version 0.1.0",
 
   header       = "To cite SSNbler in publications use:",
   textVersion  =
   paste("Peterson E. E., Dumelle, M., Pearse A., Teleki D., and Ver Hoef, J. M. (2024).",
         "SSNbler: Assemble SSN objects in R.",
-        "R package version 0.0.1")
+        "R package version 0.1.0")
 )

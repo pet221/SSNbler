@@ -109,7 +109,7 @@ Then we can read in the relevant data using `st_read` from the `sf` **R**
 package [@pebesma2018sf], which comes installed alongside
 `SSNbler`. Note that the input data can be in any vector data format
 that can be imported into R and stored as an `sf` object with `LINESTRING`
-or `POINT` geometry (e.g., shapefile, GeoJSON, GeoPackage, Spatialite,
+or `POINT` geometry (e.g., shapefile, GeoJSON, GeoPackage, SpatiaLite,
 PostGIS).
 
 ```{r Import_Data, results = "hide"}
@@ -214,9 +214,9 @@ function, which generally requires these arguments:
   output files will be stored. This directory will be created if it does not exist.
 * `check_topology`: Logical indicating whether to check for
   topological errors in `streams`.
-* `snap_tolerance`: Two nodes separated by a Euclidean distance $\leq$
+* `snap_tolerance`: Two nodes separated by a Euclidean distance $\le$
   `snap_tolerance` will be assumed connected. Distance is measured in map units (i.e., projection units for `streams`).
-* `topo_tolerance`: Two nodes separated by a Euclidean distance $\leq$ `topo_tolerance` are flagged as potential topological errors in the network.
+* `topo_tolerance`: Two nodes separated by a Euclidean distance $\le$ `topo_tolerance` are flagged as potential topological errors in the network.
 
 We create a LSN associated with `MF_streams` by running
 
@@ -596,7 +596,7 @@ names(edges) ## Look at edges column names
 summary(edges$afvArea) ## Summarize the AFV column
 ```
 The AFVs are a product of ratios, which means that the AFVs are always
-between zero and one ($0 \leq AFV \leq 1$). The AFV for the most downstream edge in a network will always
+between zero and one ($0 \le AFV \le 1$). The AFV for the most downstream edge in a network will always
 be one. If AFVs do not meet this requirement, then an error has
 occurred.
 

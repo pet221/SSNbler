@@ -97,7 +97,7 @@ models in \code{SSN2}.
 before the new directory is created. This directory contains:
 \itemize{
 \item edges.gpkg: edges in geopackage format. A new network identifier, netID, is added that is unique to each subnetwork.
-\item sites.gpkg: observed sites in geopackage format (if present). Three new ID columns are added that are unqiue to the measurement (pid), the location (locID), and the network (netID).
+\item sites.gpkg: observed sites in geopackage format (if present). Three new ID columns are added that are unique to the measurement (pid), the location (locID), and the network (netID).
 \item prediction datasets in geopackage format (if present). The prediction sites also contain pid, locID, and netID. The naming convention is taken from the names provided in \code{preds_list}.
 \item netID.dat files for each distinct network, which store the binaryID values for line segments in edges.
 }

@@ -6,7 +6,7 @@
 #'   locations are 'snapped' to the closest edge location and new
 #'   information is generated describing the geographic and
 #'   topological location relative to other features in the LSN.
-#' @param sites An \code{sf} object with POINT geometery, typically
+#' @param sites An \code{sf} object with POINT geometry, typically
 #'   representing observed data or prediction locations.
 #' @param edges An \code{sf} object with LINESTING geometry created
 #'   using \code{\link{lines_to_lsn}}.

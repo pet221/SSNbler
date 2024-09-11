@@ -41,7 +41,7 @@ citation(package = "SSNbler")
 #> To cite SSNbler in publications use:
 #> 
 #>   Peterson E. E., Dumelle, M., Pearse A., Teleki D., and Ver Hoef, J. M.
-#>   (2024). SSNbler: Assemble SSN objects in R. R package version 0.0.1
+#>   (2024). SSNbler: Assemble SSN objects in R. R package version 0.1.0
 #> 
 #> A BibTeX entry for LaTeX users is
 #> 
@@ -49,7 +49,7 @@ citation(package = "SSNbler")
 #>     title = {{SSNbler}: Assemble SSN objects in {R}},
 #>     author = {Erin Peterson and Michael Dumelle and Alan Pearse and Dan Teleki and Jay M. {Ver Hoef}},
 #>     year = {2024},
-#>     note = {{R} package version 0.0.1},
+#>     note = {{R} package version 0.1.0},
 #>   }
 ```
 

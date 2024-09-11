@@ -16,7 +16,7 @@ sites_to_lsn(
 )
 }
 \arguments{
-\item{sites}{An \code{sf} object with POINT geometery, typically
+\item{sites}{An \code{sf} object with POINT geometry, typically
 representing observed data or prediction locations.}
 
 \item{edges}{An \code{sf} object with LINESTING geometry created

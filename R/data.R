@@ -7,7 +7,7 @@
 #'   \itemize{
 #'     \item COMID: Common identifier of an NHD feature or relationship
 #'     \item GNIS_NAME: Feature name as found in the Geographic Names Information System
-#'     \item REACHCODE: Unique identifier for a reach. The first 8 digits contain the identfier for the HUC8 and the last 6 digits are a unique within-HUC8 identifier for the reach
+#'     \item REACHCODE: Unique identifier for a reach. The first 8 digits contain the identifier for the HUC8 and the last 6 digits are a unique within-HUC8 identifier for the reach
 #'     \item FTYPE: three-digit integer used to classify hydrography features in the NHD and define subtypes
 #'     \item FCODE: Numeric code that contains the feature type and its attributes as found in the NHDFCode lookup table
 #'     \item AREAWTMAP: Area weighted mean annual precipitation (mm) at the lowermost location on the edge
