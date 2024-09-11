@@ -33,11 +33,6 @@ citation(package = "SSNbler")
 #>   }
 ```
 
-## Statement of Need
-
-More to come.
-
-
 ## Installation Instructions
 
 Install and load the most recent version of`SSNbler` from GitHub by running
@@ -50,14 +45,6 @@ remotes::install_github("pet221/SSNbler", ref = "main")
 # load the most recent development version from GitHub
 library(SSNbler)
 ```
-
-## Contributing to `SSNbler`
-
-More to come.
-
-## Getting Help
-
-More to come.
 
 ## Example Usage
 
