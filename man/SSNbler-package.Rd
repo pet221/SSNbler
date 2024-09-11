@@ -4,7 +4,7 @@
 \name{SSNbler-package}
 \alias{SSNbler}
 \alias{SSNbler-package}
-\title{SSNbler: Create and Assemble SSN Objects in R}
+\title{SSNbler: Assemble SSN Objects in R}
 \description{
 Import, create and assemble data needed to fit spatial-statistical stream-network models using the SSN2 R package. Streams, observations, and prediction locations are represented as simple features and specific tools have been provided to define topological relationships between features; calculate the hydrologic distances (with flow-direction preserved) and the spatial additive function used to weight converging stream segments; and export the topological, spatial, and attribute information to an SSN object, which can be efficiently stored, accessed and analysed in R.
 }
