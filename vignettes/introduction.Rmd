@@ -483,9 +483,11 @@ Upstream distance is calculated for each site using the
 
 ```{r updist_sites}
 site.list <- updist_sites(
-  sites = list(obs = obs,
-               pred1km = preds,
-               CapeHorn = capehorn),
+  sites = list(
+    obs = obs,
+    pred1km = preds,
+    CapeHorn = capehorn
+  ),
   edges = edges,
   length_col = "Length",
   save_local = TRUE,

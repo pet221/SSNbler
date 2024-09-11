@@ -130,7 +130,6 @@
 
 afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
                       lsn_path = NULL, overwrite = TRUE) {
-  
   ## check sf object
   if (any(vapply(sites, function(x) !inherits(x, "sf"), logical(1)))) {
     stop("All sites objects must be sf objects.", call. = FALSE)

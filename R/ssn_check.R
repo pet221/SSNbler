@@ -17,10 +17,10 @@
 #' SSN2::copy_lsn_to_temp()
 #'
 #' # Import the SSN object with prediction points, pred1km
-#' mf04<- SSN2::ssn_import(
-#'    paste0(tempdir(), "/MiddleFork04.ssn"),
-#'    predpts = c("pred1km"),
-#'    overwrite = TRUE
+#' mf04 <- SSN2::ssn_import(
+#'   paste0(tempdir(), "/MiddleFork04.ssn"),
+#'   predpts = c("pred1km"),
+#'   overwrite = TRUE
 #' )
 #'
 #' # Check the SSN object, including the additive function column,
@@ -28,12 +28,12 @@
 #' ssn_check(mf04, afv_col = "afvArea")
 #'
 ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TRUE) {
-    out.message <- "\n"
-    valid <- TRUE
+  out.message <- "\n"
+  valid <- TRUE
 
-    ## check that ssn.object == SSN
-    if (!inherits(ssn.object, "SSN")) {
-        stop("ssn.object is not of class SSN", call. = FALSE)
+  ## check that ssn.object == SSN
+  if (!inherits(ssn.object, "SSN")) {
+    stop("ssn.object is not of class SSN", call. = FALSE)
   }
 
   ## check that .ssn folder exists
@@ -104,7 +104,7 @@ ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TR
             out.message, "edges AFV column, ",
             afv_i, ", contains NAs\n"
           )
-          valid<- FALSE
+          valid <- FALSE
         }
 
         if (sum(edges.df[, afv_i] < 0) > 0 |
@@ -207,8 +207,7 @@ ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TR
 
   pred.names <- names(ssn.object$preds)
 
-  if(!is.null(pred.names)) {
-
+  if (!is.null(pred.names)) {
     for (p in 1:length(pred.names)) {
       ## Check class of preds
       if (!inherits(ssn.object$preds[[pred.names[p]]], "sf")) {
@@ -237,8 +236,8 @@ ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TR
       if ("netgeom" %in% colnames(ssn.object$preds[[pred.names[p]]])) {
         ## Check contents of netgeom
         ng.message <- check_netgeom(ssn.object$preds[[pred.names[p]]],
-                                    type = pred.names[p], verbose = TRUE
-                                    )
+          type = pred.names[p], verbose = TRUE
+        )
         if (!is.null(ng.message)) {
           out.message <- paste0(out.message, ng.message)
           valid <- FALSE
@@ -266,7 +265,7 @@ ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TR
             }
 
             if (sum(pred.df[, afv_i] < 0) > 0 |
-                sum(pred.df[, afv_i] > 1) > 0) {
+              sum(pred.df[, afv_i] > 1) > 0) {
               out.message <- paste0(
                 out.message, pred.names[p],
                 " AFV column, ", afv_i,

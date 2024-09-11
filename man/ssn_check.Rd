@@ -27,10 +27,10 @@ Check a \code{SSN} object to ensure that it contains valid spatial, topological,
 SSN2::copy_lsn_to_temp()
 
 # Import the SSN object with prediction points, pred1km
-mf04<- SSN2::ssn_import(
-   paste0(tempdir(), "/MiddleFork04.ssn"),
-   predpts = c("pred1km"),
-   overwrite = TRUE
+mf04 <- SSN2::ssn_import(
+  paste0(tempdir(), "/MiddleFork04.ssn"),
+  predpts = c("pred1km"),
+  overwrite = TRUE
 )
 
 # Check the SSN object, including the additive function column,
