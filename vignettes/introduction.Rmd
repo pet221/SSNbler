@@ -2,11 +2,12 @@
 title: "An Introduction to SSNbler: Assembling Spatial Stream Network (SSN) Objects in R"
 author: "Erin E Peterson, Michael Dumelle, Alan R Pearse, Dan Teleki, and Jay M Ver Hoef"
 bibliography: "references.bib"
+csl: "apa-6th-edition.csl"
 output:
   html_document:
     theme: flatly
     number_sections: true
-    highlighted: default 
+    highlighted: default
     toc: yes
     toc_float:
       collapsed: no
@@ -19,7 +20,7 @@ vignette: >
   %\VignetteIndexEntry{An Introduction to SSNbler}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
-editor_options: 
+editor_options:
   chunk_output_type: console
 ---
 
@@ -44,7 +45,7 @@ Data collected in streams frequently exhibit unique patterns of spatial
 autocorrelation resulting from the branching network structure,
 longitudinal (i.e., upstream/downstream) connectivity, directional
 water flow, and differences in flow volume upstream of junctions
-(i.e., confluences) in the network 
+(i.e., confluences) in the network
 [@peterson2013modelling]. In addition, stream networks are embedded
 within geographic (i.e., 2-D) space, with the terrestrial landscape
 often having a strong influence on observations collected on
@@ -54,62 +55,64 @@ models) that capture the unique and complex spatial dependencies
 inherent in streams. These stream network models can be fit
 using the `SSN2` **R** package [@dumelle2024SSN2]. To use `SSN2`, however, users must
 provide the spatial, topological, and attribute data in a specific format called
-an SSN object. The `SSNbler` **R** package, which we introduce here, is an adaptation
-of the STARS ArcGIS toolset [@peterson2014stars] to the **R** programming language. `SSNbler` generates
-formats, assembles, and validates SSN objects that can be used for statistical
+an `SSN` object. The `SSNbler` **R** package, which we introduce here, is an adaptation
+of the STARS ArcGIS toolset [@peterson2014stars] for the **R** programming language. `SSNbler` generates
+formats, assembles, and validates `SSN` objects that can be used for statistical
 modeling in `SSN2`.
 
-In this vignette, we use `SSNbler` to create the SSN object
+In this vignette, we use `SSNbler` to create the `SSN` object
 `MiddleFork04.ssn` used by `SSN2`. First, we load `SSNbler` into our current
 **R** session.
 
-```{r}
+```{r Load_SSNbler}
 library(SSNbler)
 ```
 
-`SSNbler` has a few input datasets:
+A few input datasets are included in the `SSNbler` package:
 
 -   `MF_streams`: An `sf` object with `LINESTRING` geometry
     representing a portion of the Middle Fork stream network in Idaho, USA.
 -   `MF_obs`: An `sf` object with `POINT` geometry containing observed
-    stream temperature data at 45
+    summer mean stream temperature observations at 45
     unique locations on `MF_streams`.
 -   `MF_pred1km`: An `sf` object with `POINT` geometry containing
     unsampled locations spaced at one-kilometer intervals throughout
     `MF_streams`. This prediction dataset represents 175 locations where
     predictions of some response variable (i.e., temperature) may be
-    desired. 
+    desired.
 -   `MF_CapeHorn`: An `sf` object with `POINT` geometry containing
     654 unsampled locations spaced at 10-meter intervals throughout
-    Cape Horn Creek in `MF_streams`. 
+    Cape Horn Creek in `MF_streams`.
 
-Documentation for each dataset can be found by running `help()`. For example,
-to learn more about `MF_streams`, run `help("MF_streams, package = "SSNbler")`.
+To provide context, the observed data in `MF_obs` will be used to build statistical
+models and make predictions at the locations in `MF_pred1km` and
+`MF_CapeHorn` using the **R** package `SSN2`. Documentation for each dataset can be found by running `help()`. For example,
+to learn more about `MF_streams`, run `help("MF_streams", package = "SSNbler")`.
 
 While these datasets come with `SSNbler` and can be loaded via `data()`,
 we focus here on a more realistic
 workflow for the user. We start with a collection of spatial datasets
-installed alongside `SSNbler` in the `streamsdata` folder that represent the Middle Fork stream network. 
-In `streamsdata` are GeoPackages (more on this later) for
+installed alongside `SSNbler` in the `streamsdata` folder that represent the Middle Fork stream network.
+In `streamsdata` are GeoPackages (more on this later) representing
 the stream network, observed data,
 and prediction data (optional) required to create an SSN
 object. To prevent `SSNbler`
 functions from reading and writing to this folder, we copy it to R's
 temporary directory and store the path to this folder:
 
-```{r}
+```{r Copy_Local}
 copy_streams_to_temp()
 path <- paste0(tempdir(), "/streamsdata")
 ```
 
-Then we can read in the relevant data using `st_read` from the `sf` **R** 
+Then we can read in the relevant data using `st_read` from the `sf` **R**
 package [@pebesma2018sf], which comes installed alongside
 `SSNbler`. Note that the input data can be in any vector data format
 that can be imported into R and stored as an `sf` object with `LINESTRING`
 or `POINT` geometry (e.g., shapefile, GeoJSON, GeoPackage, Spatialite,
-PostGIS).  
+PostGIS).
 
-```{r ImportData, results = "hide"}
+```{r Import_Data, results = "hide"}
 library(sf)
 MF_streams <- st_read(paste0(path, "/MF_streams.gpkg"))
 MF_obs <- st_read(paste0(path, "/MF_obs.gpkg"))
@@ -126,24 +129,24 @@ the required geometry types. All of the input data have an Albers Equal Area Con
 input datasets have the same map projection, which must be a projected coordinate system and not
 a geographic coordinate system measured in Latitude and
 Longitude. The `sf` function `st_transform` can be used to
-reproject `sf` objects in *R*. 
+reproject `sf` objects in **R**.
 
 We previously mentioned these data are stored in `streamsdata` in a
 GeoPackage format. GeoPackages, like shapefiles, are a way to store spatial data. We
 prefer GeoPackages over shapefiles because they offer better support
 for high precision numeric data compared to the traditional DBF
 (dBASE) format (used in shapefiles), which limits the precision to 10 decimal places when *writing* (not reading)
-to local files from *R*. This is problematic because several important columns
+to local files from **R**. This is problematic because several important columns
 `SSNbler` adds and `SSN2` uses contain very small values ranging from zero to
 one. If these columns are truncated it can lead to
 difficult-to-diagnose errors when models are fit in
 `SSN2`. GeoPackages do not have this limitation. To learn more about GeoPackages, [visit here](https://www.geopackage.org/).
 
 Before working with any of the input files, we visualize the stream
-network, observed sites, and prediction sites using the `ggplot2`
-**R** package [@wickham2016ggplot2].
+network, observed sites, and prediction sites using the
+**R** package `ggplot2` [@wickham2016ggplot2].
 
-```{r mf-input, fig.cap = "The Middle Fork Stream Network.", fig.alt = "The Middle Fork Stream Network.", fig.align = "center", out.width = "75%"}
+```{r Plot_MF, fig.alt = "The Middle Fork Stream Network.", fig.align = "center", out.width = "75%"}
 library(ggplot2)
 ggplot() +
   geom_sf(data = MF_streams) +
@@ -153,11 +156,10 @@ ggplot() +
   coord_sf(datum = st_crs(MF_streams))
 ```
 
-In the Figure above, there are two subnetworks from `MF_Streams` (black lines).
-Point features from `MF_obs` (blue dots) and `MF_pred1km` (purple dots) are 
+In the figure above, there are two subnetworks from `MF_Streams` (black lines).
+Point features from `MF_obs` (blue dots) and `MF_pred1km` (purple dots) are
 found on both networks, while `MF_CapeHorn` point features (yellow dots) are only found on one
-of the two networks.  In `SSN2`, the observed data in `MF_obs` are used to build statistical 
-models and make predictions at the locations in `MF_pred1km` and `MF_CapeHorn`.
+of the two networks.
 
 # The Landscape Network
 
@@ -173,14 +175,14 @@ detailed description of the LSN, see @peterson2014stars.
 There are four topologically valid node categories in a LSN:
 
 -   **Source**: Water flow originates at these nodes and flows downstream. An edge that begins at a source node is called a headwater segment. Source nodes do not receive flow from any upstream edges.
--   **Outlet**: Flow terminates at these nodes. This node is the most downstream point in the edge network. We refer to an edge that terminates at an outlet as an outlet segment. Note that a streams dataset may contain multiple subnetworks with associated outlets. 
--   **Confluence**: Multiple edges converge, or flow into, a single node. 
+-   **Outlet**: Flow terminates at these nodes. This node is the most downstream point in an edge network. We refer to an edge that terminates at an outlet as an outlet segment. Note that a streams dataset may contain multiple subnetworks with associated outlets.
+-   **Confluence**: Multiple edges converge, or flow into, a single node.
 -   **Pseudonode**: One edge flows in and one edge flows out of a
     single node. While these nodes are not topologically problematic,
     an excessive number of pseudonodes can slow down geoprocessing
     operations for large datasets.
 
-```{r, fig.cap = "A landscape network (LSN). Nodes are denoted by blue circles, with the node category labelled. Edges are denoted by black arrows, with the arrow indicating flow direction (i.e., digitized direction)", fig.alt = "Valid Nodes", fig.align = "center",echo =FALSE, out.width = "50%"}
+```{r valid_nodes_fig, fig.cap = "A landscape network (LSN). Nodes are denoted by blue circles, with the node category labelled. Edges are denoted by black arrows, with the arrow indicating flow direction (i.e., digitized direction).", fig.alt = "Valid Nodes", fig.align = "center",echo =FALSE, out.width = "50%"}
 knitr::include_graphics("valid_nodes.png")
 ```
 
@@ -191,7 +193,7 @@ always be a single node at the intersection of edges. If there is more
 or less than one node at an intersection, it is a topological
 error. If these errors are not corrected, the connectivity between
 line features and the observed and prediction sites associated with
-them will not be accurately represented in the SSN object or the
+them will not be accurately represented in the `SSN` object or the
 spatial statistical models subsequently fit to the data. In this
 vignette, we assume that `MF_streams` has already been checked and
 topologically corrected. Two tutorials have been created with detailed
@@ -207,18 +209,18 @@ are available for download within the relevant folders on GitHub at
 The LSN is created using the `lines_to_lsn()`
 function, which generally requires these arguments:
 
-* `streams`: An `sf` object with `LINESTRING` geometry that represents the stream network. 
-* `lsn_path`: A path to the directory in which to store the LSN
-  output. This directory will be created if it does not exist.
+* `streams`: An `sf` object with `LINESTRING` geometry that represents the stream network.
+* `lsn_path`: A path to the directory in which the LSN
+  output files will be stored. This directory will be created if it does not exist.
 * `check_topology`: Logical indicating whether to check for
   topological errors in `streams`.
 * `snap_tolerance`: Two nodes separated by a Euclidean distance $\leq$
   `snap_tolerance` will be assumed connected. Distance is measured in map units (i.e., projection units for `streams`).
-* `topo_tolerance`: Two nodes separated by a Euclidean distance $\leq$ `topo_tolerance` are flagged as potential topological errors in the network. 
+* `topo_tolerance`: Two nodes separated by a Euclidean distance $\leq$ `topo_tolerance` are flagged as potential topological errors in the network.
 
-We create a LSN associated with `MF_streams` by running  
+We create a LSN associated with `MF_streams` by running
 
-```{r}
+```{r lines_to_lsn}
 ## Set path for new folder for lsn
 lsn.path <- paste0(tempdir(), "/mf04")
 
@@ -236,10 +238,10 @@ The `lines_to_lsn()` function writes a minimum of five files to `lsn_path`:
 
 * `nodes.gpkg`: A GeoPackage with `POINT` geometry features
   representing LSN nodes. It contains a unique node identifier column,
-  `pointid`, and another column  named `nodecat`, which contains the node type (pseudonodes, confluences, sources, outlets).
+  `pointid`, and another column  named `nodecat`, which contains the node type (pseudonode, confluence, source, outlet).
 * `edges.gpkg`: A GeoPackage with `LINESTRING` geometry features
   representing LSN edges, which contains all of the columns in
-  `streams` and a unique edge (i.e., reach) identifier column named `rid`. 
+  `streams` and a unique edge (i.e., reach) identifier column named `rid`.
 * `nodexy.csv`: A comma-separated value (csv) file with the `pointid`
   and x and y coordinates for each node.
 * `noderelationships.csv`: A csv file with three columns used to
@@ -249,18 +251,18 @@ The `lines_to_lsn()` function writes a minimum of five files to `lsn_path`:
   respectively.
 * `relationships.csv`: A csv file that describes the directional
   relationship between edges using two columns named `fromedge` and
-  `toedge`, which contain the edge `rid` values. 
-  
+  `toedge`, which contain the edge `rid` values.
+
 Together these five files describe the geographic and topological relationships
-between edges in the network, while preserving flow direction. 
+between edges in the network, while preserving flow direction.
 
 When `check_topology = TRUE`, `lines_to_lsn()` also checks the
 topology of the network. When potential topological errors are
-identified, they are saved at the location specified by `lsn_path` 
-as a GeoPackage named `node_errors.gpkg` with `POINT` geometry. 
+identified, they are saved at the location specified by `lsn_path`
+as a GeoPackage named `node_errors.gpkg` with `POINT` geometry.
 
 It is important to pay attention to the output messages from
-`lines_to_lsn()` that are printed to the *R* console. In this example, the
+`lines_to_lsn()` that are printed to the **R** console. In this example, the
 message is
 `No obvious topological errors detected and node_errors.gpkg was NOT created.`
 This suggests that the LSN edges are error-free, but
@@ -287,17 +289,17 @@ LSN. `sites_to_lsn()` generally requires these arguments:
   distance to the nearest edge feature is less than or equal to `snap_tolerance`, sites
   are snapped to the relevant edge. If the distance to the
   nearest edge feature is greater than `snap_tolerance`, the point feature is not
-  snapped to an edge or included in the output. 
+  snapped to an edge or included in the output.
 * `save_local`: If `TRUE` (the default), the snapped sites are written
-  to `lsn_path` with name specified by `file_name`. 
+  to `lsn_path` with name specified by `file_name`.
 * `lsn_path`: A path to the directory where the LSN created via `lines_to_lsn()`
   is stored.
 * `file_name`: Output file name for the snapped sites, which are saved
-  in `lsn_path` with a GeoPackage format.
-  
-We run `sites_to_lsn` for the `MF_obs` (observed) data: 
+  in `lsn_path` in GeoPackage format.
 
-```{r}
+We run `sites_to_lsn` for the `MF_obs` (observed) data:
+
+```{r sites_to_lsn_obs}
 obs <- sites_to_lsn(
   sites = MF_obs,
   edges = edges,
@@ -309,35 +311,40 @@ obs <- sites_to_lsn(
 )
 ```
 
-`sites_to_lsn()` writes a GeoPackage named `obs.gpkg` to
+In the code above, `sites_to_lsn()` writes a GeoPackage named `obs.gpkg` to
 `lsn_path` and also returns these snapped sites as an `sf` object named `obs`. The new
-dataset contains the original columns in `sites` and three new columns: 
+dataset contains the original columns in `sites` and three new columns:
 
-* `rid`: The edge `rid` value where the snapped site resides. 
-* `ratio`: The proportion of the site location along the length between the downstream end node and the upstream end node of the edge.
-* `snapdist`: The distance in map units the site was moved. 
+* `rid`: The edge `rid` value where the snapped site resides.
+* `ratio`: Describes the site location on the edge. It is calculated
+  by dividing the length of the edge found between the downstream end node and the site location by the total edge length.
+* `snapdist`: The Euclidean distance in map units the site was moved.
 
 The `rid` value provides information about where a site is in relation
 to all of the other edges and sites in an LSN, while the `ratio` value
-can be used to identify where *exactly* a site is on the edge. Note that to add sites to the LSN, the `sites_to_lsn` function must be run (even if the site
-locations already intersect the edge features).
+can be used to identify where *exactly* a site is on the edge. Note
+that the `sites_to_lsn` function must be run for each dataset, even if the site
+locations already intersect edge features.
 
-It is important to pay attention to the message output in the *R*
+It is important to pay attention to the message output in the **R**
 console because it indicates how many of the sites were successfully
 snapped to the LSN. In this case, the message says `Snapped 45 out of 45 sites to LSN`.
 If some sites were not snapped, the
 `snap_tolerance` value should be increased until all sites are
 snapped. The `snapdist` column can then be used to identify sites that were
 moved relatively large distances to ensure they were snapped to the
-correct edge. 
+correct edge.
 
-Prediction datasets store locations at which predictions from a spatial stream network model may be desired. Prediction datasets are optional but must also be added to the LSN
-using `sites_to_lsn()`. We add the `MF_pred1km` and `MF_capehorn` prediction datasets to the LSN by running
+Prediction datasets (optional) represent spatial locations where
+predictions from a spatial stream-network model may be desired. They
+are optional, but must also be incorporated into the LSN
+using `sites_to_lsn()` before predictions can be made using a fitted model. We add the `MF_pred1km` and `MF_capehorn` prediction datasets to the LSN by running
 
-```{r}
+```{r sites_to_lsn_preds}
 preds <- sites_to_lsn(
   sites = MF_pred1km,
   edges = edges,
+  save_local = TRUE,
   lsn_path = lsn.path,
   file_name = "pred1km.gpkg",
   snap_tolerance = 100,
@@ -347,6 +354,7 @@ preds <- sites_to_lsn(
 capehorn <- sites_to_lsn(
   sites = MF_CapeHorn,
   edges = edges,
+  save_local = TRUE,
   lsn_path = lsn.path,
   file_name = "CapeHorn.gpkg",
   snap_tolerance = 100,
@@ -355,7 +363,7 @@ capehorn <- sites_to_lsn(
 ```
 
 Note that a LSN can contain an unlimited number of prediction
-datasets (but only one set of observations). The `sites_to_lsn`
+datasets, but only one set of observations. The `sites_to_lsn`
 function must be run separately for every observed and prediction
 dataset. While this may at first seem tedious, it provides the user
 the opportunity to examine each output dataset individually, ensuring
@@ -379,7 +387,11 @@ features and attribute data *within* each dataset, while the three
 tables (nodexy, noderelationships, and relationships) describe the
 relationships *between* edges and sites. These tables are not stored
 in memory but are accessed by subsequent `SSNbler`
-functions. Prediction datasets may also be included in the LSN if desired.
+functions. Prediction datasets may also be included in the LSN if
+desired. By default, all `SSNbler` functions will update the files stored
+locally in `lsn_path` *and* return an updated `sf` object. However, the `save_local`
+argument can be set to FALSE in most functions if the user would
+prefer not to save results locally.
 
 
 | **LSN Component**           | **In Memory**                    | **Local LSN Directory** |
@@ -392,11 +404,11 @@ functions. Prediction datasets may also be included in the LSN if desired.
 | noderelationship table      |                                  | csv file                |
 | relationships table         |                                  | csv file                |
 
-Table: LSN components are stored in memory as sf objects and also in a
+Table: LSN components are stored in memory as `sf` objects and also in a
 local LSN directory as GeoPackages and comma separated value (csv) files, which are accessed using other SSNbler functions.
 
 Once the LSN has been created, the next steps are to calculate the
-information needed to fit spatial stream-network models. 
+information needed to fit spatial stream-network models.
 
 # Calculating Upstream Distance
 
@@ -411,24 +423,27 @@ upDist_j = \sum_{k \in D_j}{L_k},
 $$
 
 where $L_j$ is the length of each edge and $D_j$ is the set of edges
-found in the path between the network outlet and the $j$th edge. Note that
-the $j$th edge is included in $D_j$ (including
-the $j$th edge). 
+found in the path between the network outlet and the $j$th edge, including
+the $j$th edge.
 
 The upstream distance for each edge is calculated using the
 `updist_edges()` function, which generally requires these arguments:
 
 * `edges`: An `sf` object containing the edges in the LSN generated
   using `lines_to_lsn()`.
-* `lsn_path`: `LSN` pathname where `edges` and `relationships.csv` are stored.
+* `save_local`: A logical indicating whether the updated edges should
+  be saved to `lsn_path` in GeoPackage format. Default is TRUE.
+* `lsn_path`: `LSN` pathname where `edges` and `relationships.csv` are
+  stored locally.
 * `calc_length`: A logical indicating whether a column representing
   line length should be calculated and added to `edges`. It is
   important to set `calc_length = TRUE` if the edge features have been edited.
 
 
-```{r}
+```{r updist_edges}
 edges <- updist_edges(
   edges = edges,
+  save_local = TRUE,
   lsn_path = lsn.path,
   calc_length = TRUE
 )
@@ -438,7 +453,7 @@ names(edges) ## View edges column names
 
 Two columns are added to edges and saved in `edges.gpkg`. `Length` represents the
 length of each edge in map units and `upDist` is the upstream distance
-for each edge. 
+for each edge.
 
 For sites, the upstream distance is calculated a little differently
 because it is the hydrologic distance between the network outlet and
@@ -448,7 +463,7 @@ upDist_i = r_i L_i + \sum_{k \in D^*_j}{L_k},
 $$
 
 where $r_i$ is the `ratio` value for $site_i$, $L_i$ is the length of
-the edge $site_i$ resides on, and $D^*_k$ is the set of edges found in
+the edge $site_i$ resides on, and $D^*_j$ is the set of edges found in
 the path between the network outlet and $site_i$, excluding the edge $site_i$
 resides on.
 
@@ -459,14 +474,21 @@ Upstream distance is calculated for each site using the
   geometry, which have been incorporated into the LSN using `sites_to_lsn()`.
 * `edges:` An `sf` object representing edges that have been
   processed using `lines_to_ssn()` and `updist_edges()`.
-* `length_col`: The name of the column in `edges` that represents edge.
-* `lsn_path`: The LSN pathname where the `sites` and `edges` reside.
-  
-```{r}
+* `length_col`: The name of the column in `edges` that represents edge
+  length.
+* `save_local`: A logical indicating whether the updated sites should
+  be saved to `lsn_path` in GeoPackage format. Default is TRUE.
+* `lsn_path`: The LSN pathname where the `sites` and `edges`
+  GeoPackages reside. Must be specified if `save_local` is TRUE.
+
+```{r updist_sites}
 site.list <- updist_sites(
-  sites = list(obs = obs, pred1km = preds, CapeHorn = capehorn),
+  sites = list(obs = obs,
+               pred1km = preds,
+               CapeHorn = capehorn),
   edges = edges,
   length_col = "Length",
+  save_local = TRUE,
   lsn_path = lsn.path
 )
 
@@ -478,9 +500,9 @@ The data stored in `upDist` are later used to calculate the directional hydrolog
 distances between observed and prediction locations in the `SSN2`
 package. If we plot the edges and observations, assigning color based on
 the `upDist` column, it is apparent that the upstream distance
-increases from the outlet to headwater streams, as expected.  
-  
-```{r, fig.cap = "Upstream Distance.", fig.alt = "Upstream Distance.", fig.align = "center", out.width = "75%"}
+increases from the outlet to headwater streams, as expected.
+
+```{r plot_updist, fig.alt = "Upstream Distance.", fig.align = "center", out.width = "75%"}
 ggplot() +
   geom_sf(data = edges, aes(color = upDist)) +
   geom_sf(data = site.list$obs, aes(color = upDist)) +
@@ -491,8 +513,7 @@ ggplot() +
 
 # Calculating Additive Function Values (AFVs)
 
-Spatial weights are used when fitting statistical models with `SSN2`
-to split the tail-up covariance function
+Spatial weights are used to split the tail-up covariance function
 upstream of network confluences, which allows for the disproportionate
 influence of one upstream edge over another (e.g., a large stream channel
 converges with a smaller one) on downstream values. Calculating the
@@ -508,10 +529,10 @@ the following example, $\omega_j$ is based on cumulative watershed area for the
 downstream node of each edge, $A_j$, which is used as a
 surrogate for flow volume. However, simpler measures could be used,
 such as Shreve's stream order (Shreve 1966) or equal weighting, as
-long as a value exists for every line feature in `edges` (i.e., missing
+long as a value exists for every line feature in edges (i.e., missing
 data are not allowed). It is also preferable to use a
 column that does not contain values equal to zero, which we explain in
-more detail below. 
+more detail below.
 
 When two edges, denoted $j$ and $k$, converge at a
 node, the segment PI for the $j$th edge is:
@@ -522,11 +543,11 @@ $$
 
 Notice that the segment PI values are ratios. Therefore, the sum of
 the PI values for edges directly upstream of a single node always
-sum to one. Also note that $\omega_j=0$ when $A_j=0$. 
+sum to one. Also note that $\omega_j=0$ when $A_j=0$.
 
 The AFVs for the $j$th edge, $AFV_j$, is equal to the product of the
 segment PIs found in the path between the edge and the
-network outlet (including edge $j$ itself). 
+network outlet, including edge $j$ itself.
 
 $$
 AFV_j = \prod_{k \in D_j}{\omega_k}.
@@ -537,7 +558,7 @@ the $j$th edge will also be equal to zero. This may not be problematic if
 the $j$th edge is a headwater segment without an observed
 site. However, it can have a significant
 impact on the covariance structure of the tail-up
-model when the $j$th edge is found lower in the stream network. 
+model when the $j$th edge is found lower in the stream network.
 
 AFVs are calculated for every edge in the network
 using `afv_edges()`, which generally requires these
@@ -550,12 +571,15 @@ arguments:
   calculate the segment PI for each edge feature. Missing values are not allowed.
 * `segpi_col`: The name of the new column in edges where segment PI
   values are stored.
-* `afv_col`: The name of the new column in edges where AFVs are stored.
+* `afv_col`: The name of the new column in edges where AFVs are
+  stored.
+* `save_local`: A logical indicating whether the updated edges should
+  be saved to `lsn_path` in GeoPackage format. Default is TRUE.
 
 Note that we use a variable representing cumulative watershed area that is
-already present in `edges` (`h2oAreaKm2`) to create the segment PI values: 
+already present in `edges` (`h2oAreaKm2`) to create the segment PI values:
 
-```{r}
+```{r summarise_h2oAreaKm2}
 summary(edges$h2oAreaKm2) ## Summarize and check for zeros
 
 edges <- afv_edges(
@@ -584,17 +608,20 @@ and every other site will also be zero. For more on additive function values, se
 @peterson2010mixed.
 
 The `afv_sites` function is used to create an AFV column in a list of observed
-and prediction sites. The inputs include: 
+and prediction sites. The inputs include:
 
 * `sites`: A named list of one or more `sf` objects with `POINT`
   geometry, which have been incorporated into the LSN using `sites_to_lsn()`.
 * `edges`: An `sf` object representing edges, which contains `afv_col`
   created using `edges_afv()`.
 * `afv_col`: The name of the column containing the AFVs in `edges`. A
-  new column with this name will be added to `sites`. 
-* `lsn_path`: The LSN pathname where the `sites` and `edges` reside.
+  new column with this name will be added to `sites`.
+* `save_local`: If `TRUE` (the default), the updated sites are written
+  to `lsn_path`.
+* `lsn_path`: A path to the directory where the LSN created via `lines_to_lsn()`
+  is stored. Required when `save_local = TRUE`.
 
-```{r}
+```{r afv_sites}
 site.list <- afv_sites(
   sites = site.list,
   edges = edges,
@@ -608,34 +635,38 @@ summary(site.list$pred1km$afvArea) ## Summarize AFVs in pred1km and look for zer
 ```
 Each `sf` dataset in `sites.list` now has an AFV column, `afvArea`, which was
 generated based on cumulative watershed area. All AFVs should meet the
-requirement that they are between zero and one. 
+requirement that they are between zero and one.
 
 # Assembling the SSN Object
 
-The last data processing step is to assemble the SSN object using
-`ssn_assemble` so that it can be used to fit spatial stream-network
-models in `SSN2`. 
+The last data processing step is to assemble the `SSN` object using the
+`ssn_assemble` function.
 
-The key arguments in `ssn_assemble()` include: 
+The key arguments in `ssn_assemble()` include:
 
 * `edges`: An `sf` object representing edges that has been
   processed using `lines_to_lsn()`, `updist_edges()`, and
   `afv_edges()`.
 * `lsn_path`: The LSN pathname where the `edges` and all observation
   and prediction site datasets reside.
-* `obs_sites:` A single `sf` object representing observed sites, which has
+* `obs_sites:` Optional. A single `sf` object representing observed sites, which has
   been processed using `sites_to_lsn()`, `updist_sites()`, and
-  `afv_sites()`.
-* `preds_list`: A named list of one or more `sf` objects representing
+  `afv_sites()`. Default is is NULL.
+* `preds_list`: Optional. A named list of one or more `sf` objects representing
   prediction site datasets that have been processed using `sites_to_lsn()`, `updist_sites()`, and
-  `afv_sites()`.
-* `ssn_path`: The path to a local directory where the files making up
-  the new `SSN` object will be saved. If the `ssn_path`
-  does not include a `.ssn` extension, it will be added. 
-* `import`: Logical indicating whether the SSN object be automatically imported into **R**.
+  `afv_sites()`. Default is NULL.
+* `ssn_path`: The path to a local directory where the output files
+  will be saved. A `.ssn` extension will be added if it is not included.
+* `import`: Logical indicating whether the output files should be
+  imported and returned as an `SSN` object.
+* `check`: Logical indicating whether the validity of the `SSN` object
+  should be checked using `ssn_check()`. Default is TRUE.
+* `afv_col`: Character vector containing the names of the AFV columns
+  that will be checked when `check = TRUE`. Columns must be present in
+  `edges`, `obs_sites`, and `preds_list`, if they are included.
 
 
-```{r}
+```{r ssn_assemble}
 mf04_ssn <- ssn_assemble(
   edges = edges,
   lsn_path = lsn.path,
@@ -643,15 +674,18 @@ mf04_ssn <- ssn_assemble(
   preds_list = site.list[c("pred1km", "CapeHorn")],
   ssn_path = paste0(path, "/MiddleFork04.ssn"),
   import = TRUE,
+  check = TRUE,
+  afv_col = "afvArea",
   overwrite = TRUE
 )
+
 class(mf04_ssn) ## Get class
 names(mf04_ssn) ## print names of SSN object
 names(mf04_ssn$preds) ## print names of prediction datasets
 ```
 The outputs of `ssn_assemble()` are stored locally in a directory with
-a `.ssn` extension and in memory as an object of class `SSN` when `import = TRUE`.
-At a minimum, the new `.ssn` directory will contain: 
+a `.ssn` extension and in memory as an object of class `SSN` when
+`import = TRUE`. At a minimum, the new `.ssn` directory will contain:
 
 1. `edges.gpkg`: edges in GeoPackage format
 2. `sites.gpkg`: observed sites in GeoPackage format (if included)
@@ -660,13 +694,13 @@ At a minimum, the new `.ssn` directory will contain:
 4. `netIDx.dat files`: one text file for each unique subnetwork in edges
    containing information describing the topological relationships
    between edges.
-   
+
 When `import = TRUE`, the spatial data stored in the `.ssn` directory are
-imported into *R* and stored in memory as a `SSN` object. The `netIDx.dat` files are combined behind the scenes into an SQLite database named `binaryID.db`, which is saved in
+imported into **R** and stored in memory as an `SSN` object. The `netIDx.dat` files are combined behind the scenes into an SQLite database named `binaryID.db`, which is saved in
 the `.ssn` directory. Most users will not need to access the
 `binaryID.db` or the `netIDx.dat` files, but a more detailed description
 about how the topological relationships are stored can be found in
-@peterson2014stars. 
+@peterson2014stars.
 
 The `SSN` object itself is a list containing four elements:
 
@@ -674,7 +708,17 @@ The `SSN` object itself is a list containing four elements:
 2. `obs`: An `sf` object of observed sites.
 3. `preds`: Named list of `sf` objects representing prediction site datasets.
 4. `path`: Character string describing the path to the `.ssn`
-   where the `SSN` components are stored locally. 
+   where the `SSN` components are stored locally.
+
+Including observed sites is optional in `ssn_assemble` and when they
+are missing `obs` will contain `NA` rather than an `sf`
+object. Most users will likely include observations because they are needed to fit spatial statistical stream-network
+models. Nevertheless, this option provides the flexibility to
+include additional functionality in future `SSNbler` versions. More specifically to
+create an `SSN` object based on existing stream network data, generate
+artificial observed locations at various locations
+throughout the network, and simulate data at those locations using the
+`SSN2` function `ssn_simulate`.
 
 The `path` element provides a critical link between the `.ssn`
 directory and the `SSN` object stored in R. This is important because
@@ -682,17 +726,17 @@ the `SSN2` package reads and writes data to this directory during the
 spatial stream-network modelling workflow.
 
 The `ssn_assemble` function also adds several important columns to the edges, obs, and
-prediction datasets. 
+prediction datasets.
 
-* `edges`: 
+* `edges`:
   * `netID`: A unique network identifier
-* `obs` and `preds`: 
+* `obs` and `preds`:
   * `netID` The network identifier value for the edge the site resides
     on
   * `pid`: A unique identifier for each measurement (i.e., point feature).
   * `locID`: A unique identifier for each location. Note that repeated
     measurements at a site will have the same `locID` value, but
-    different `pid` values. 
+    different `pid` values.
 
 A `netgeom` (short for network geometry) column is also added to each
 of the sf objects stored within an `SSN` object. The `netgeom` column
@@ -706,8 +750,8 @@ $$
 \texttt{ENETWORK (netID rid upDist)},
 $$
 and for sites
-$$ 
-\texttt{SNETWORK (netID rid upDist ratio pid locID)}. 
+$$
+\texttt{SNETWORK (netID rid upDist ratio pid locID)}.
 $$
 
 The information stored in these columns is used to keep track of the spatial and topological
@@ -715,19 +759,19 @@ relationships in the network. The data used to define `netgeom` is
 stored in the edges, observed sites, and prediction sites datasets. We
 store an additional copy of this critical
 information as text in the `netgeom` column because it reduces the chances that users will unknowingly make changes to these data, which in turn could change how relationships are
-represented in spatial stream-network models. 
+represented in spatial stream-network models.
 
-# Plotting a SSN Object
+# Plotting an SSN Object
 
 The `SSNbler` and `SSN2` packages do not include generic plotting
-functions for SSN objects because the functionality is already
+functions for `SSN` objects because the functionality is already
 available in the package `ggplot2`. As an example, we create a
-plot of the SSN object. The edges are displayed in blue, with the
+plot of the `SSN` object. The edges are displayed in blue, with the
 linewidth proportional to cumulative watershed area column, `h2oAreaKm2`. The summer stream
 temperature observations (`Summer_mn`) are shown using the viridis
-color palette, with `pred1km` locations shown as smaller white dots: 
+color palette, with `pred1km` locations shown as smaller white dots:
 
-```{r, fig.cap = "Mean summer stream temperature (Temperature) and cumulative watershed area (WS AREA) for the Middle Fork stream network. Prediction locations are white circles.", fig.alt = "Mean summer stream temperature and cumulative watershed area.", fig.align = "center", out.width = "75%"}
+```{r plot_SSN, fig.cap = "Mean summer stream temperature (Temperature) and cumulative watershed area (WS AREA) for the Middle Fork stream network. Prediction locations are white circles.", fig.alt = "Mean summer stream temperature and cumulative watershed area.", fig.align = "center", out.width = "75%"}
 ggplot() +
   geom_sf(
     data = mf04_ssn$edges,
@@ -756,19 +800,51 @@ ggplot() +
   )
 ```
 
-Notice the different ways the sf objects for the edges, obs, and pred1km datasets are accessed in the SSN object and used for plotting in the calls to `geom_sf`. Any
+Notice the different ways the sf objects for the edges, obs, and pred1km datasets are accessed in the `SSN` object and used for plotting in the calls to `geom_sf`. Any
 valid plotting function for sf objects and ggplot in general can be
-used to create attractive plots of SSN object
-components. 
+used to create attractive plots of `SSN` object
+components.
 
-# Creating a Spatial Stream Network Model Using SSN2
+# Incorporating Data Into an sf or SSN Object
+The edges, observations, and prediction locations are stored as `sf`
+objects, which allows these data to be accessed, manipulated, deleted,
+or replaced in the same way as other `sf` objects. The `sf` objects found
+in an `SSN` object can be accessed just like an element in any named
+list. In this example, the edges and observed sites are accessed using
+calls to `mf04_ssn$edges` and `mf04_ssn$obs`, respectively. The
+prediction sites are accessed a bit differently
+(e.g. `mf04_ssn$preds$pred1km`) because `preds` is itself a named
+list.
+
+Users often want to incorporate additional data into the edges,
+observations, or prediction datasets to generate AFVs, for use as
+model covariates, or to create more meaningful plots. For example, the
+US EPA's StreamCat database
+[@hill2015stream] contains hundreds of variables describing stream
+segment characteristics in the conterminous US. It
+is relatively easy to join these and other data to the `sf` objects in **R**
+before or after the `SSN` object is assembled. An online search
+will show there are numerous functions available for joining an `sf`
+object to a variety of data formats (e.g. `data.frames`, `tibbles`,
+`vectors`, `sp` objects). However, if the result of the join is not an
+`sf` object, it must be converted to one before running additional
+functions in `SSNbler` and `SSN2` (see `st_as_sf` in the `sf`
+package).
+
+
+
+# Fitting a Spatial Stream Network Model Using SSN2
 
 We can now use the mf04_ssn object to fit a spatial stream-network model relating mean summer temperature to elevation (`ELEV_DEM`) and mean annual precipitation (`AREAWTMAP`), with the exponential tail-up, spherical tail-down, and Gaussian Euclidean covariance functions. Notice that `additive = "afvArea"`, which is the column we created earlier using
-the `afv_edges` and `afv_sites` functions. 
+the `afv_edges` and `afv_sites` functions.
 
-```{r}
+```{r SSN2_modelling}
 library(SSN2)
+
+## Generate hydrologic distance matrices
 ssn_create_distmat(mf04_ssn)
+
+## Fit the model
 ssn_mod <- ssn_lm(
   formula = Summer_mn ~ ELEV_DEM + AREAWTMAP,
   ssn.object = mf04_ssn,
