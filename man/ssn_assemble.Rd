@@ -55,7 +55,7 @@ already exists, the contents of \code{ssn_path} will be
 overwritten. Defaults to \code{FALSE}.}
 
 \item{verbose}{Logical. Indicates whether messages about the
-function progress should be printed to the console. Defaults to
+function progress and object validity check (when \code{check = TRUE} should be printed to the console. Defaults to
 \code{TRUE}.}
 }
 \value{

@@ -30,7 +30,7 @@
 #'   already exists, the contents of \code{ssn_path} will be
 #'   overwritten. Defaults to \code{FALSE}.
 #' @param verbose Logical. Indicates whether messages about the
-#'   function progress should be printed to the console. Defaults to
+#'   function progress and object validity check (when \code{check = TRUE} should be printed to the console. Defaults to
 #'   \code{TRUE}.
 #'
 #' @details The \code{SSNbler} package is used to generate the
@@ -554,7 +554,7 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   netid_df$netID <- as.numeric(netid_df$netID)
   netid_df$rid <- as.numeric(netid_df$rid)
 
-  if (verbose) {
+  if (verbose == TRUE) {
     message("Adding NetID and netgeom to edges \n")
   }
 
@@ -570,7 +570,7 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   #############################################################################
   ## Add locID and pid to obs_sites attribute table
   #############################################################################
-  if (verbose) {
+  if (verbose == TRUE) {
     message("\npid, locID, netID, and netgeom added to ...")
   }
   ## ---------------------------------------------------------
@@ -643,7 +643,7 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
       ## Add netgeom column
       obs_sites <- create_netgeom(obs_sites, type = "POINT", overwrite = TRUE)
 
-      if (verbose) {
+      if (verbose == TRUE) {
         message("\nobs_sites")
       }
     }
@@ -676,7 +676,7 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
       preds_list[[p]] <- pred.tmp
       rm(pred.tmp)
 
-      if (verbose) {
+      if (verbose == TRUE) {
         message(paste0("\n", names(preds_list)[p]))
       }
     }
@@ -686,7 +686,7 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   ## Export sf objects to geopackages
   ###########################################################################
 
-  if (verbose) {
+  if (verbose == TRUE) {
     message(paste("\nSaving files to", ssn_path))
   }
 
@@ -720,8 +720,8 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   ## ---------------------------------------------------------------
   ## If import = TRUE, construct and return SSN object
   ## ---------------------------------------------------------------
-  if (import) {
-    if (verbose) {
+  if (import == TRUE) {
+    if (verbose == TRUE) {
       message("\nCreating SSN object")
     }
 
@@ -734,7 +734,9 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
 
     ## ## Check the SSN object
     if (check == TRUE) {
-      message("\nChecking the SSN object")
+      if(verbose == TRUE){
+          message("\nChecking the SSN object")
+      }
 
       if (obs.exist) {
         check.msg <- ssn_check(ssnlist, afv_col = afv_col)
@@ -744,7 +746,9 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
           afv_col = afv_col
         )
       }
-      cat(check.msg)
+      if (verbose == TRUE) {
+          cat(check.msg)
+      }
     }
 
     return(ssnlist)
