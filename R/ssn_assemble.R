@@ -1,26 +1,26 @@
-#' @title Assemble an SSN object from a LSN
+#' @title Assemble an `SSN` object from an LSN
 #'
-#' @description Create an SSN object from a Landscape Network (LSN).
+#' @description Create an `SSN` (spatial stream network) object from a Landscape Network (LSN).
 #'
-#' @param edges An \code{sf} object with LINESTING geometry created
+#' @param edges An `sf` object with LINESTING geometry created
 #'   using \code{\link{lines_to_lsn}} (see Details).
 #' @param lsn_path Local pathname to a directory in character format
 #'   specifying where relationships.csv resides, which is created
 #'   using \code{link{lines_to_lsn}}.
-#' @param obs_sites Optional. A single \code{sf} object with POINT
+#' @param obs_sites Optional. A single `sf` object with POINT
 #'   geometry created using \code{link{sites_to_lsn}} that represents
 #'   the observation locations (i.e. where data were
 #'   collected). Default = NULL (see Details).
-#' @param preds_list Optional. A list of one or more \code{sf} objects
+#' @param preds_list Optional. A list of one or more `sf` objects
 #'   representing prediction sites.
 #' @param ssn_path Pathname to an output directory where output files
 #'   will be stored. A .ssn extension will be added if it is not
 #'   included.
 #' @param import Logical indicating whether the output files should be
-#'   returned as an \code{SSN} object. Defaults to \code{TRUE}.
+#'   returned as an `SSN` object. Defaults to \code{TRUE}.
 #' @param check Logical indicating whether the validity of the
-#'   \code{SSN} should be checked using \code{[ssn_check]} when
-#'   \code{import = TRUE}. Default = \code{TRUE}.
+#'   `SSN` should be checked using \code{[ssn_check]} when both
+#'   \code{import = TRUE} and \code{verbose = TRUE}. Default = \code{TRUE}.
 #' @param afv_col Character vector containing the names of the
 #'   additive function value columns that will be checked when
 #'   \code{check = TRUE}. Columns must be present in \code{edges},
@@ -35,9 +35,9 @@
 #'
 #' @details The \code{SSNbler} package is used to generate the
 #'   spatial, topological, and attribute information needed to fit
-#'   spatial stream-network models using the \code{SSN2} package. The
+#'   spatial stream-network models using the 'SSN2' package. The
 #'   \code{ssn_assemble} function will often be the final step in the
-#'   \code{SSNbler} data-processing workflow and it is important that
+#'   'SSNbler' data-processing workflow and it is important that
 #'   the previous processing steps have been followed. Prior to
 #'   running \code{ssn_assemble}, the \code{edges} must be processed
 #'   using \code{link{lines_to_lsn}}, \code{link{updist_edges}}, and
@@ -45,31 +45,31 @@
 #'   datasets in \code{preds_list} must be processed with
 #'   \code{link{sites_to_lsn}}, \code{link{updist_sites}}, and
 #'   \code{link{afv_sites}}. In addition, the \code{edges},
-#'   \code{obs_sites}, and all of the \code{sf} objects in
+#'   \code{obs_sites}, and all of the `sf` objects in
 #'   \code{preds_list} must be part of the same LSN.
 #'
 #'   The \code{obs_sites} and \code{preds_list} are optional arguments,
 #'   with the Default = NULL. If \code{obs_sites = NULL}, an
-#'   \code{SSN} object will be returned with NA stored in
+#'   `SSN` object will be returned with NA stored in
 #'   \code{ssn.object$obs} and a warning returned that
 #'   \code{ssn.object$obs} is required for fitting spatial statistical
-#'   models in \code{SSN2}.
+#'   models in 'SSN2'.
 #'
 #'   \code{ssn_assemble} stores the output locally in \code{ssn_path}. If
 #'   \code{ssn_path} does not include the .ssn extension, it is added
 #'   before the new directory is created. This directory contains:
 #'   \itemize{
-#'      \item edges.gpkg: edges in geopackage format. A new network identifier, netID, is added that is unique to each subnetwork.
-#'      \item sites.gpkg: observed sites in geopackage format (if present). Three new ID columns are added that are unique to the measurement (pid), the location (locID), and the network (netID).
-#'      \item prediction datasets in geopackage format (if present). The prediction sites also contain pid, locID, and netID. The naming convention is taken from the names provided in \code{preds_list}.
+#'      \item edges.gpkg: edges in GeoPackage format. A new network identifier, netID, is added that is unique to each subnetwork.
+#'      \item sites.gpkg: observed sites in GeoPackage format (if present). Three new ID columns are added that are unique to the measurement (pid), the location (locID), and the network (netID).
+#'      \item prediction datasets in GeoPackage format (if present). The prediction sites also contain pid, locID, and netID. The naming convention is taken from the names provided in \code{preds_list}.
 #'      \item netID.dat files for each distinct network, which store the binaryID values for line segments in edges.
 #'   }
 #'   A more detailed description of the .ssn directory and its contents is provided in Peterson and Ver Hoef (2014).
 #'
-#' @return The components of an \code{SSN} object are written to
+#' @return The components of an `SSN` object are written to
 #'     \code{ssn_path} (see Details). When \code{import = TRUE}, the
-#'     function also returns an object of class \code{SSN}. If
-#'     \code{check = TRUE}, the validity of the returned \code{SSN}
+#'     function also returns an object of class `SSN`. If
+#'     \code{check = TRUE} and \code{verbose = TRUE}, the validity of the returned `SSN`
 #'     object is checked using \code{[ssn_check]} and results are
 #'     printed to the console.
 #'
@@ -215,26 +215,6 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
     stop("edges.gpkg already exists in ssn_path and overwrite = FALSE")
   }
 
-  ## ## If pid file exists and overwrite is TRUE
-  ## if("pid" %in% colnames(edges)) {
-  ##   if(overwrite) {
-  ##     edges$pid <- NULL
-  ##   } else {
-  ##     stop("pid already exists in edges and overwrite = FALSE", call. = FALSE)
-  ##   }
-  ## }
-  ## check_names_case(names(edges), "pid", "edges")
-
-  ## ## If locID file exists and overwrite is TRUE
-  ## if("locID" %in% colnames(edges)) {
-  ##   if(overwrite) {
-  ##     edges$locID <- NULL
-  ##   } else {
-  ##     stop("locID already exists in edges and overwrite = FALSE", call. = FALSE)
-  ##   }
-  ## }
-  ## check_names_case(names(edges), "locID", "edges")
-
   ## If netID file exists and overwrite is TRUE
   if ("netID" %in% colnames(edges)) {
     if (overwrite) {
@@ -272,6 +252,12 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   ## Check whether .ssn path exists
   if (file.exists(ssn_path) & overwrite == FALSE) {
     stop("\n ssn_path exists and overwrite = FALSE")
+  }
+
+    ## Print warning if check == TRUE and verbose == FALSE
+  if (import == TRUE & check == TRUE & verbose == FALSE) {
+      warning("check == TRUE and verbose == FALSE. SSN object will not be checked. Set verbose = TRUE to check SSN object or run ssn_check() separately.")
+
   }
 
   ## obs_sites
@@ -683,7 +669,7 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
   }
 
   ###########################################################################
-  ## Export sf objects to geopackages
+  ## Export sf objects to GeoPackages
   ###########################################################################
 
   if (verbose == TRUE) {
@@ -733,22 +719,24 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
     createBinaryID(ssnlist, overwrite = overwrite)
 
     ## ## Check the SSN object
-    if (check == TRUE) {
-      if(verbose == TRUE){
-          message("\nChecking the SSN object")
-      }
+    if (check == TRUE & verbose == TRUE) {
+
+        message("\nChecking the SSN object")
+
 
       if (obs.exist) {
-        check.msg <- ssn_check(ssnlist, afv_col = afv_col)
+          check.msg <- ssn_check(ssnlist,
+                                 afv_col = afv_col,
+                                 verbose = verbose)
       } else {
         check.msg <- ssn_check(ssnlist,
           check_obs = FALSE,
-          afv_col = afv_col
+          afv_col = afv_col,
+          verbose = verbose
         )
       }
-      if (verbose == TRUE) {
-          cat(check.msg)
-      }
+        cat(check.msg)
+
     }
 
     return(ssnlist)
