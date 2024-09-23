@@ -1,3 +1,15 @@
+## Resubmission 1.0.1
+Resubmission to address CRAN comments.
+
+> The Title field should be in title case. Current version is: 'Assemble `SSN` Objects'. This is OK, but please use straight rather than directed single quotes.
+
+Fixed.
+
+
+> Is there some reference about the method you can add in the Description field in the form Authors (year) <doi:10.....>?
+
+
+
 ## Resubmission 1.0.0
 Resubmission to address CRAN comments.
 
