@@ -8,7 +8,7 @@ Fixed.
 
 > Is there some reference about the method you can add in the Description field in the form Authors (year) <doi:10.....>?
 
-
+Added (Peterson, E.E. and Ver Hoef, J.M., (2014) <doi:10.18637/jss.v056.i02>) to Description field.
 
 ## Resubmission 1.0.0
 Resubmission to address CRAN comments.
