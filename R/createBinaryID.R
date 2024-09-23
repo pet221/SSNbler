@@ -1,4 +1,8 @@
 createBinaryID <- function(ssn.object, overwrite) {
+
+  old.wd <- getwd()
+  on.exit(setwd(old.wd))
+  ## Set working directory
   local_dir(ssn.object$path)
 
   ## If binaryID.db exists
