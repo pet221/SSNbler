@@ -1,15 +1,15 @@
-#' @title Calculate additive function values for sites in a LSN
+#' @title Calculate additive function values for sites in a Landscape Network (LSN)
 #'
-#' @param sites A named list of one or more \code{sf} objects with
+#' @param sites A named list of one or more `sf` objects with
 #'   POINT geometry that have been snapped to the LSN using
 #'   \code{\link[SSNbler]{sites_to_lsn}}.
-#' @param edges An \code{sf} object with LINESTING geometry created
+#' @param edges `sf` object with LINESTING geometry created
 #'   using \code{\link{lines_to_lsn}}.
 #' @param afv_col Name of the column in \code{edges} containing
 #'   the additive function value for each feature, in character
 #'   format. Created using \code{\link{afv_edges}}.
 #' @param save_local Logical indicating whether the updated
-#'   \code{sites} should be saved to \code{lsn_path} in geopackage
+#'   \code{sites} should be saved to \code{lsn_path} in GeoPackage
 #'   format. File basenames are taken from the names assigned to the
 #'   \code{sites} list. Default is \code{TRUE}.
 #' @param lsn_path Optional. Local pathname to a directory in
@@ -22,7 +22,7 @@
 #'   \code{save_local = TRUE}. Default = TRUE.
 #'
 #' @details Spatial weights are used when fitting statistical models
-#'   with `SSN2` to split the tail up covariance function upstream of
+#'   with 'SSN2' to split the tail up covariance function upstream of
 #'   network confluences, which allows for the disproportionate
 #'   influence of one upstream edge over another (e.g., a large stream
 #'   channel converges with a smaller one) on downstream
@@ -38,7 +38,7 @@
 #'
 #' Steps 1) and 2) are undertaken in [afv_edges()], Step 3) is
 #' calculated in \code{afv_sites()}, and Step 4) is calculated in the
-#' package `SSN2` when spatial stream network models that include the
+#' package 'SSN2' when spatial stream network models that include the
 #' tail up covariance function are fit using \code{\link[SSN2]{ssn_lm}}
 #' or \code{\link[SSN2]{ssn_glm}}.
 #'
@@ -48,10 +48,10 @@
 #'   (2010) for a more detailed description of AFVs, how they are
 #'   calculated, and how they are used in the tail up covariance function.
 #'
-#' @return One or more \code{sf} object(s) with all the original data
+#' @return One or more `sf` object(s) with all the original data
 #'   from \code{sites}, along with a new \code{afv_col} column in each
 #'   \code{sites sf} object. A named list is returned. If
-#'   \code{save_local = TRUE}, a geopackage for each \code{sf} object
+#'   \code{save_local = TRUE}, a GeoPackage for each `sf` object
 #'   is saved in \code{lsn_path}. Output file names are assigned based
 #'   on the input \code{sites} attribute \code{names}.
 #'
@@ -159,7 +159,7 @@ afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
       stop("\n lsn_path does not exist.\n\n")
     }
 
-    ## Can we overwrite sites geopackage files if necessary
+    ## Can we overwrite sites GeoPackage files if necessary
     if (overwrite == FALSE) {
       s.exists <- vector()
       for (e in 1:length(sites)) {
@@ -169,7 +169,7 @@ afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
           s.exists[e] <- FALSE
         }
       }
-      ## Do some sites geopackage files already exist
+      ## Do some sites GeoPackage files already exist
       if (sum(s.exists) > 0) {
         stop(paste0(
           "Cannot save sites to local files because at least one file already exists in ",

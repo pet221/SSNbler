@@ -29,14 +29,14 @@ and all edges is > \code{snap_tolerance}, the point feature is not
 snapped or included in the lsn_path.}
 
 \item{save_local}{Logical indicating whether the outputs should be
-saved to a local directory in geopackage format. Defaults to
+saved to a local directory in GeoPackage format. Defaults to
 \code{TRUE}.}
 
 \item{lsn_path}{Pathname to the LSN. This is typically a directory created by
 \code{\link{lines_to_lsn}}. Required if \code{save_local = TRUE}.}
 
 \item{file_name}{Filename for output sites, which are saved to \code{lsn_path}
-in geopackage format (must include the .gpkg extension). Required if \code{save_local = TRUE}.}
+in GeoPackage format (must include the .gpkg extension). Required if \code{save_local = TRUE}.}
 
 \item{overwrite}{Logical indicating whether the outputs saved to
 \code{lsn_path} should overwrite existing files if they

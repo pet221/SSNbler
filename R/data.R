@@ -1,9 +1,9 @@
 #' MF_streams: Middle Fork streams
 #'
-#' \code{MF_streams} is an \code{sf} object with LINESTRING geometry representing a subset of
+#' \code{MF_streams} is an `sf` object with LINESTRING geometry representing a subset of
 #' streams and rivers in the Middle Fork Basin, Idaho, USA.
 #'
-#' The \code{sf} data.frame contains a set of 163 features and 9 columns:
+#' The `sf data.frame` contains a set of 163 features and 9 columns:
 #'   \itemize{
 #'     \item COMID: Common identifier of an NHD feature or relationship
 #'     \item GNIS_NAME: Feature name as found in the Geographic Names Information System
@@ -28,9 +28,9 @@
 #'
 #' MF_obs: Water temperature observations in the Middle Fork Basin, Idaho in 2004.
 #'
-#' \code{MF_obs} is an \code{sf} object with POINT geometry representing water temperature observations and covariates in the Middle Fork Basin, Idaho, USA collected in 2004.
+#' \code{MF_obs} is an `sf` object with POINT geometry representing water temperature observations and covariates in the Middle Fork Basin, Idaho, USA collected in 2004.
 #'
-#' The \code{sf} data.frame contains 45 point features and 16 columns:
+#' The `sf data.frame` contains 45 point features and 16 columns:
 #'   \itemize{
 #'     \item STREAMNAME: Stream name
 #'     \item COMID: Common identifier of an NHD feature or relationship
@@ -67,9 +67,9 @@
 #'
 #' MF_CapeHorn: Prediction locations on Cape Horn Creek, in the Middle Fork Basin, Idaho.
 #'
-#' \code{MF_CapeHorn} is an \code{sf} object with POINT geometry representing prediction locations and covariates on Cape Horn Creek, Middle Fork Basin, Idaho, USA.
+#' \code{MF_CapeHorn} is an `sf` object with POINT geometry representing prediction locations and covariates on Cape Horn Creek, Middle Fork Basin, Idaho, USA.
 #'
-#' The \code{sf} data.frame contains 654 point features and 9 columns:
+#' The `sf data.frame` contains 654 point features and 9 columns:
 #'   \itemize{
 #'     \item COMID: Common identifier of an NHD feature or relationship
 #'     \item AREAWTMAP: Area weighted mean annual precipitation (mm) at lowermost
@@ -98,9 +98,9 @@
 #'
 #' MF_pred1km: Prediction locations at 1km intervals throughout the Middle Fork Basin, Idaho.
 #'
-#' \code{MF_pred1km} is an \code{sf} object with POINT geometry representing prediction locations and covariates distributed at 1km intervals throughout the Middle Fork Basin, Idaho, USA.
+#' \code{MF_pred1km} is an `sf` object with POINT geometry representing prediction locations and covariates distributed at 1km intervals throughout the Middle Fork Basin, Idaho, USA.
 #'
-#' The \code{sf} data.frame contains 175 point features and 9 columns:
+#' The `sf data.frame` contains 175 point features and 9 columns:
 #'   \itemize{
 #'     \item COMID: Common identifier of an NHD feature or relationship
 #'     \item AREAWTMAP: Area weighted mean annual precipitation (mm) at lowermost
@@ -129,9 +129,9 @@
 
 #' MF_preds: A small set of prediction locations found in the Middle Fork Basin, Idaho.
 #'
-#' \code{MF_preds} is an \code{sf} object with POINT geometry representing prediction locations and covariates distributed at 1km intervals throughout the Middle Fork Basin, Idaho, USA.
+#' \code{MF_preds} is an `sf` object with POINT geometry representing prediction locations and covariates distributed at 1km intervals throughout the Middle Fork Basin, Idaho, USA.
 #'
-#' The \code{sf} data.frame contains 43 point features and 9 columns:
+#' The `sf data.frame` contains 43 point features and 9 columns:
 #'   \itemize{
 #'     \item COMID: Common identifier of an NHD feature or relationship
 #'     \item AREAWTMAP: Area weighted mean annual precipitation (mm) at lowermost

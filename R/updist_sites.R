@@ -1,9 +1,9 @@
-#' @title Get upstream distance for sites in an LSN
+#' @title Get upstream distance for sites in a Landscape Network (LSN)
 #'
-#' @param sites A named list of one or more \code{sf} objects with
+#' @param sites A named list of one or more `sf` objects with
 #'   POINT geometry that have been snapped to the LSN using
 #'   \code{\link[SSNbler]{sites_to_lsn}}.
-#' @param edges An \code{sf} object with LINESTING geometry created
+#' @param edges An `sf` object with LINESTING geometry created
 #'   using \code{\link{lines_to_lsn}} and
 #'   \code{link[SSNbler]{updist_edges}}.
 #' @param length_col The name of the column in \code{edges} that
@@ -28,19 +28,19 @@
 #'   network. We refer to this as the upstream distance.
 #'
 #' Upstream distances are measured in the map projection units for the
-#'   \code{sf} object containing the point features and stored in a
+#'   `sf` object containing the point features and stored in a
 #'   new column named \code{upDist}.
 #'
 #' The upstream distances stored in \code{upDist} are used to
 #' calculate the pairwise hydrologic distances used to fit spatial
-#' stream network models in the \code{SSN2} package. Do not modify the name
+#' stream network models in the 'SSN2' package. Do not modify the name
 #' of the column in any way or the values the \code{upDist} column
 #' contains.
 #'
-#' @return One or more \code{sf} object(s) with all the original
+#' @return One or more `sf` object(s) with all the original
 #'   data from \code{sites}, along with a new \code{upDist} column in
-#'   each sites \code{sf} object. A named list is returned. If
-#'   \code{save_local = TRUE}, a GeoPackage for each \code{sf} object
+#'   each sites `sf` object. A named list is returned. If
+#'   \code{save_local = TRUE}, a GeoPackage for each `sf` object
 #'   is saved in \code{lsn_path}. Output file names are assigned based
 #'   on the input \code{sites} attribute \code{names}.
 #' @export
@@ -128,7 +128,7 @@ updist_sites <- function(sites, edges, length_col, lsn_path, save_local = TRUE,
     stop("\n lsn_path does not exist.\n\n")
   }
 
-  ## Can we overwrite sites geopackage files if necessary
+  ## Can we overwrite sites GeoPackage files if necessary
   if (save_local == TRUE & overwrite == FALSE) {
     s.exists <- vector()
     for (e in 1:length(sites)) {
@@ -138,7 +138,7 @@ updist_sites <- function(sites, edges, length_col, lsn_path, save_local = TRUE,
         s.exists[e] <- FALSE
       }
     }
-    ## Do some sites geopackage files already exist when overwrite = FALSE and save_local = TRUE
+    ## Do some sites GeoPackage files already exist when overwrite = FALSE and save_local = TRUE
     if (sum(s.exists) > 0) {
       stop(paste0(
         "Cannot save sites to local files because at least one file already exists in ",

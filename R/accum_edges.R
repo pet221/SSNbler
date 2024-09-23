@@ -2,7 +2,7 @@
 #' @description Accumulate (sum) edge values downstream in a
 #'   Landscape Network (LSN)
 #'
-#' @param edges An \code{sf} object with LINESTING geometry created
+#' @param edges An `sf` object with LINESTING geometry created
 #'   using \code{\link{lines_to_lsn}}.
 #' @param lsn_path Local pathname to a directory in character format
 #'   specifying where relationships.csv resides, which is created
@@ -13,7 +13,7 @@
 #'   format) where the accumulated \code{sum_col} values will be
 #'   stored (see details).
 #' @param save_local Logical indicating whether the updated
-#'   \code{edges} should be saved to \code{lsn_path} in geopackage
+#'   \code{edges} should be saved to \code{lsn_path} in GeoPackage
 #'   format. Defaults to \code{TRUE}.
 #' @param overwrite A logical indicating whether results should be
 #'   overwritten if \code{acc_col} already exists in \code{edges}
@@ -34,9 +34,9 @@
 #'   represents the cumulative upstream sum of \code{sum_col} for the
 #'   downstream node of each line feature in \code{edges}.
 #'
-#' @return An \code{sf} object representing edges in the LSN, with a
+#' @return An `sf` object representing edges in the LSN, with a
 #'   new \code{acc_col} column. If \code{save_local = TRUE},
-#'   \code{edges} is saved to \code{lsn_path} in geopackage (.gpkg)
+#'   \code{edges} is saved to \code{lsn_path} in GeoPackage (.gpkg)
 #'   format.
 #' @export
 #' @examples

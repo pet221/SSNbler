@@ -2,7 +2,7 @@
 % Please edit documentation in R/afv_sites.R
 \name{afv_sites}
 \alias{afv_sites}
-\title{Calculate additive function values for sites in a LSN}
+\title{Calculate additive function values for sites in a Landscape Network (LSN)}
 \usage{
 afv_sites(
   sites,
@@ -18,7 +18,7 @@ afv_sites(
 POINT geometry that have been snapped to the LSN using
 \code{\link[SSNbler]{sites_to_lsn}}.}
 
-\item{edges}{An \code{sf} object with LINESTING geometry created
+\item{edges}{\code{sf} object with LINESTING geometry created
 using \code{\link{lines_to_lsn}}.}
 
 \item{afv_col}{Name of the column in \code{edges} containing
@@ -26,7 +26,7 @@ the additive function value for each feature, in character
 format. Created using \code{\link{afv_edges}}.}
 
 \item{save_local}{Logical indicating whether the updated
-\code{sites} should be saved to \code{lsn_path} in geopackage
+\code{sites} should be saved to \code{lsn_path} in GeoPackage
 format. File basenames are taken from the names assigned to the
 \code{sites} list. Default is \code{TRUE}.}
 
@@ -44,16 +44,16 @@ or sites.gpkg already exists in \code{lsn_path} and
 One or more \code{sf} object(s) with all the original data
 from \code{sites}, along with a new \code{afv_col} column in each
 \code{sites sf} object. A named list is returned. If
-\code{save_local = TRUE}, a geopackage for each \code{sf} object
+\code{save_local = TRUE}, a GeoPackage for each \code{sf} object
 is saved in \code{lsn_path}. Output file names are assigned based
 on the input \code{sites} attribute \code{names}.
 }
 \description{
-Calculate additive function values for sites in a LSN
+Calculate additive function values for sites in a Landscape Network (LSN)
 }
 \details{
 Spatial weights are used when fitting statistical models
-with \code{SSN2} to split the tail up covariance function upstream of
+with 'SSN2' to split the tail up covariance function upstream of
 network confluences, which allows for the disproportionate
 influence of one upstream edge over another (e.g., a large stream
 channel converges with a smaller one) on downstream
@@ -71,7 +71,7 @@ weights for observed and prediction sites.
 
 Steps 1) and 2) are undertaken in \code{\link[=afv_edges]{afv_edges()}}, Step 3) is
 calculated in \code{afv_sites()}, and Step 4) is calculated in the
-package \code{SSN2} when spatial stream network models that include the
+package 'SSN2' when spatial stream network models that include the
 tail up covariance function are fit using \code{\link[SSN2]{ssn_lm}}
 or \code{\link[SSN2]{ssn_glm}}.
 

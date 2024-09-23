@@ -2,12 +2,12 @@
 % Please edit documentation in R/ssn_check.R
 \name{ssn_check}
 \alias{ssn_check}
-\title{Check a SSN object}
+\title{Check an \code{SSN} object}
 \usage{
 ssn_check(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TRUE)
 }
 \arguments{
-\item{ssn.object}{A \code{SSN} object created using \code{\link[SSNbler]{ssn_assemble}} or imported using \code{\link[SSN2]{ssn_import}}.}
+\item{ssn.object}{An \code{SSN} object created using \code{\link[SSNbler]{ssn_assemble}} or imported using \code{\link[SSN2]{ssn_import}}.}
 
 \item{check_obs}{A logical indicating whether the observations should be checked. Default = \code{TRUE}.}
 
@@ -19,7 +19,7 @@ ssn_check(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TRUE)
 Boolean indicating whether the \code{SSN} object is valid. If \code{verbose = TRUE}, additional messages are printed to the console describing potential issues with the \code{SSN} object.
 }
 \description{
-Check a \code{SSN} object to ensure that it contains valid spatial, topological, and attribute information needed to fit spatial statistical stream network models using the \code{SSN2} package.
+Check an \code{SSN} (spatial stream network) object to ensure that it contains valid spatial, topological, and attribute information needed to fit spatial statistical stream network models using the 'SSN2' package.
 }
 \examples{
 ## Create local temporary copy of MiddleFork04.ssn found in

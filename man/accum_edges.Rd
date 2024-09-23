@@ -30,7 +30,7 @@ format) where the accumulated \code{sum_col} values will be
 stored (see details).}
 
 \item{save_local}{Logical indicating whether the updated
-\code{edges} should be saved to \code{lsn_path} in geopackage
+\code{edges} should be saved to \code{lsn_path} in GeoPackage
 format. Defaults to \code{TRUE}.}
 
 \item{overwrite}{A logical indicating whether results should be
@@ -45,7 +45,7 @@ function progress should be printed to the console. Defaults to
 \value{
 An \code{sf} object representing edges in the LSN, with a
 new \code{acc_col} column. If \code{save_local = TRUE},
-\code{edges} is saved to \code{lsn_path} in geopackage (.gpkg)
+\code{edges} is saved to \code{lsn_path} in GeoPackage (.gpkg)
 format.
 }
 \description{

@@ -1,5 +1,5 @@
 ---
-title: "An Introduction to SSNbler: Assembling Spatial Stream Network (SSN) Objects in R"
+title: "An Introduction to 'SSNbler': Assembling Spatial Stream Network (`SSN`) Objects in R"
 author: "Erin E Peterson, Michael Dumelle, Alan R Pearse, Dan Teleki, and Jay M Ver Hoef"
 bibliography: "references.bib"
 csl: "apa-6th-edition.csl"
@@ -53,22 +53,22 @@ the stream network. @ver2010moving describe how to fit spatial
 statistical models on stream networks (i.e., spatial stream-network
 models) that capture the unique and complex spatial dependencies
 inherent in streams. These stream network models can be fit
-using the `SSN2` **R** package [@dumelle2024SSN2]. To use `SSN2`, however, users must
+using the 'SSN2' **R** package [@dumelle2024SSN2]. To use 'SSN2', however, users must
 provide the spatial, topological, and attribute data in a specific format called
-an `SSN` object. The `SSNbler` **R** package, which we introduce here, is an adaptation
-of the STARS ArcGIS toolset [@peterson2014stars] for the **R** programming language. `SSNbler` generates
+an `SSN` object. The 'SSNbler' **R** package, which we introduce here, is an adaptation
+of the STARS ArcGIS toolset [@peterson2014stars] for the **R** programming language. 'SSNbler' generates
 formats, assembles, and validates `SSN` objects that can be used for statistical
-modeling in `SSN2`.
+modeling in 'SSN2'.
 
-In this vignette, we use `SSNbler` to create the `SSN` object
-`MiddleFork04.ssn` used by `SSN2`. First, we load `SSNbler` into our current
+In this vignette, we use 'SSNbler' to create the `SSN` object
+`MiddleFork04.ssn` used by 'SSN2'. First, we load 'SSNbler' into our current
 **R** session.
 
 ```{r Load_SSNbler}
 library(SSNbler)
 ```
 
-A few input datasets are included in the `SSNbler` package:
+A few input datasets are included in the 'SSNbler' package:
 
 -   `MF_streams`: An `sf` object with `LINESTRING` geometry
     representing a portion of the Middle Fork stream network in Idaho, USA.
@@ -86,17 +86,17 @@ A few input datasets are included in the `SSNbler` package:
 
 To provide context, the observed data in `MF_obs` will be used to build statistical
 models and make predictions at the locations in `MF_pred1km` and
-`MF_CapeHorn` using the **R** package `SSN2`. Documentation for each dataset can be found by running `help()`. For example,
+`MF_CapeHorn` using the **R** package 'SSN2'. Documentation for each dataset can be found by running `help()`. For example,
 to learn more about `MF_streams`, run `help("MF_streams", package = "SSNbler")`.
 
-While these datasets come with `SSNbler` and can be loaded via `data()`,
+While these datasets come with 'SSNbler' and can be loaded via `data()`,
 we focus here on a more realistic
 workflow for the user. We start with a collection of spatial datasets
-installed alongside `SSNbler` in the `streamsdata` folder that represent the Middle Fork stream network.
+installed alongside 'SSNbler' in the `streamsdata` folder that represent the Middle Fork stream network.
 In `streamsdata` are GeoPackages (more on this later) representing
 the stream network, observed data,
 and prediction data (optional) required to create an SSN
-object. To prevent `SSNbler`
+object. To prevent 'SSNbler'
 functions from reading and writing to this folder, we copy it to R's
 temporary directory and store the path to this folder:
 
@@ -105,9 +105,9 @@ copy_streams_to_temp()
 path <- paste0(tempdir(), "/streamsdata")
 ```
 
-Then we can read in the relevant data using `st_read` from the `sf` **R**
+Then we can read in the relevant data using `st_read` from the 'sf' **R**
 package [@pebesma2018sf], which comes installed alongside
-`SSNbler`. Note that the input data can be in any vector data format
+'SSNbler'. Note that the input data can be in any vector data format
 that can be imported into R and stored as an `sf` object with `LINESTRING`
 or `POINT` geometry (e.g., shapefile, GeoJSON, GeoPackage, SpatiaLite,
 PostGIS).
@@ -122,13 +122,13 @@ MF_CapeHorn <- st_read(paste0(path, "/MF_CapeHorn.gpkg"))
 
 Notice that the line (`MF_Streams`) and point features (`MF_obs`,
 `MF_pred1km`, and `MF_CapeHorn`) have `LINESTRING` and `POINT`
-geometry types, which are required in `SSNbler`. If these datasets had `MULTILINESTRING` or
-`MULTIPOINT` geometry types, the `sf` function `st_cast` could be used to convert to
+geometry types, which are required in 'SSNbler'. If these datasets had `MULTILINESTRING` or
+`MULTIPOINT` geometry types, the 'sf' function `st_cast` could be used to convert to
 the required geometry types. All of the input data have an Albers Equal Area Conic projection (EPSG
 102003) and distances are measured in meters. It is important that all
 input datasets have the same map projection, which must be a projected coordinate system and not
 a geographic coordinate system measured in Latitude and
-Longitude. The `sf` function `st_transform` can be used to
+Longitude. The 'sf' function `st_transform` can be used to
 reproject `sf` objects in **R**.
 
 We previously mentioned these data are stored in `streamsdata` in a
@@ -137,14 +137,14 @@ prefer GeoPackages over shapefiles because they offer better support
 for high precision numeric data compared to the traditional DBF
 (dBASE) format (used in shapefiles), which limits the precision to 10 decimal places when *writing* (not reading)
 to local files from **R**. This is problematic because several important columns
-`SSNbler` adds and `SSN2` uses contain very small values ranging from zero to
+'SSNbler' adds and 'SSN2' uses contain very small values ranging from zero to
 one. If these columns are truncated it can lead to
 difficult-to-diagnose errors when models are fit in
-`SSN2`. GeoPackages do not have this limitation. To learn more about GeoPackages, [visit here](https://www.geopackage.org/).
+'SSN2'. GeoPackages do not have this limitation. To learn more about GeoPackages, [visit here](https://www.geopackage.org/).
 
 Before working with any of the input files, we visualize the stream
 network, observed sites, and prediction sites using the
-**R** package `ggplot2` [@wickham2016ggplot2].
+**R** package 'ggplot2' [@wickham2016ggplot2].
 
 ```{r Plot_MF, fig.alt = "The Middle Fork Stream Network.", fig.align = "center", out.width = "75%"}
 library(ggplot2)
@@ -163,7 +163,7 @@ of the two networks.
 
 # The Landscape Network
 
-`SSNbler` makes use of a data structure called a Landscape Network
+'SSNbler' makes use of a data structure called a Landscape Network
 (LSN), which is a type of graph used to represent spatial context and
 relationships with additional geographic information
 [@theobald2006functional]. In a LSN, streams are represented as a collection of directed edges, where
@@ -386,9 +386,9 @@ defined using `lsn_path`. The LSN contains at least six components. The edges, n
 features and attribute data *within* each dataset, while the three
 tables (nodexy, noderelationships, and relationships) describe the
 relationships *between* edges and sites. These tables are not stored
-in memory but are accessed by subsequent `SSNbler`
+in memory but are accessed by subsequent 'SSNbler'
 functions. Prediction datasets may also be included in the LSN if
-desired. By default, all `SSNbler` functions will update the files stored
+desired. By default, all 'SSNbler' functions will update the files stored
 locally in `lsn_path` *and* return an updated `sf` object. However, the `save_local`
 argument can be set to FALSE in most functions if the user would
 prefer not to save results locally.
@@ -499,7 +499,7 @@ names(site.list$obs) ## View column names in obs
 ```
 
 The data stored in `upDist` are later used to calculate the directional hydrologic
-distances between observed and prediction locations in the `SSN2`
+distances between observed and prediction locations in the 'SSN2'
 package. If we plot the edges and observations, assigning color based on
 the `upDist` column, it is apparent that the upstream distance
 increases from the outlet to headwater streams, as expected.
@@ -522,8 +522,8 @@ converges with a smaller one) on downstream values. Calculating the
 spatial weights is a three-step process: 1) calculating the segment
 proportional influence (PI), 2) calculating the additive function
 values (AFVs), and 3) calculating the spatial weights. Steps 1) and 2) are
-undertaken in `SSNbler`, while Step 3) is calculated in the package
-`SSN2` when spatial stream-network models are fit.
+undertaken in 'SSNbler', while Step 3) is calculated in the package
+'SSN2' when spatial stream-network models are fit.
 
 The segment PI for each edge, $\omega_j$, is defined as the relative
 influence of the $j$th edge feature on the edge directly downstream. In
@@ -716,15 +716,15 @@ Including observed sites is optional in `ssn_assemble` and when they
 are missing `obs` will contain `NA` rather than an `sf`
 object. Most users will likely include observations because they are needed to fit spatial statistical stream-network
 models. Nevertheless, this option provides the flexibility to
-include additional functionality in future `SSNbler` versions. More specifically to
+include additional functionality in future 'SSNbler' versions. More specifically to
 create an `SSN` object based on existing stream network data, generate
 artificial observed locations at various locations
 throughout the network, and simulate data at those locations using the
-`SSN2` function `ssn_simulate`.
+'SSN2' function `ssn_simulate`.
 
 The `path` element provides a critical link between the `.ssn`
 directory and the `SSN` object stored in R. This is important because
-the `SSN2` package reads and writes data to this directory during the
+the 'SSN2' package reads and writes data to this directory during the
 spatial stream-network modelling workflow.
 
 The `ssn_assemble` function also adds several important columns to the edges, obs, and
@@ -765,9 +765,9 @@ represented in spatial stream-network models.
 
 # Plotting an SSN Object
 
-The `SSNbler` and `SSN2` packages do not include generic plotting
+The 'SSNbler' and 'SSN2' packages do not include generic plotting
 functions for `SSN` objects because the functionality is already
-available in the package `ggplot2`. As an example, we create a
+available in the package 'ggplot2'. As an example, we create a
 plot of the `SSN` object. The edges are displayed in blue, with the
 linewidth proportional to cumulative watershed area column, `h2oAreaKm2`. The summer stream
 temperature observations (`Summer_mn`) are shown using the viridis
@@ -830,7 +830,7 @@ will show there are numerous functions available for joining an `sf`
 object to a variety of data formats (e.g. `data.frames`, `tibbles`,
 `vectors`, `sp` objects). However, if the result of the join is not an
 `sf` object, it must be converted to one before running additional
-functions in `SSNbler` and `SSN2` (see `st_as_sf` in the `sf`
+functions in 'SSNbler' and 'SSN2' (see `st_as_sf` in the 'sf'
 package).
 
 
@@ -861,12 +861,12 @@ summary(ssn_mod)
 As expected, there is strong evidence ($p < 0.001$) that elevation is negatively
 related to mean summer temperature, while there is moderate evidence
 ($p \approx 0.05$) that precipitation is negatively related to mean
-summer temperature. To learn more about fitting spatial stream-network models using the `SSN2` package, visit the package website at [https://usepa.github.io/SSN2/](https://usepa.github.io/SSN2/).
+summer temperature. To learn more about fitting spatial stream-network models using the 'SSN2' package, visit the package website at [https://usepa.github.io/SSN2/](https://usepa.github.io/SSN2/).
 
 
 <!--# From STARS and openSTARS to SSNbler (ADD Later)
 
-| `STARS` Function Name | `openSTARS` Function Name | `SSNbler` Function Name |
+| `STARS` Function Name | `openSTARS` Function Name | 'SSNbler' Function Name |
 |:----------------------|:--------------------------|:------------------------|
 | text                  | text                      | `lines_to_lsn()`        |
 | text                  | text                      | `sites_to_lsn()`        |

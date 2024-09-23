@@ -2,7 +2,7 @@
 % Please edit documentation in R/updist_edges.R
 \name{updist_edges}
 \alias{updist_edges}
-\title{Get upstream distance for edges in a LSN}
+\title{Get upstream distance for edges in a Landscape Network (LSN)}
 \usage{
 updist_edges(
   edges,
@@ -37,7 +37,7 @@ When \code{calc_length = TRUE} and \code{length_col = NULL}, the default for \co
 is \code{"Length"}.}
 
 \item{save_local}{Logical indicating whether the updated
-\code{edges} should be saved to \code{lsn_path} in geopackage
+\code{edges} should be saved to \code{lsn_path} in GeoPackage
 format. Defaults to \code{TRUE}.}
 
 \item{overwrite}{A logical indicating whether results should be
@@ -69,7 +69,7 @@ a new column in edges named \code{upDist}.
 
 The upstream distances stored in \code{upDist} are used to calculate the upstream distance for
 sites in \code{\link[=updist_sites]{updist_sites()}} and the pairwise hydrologic distances used to fit spatial stream network models in
-the \code{SSN2} package. Do not modify the name of the column in any way or the values the \code{upDist}
+the 'SSN2' package. Do not modify the name of the column in any way or the values the \code{upDist}
 column contains.
 }
 \examples{

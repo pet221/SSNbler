@@ -1,9 +1,9 @@
-#' @title Get upstream distance for edges in a LSN
+#' @title Get upstream distance for edges in a Landscape Network (LSN)
 #' @description Calculate the distance from the stream outlet
 #'   (i.e. the most downstream location on the stream network) to the
 #'   upstream node of each edge feature (i.e. upstream distance) in
 #'   the Landscape Network (LSN)
-#' @param edges An \code{sf} object with LINESTING geometry created
+#' @param edges An `sf` object with LINESTING geometry created
 #'   using \code{\link{lines_to_lsn}}.
 #' @param lsn_path Local pathname to a directory in character format
 #'   specifying where relationships.csv resides, which is created
@@ -21,7 +21,7 @@
 #'   When \code{calc_length = TRUE} and \code{length_col = NULL}, the default for \code{length_col}
 #'   is \code{"Length"}.
 #' @param save_local Logical indicating whether the updated
-#'   \code{edges} should be saved to \code{lsn_path} in geopackage
+#'   \code{edges} should be saved to \code{lsn_path} in GeoPackage
 #'   format. Defaults to \code{TRUE}.
 #' @param overwrite A logical indicating whether results should be
 #'   overwritten if the upDist column already exists in \code{edges}
@@ -36,15 +36,15 @@
 #'   the stream outlet (i.e. the most downstream location in the
 #'   stream network), when movement is restricted to the stream
 #'   network. We refer to this as the upstream distance. Upstream distances are
-#'   measured in the map projection units for the \code{sf} object edges and stored in
+#'   measured in the map projection units for the `sf` object edges and stored in
 #'   a new column in edges named \code{upDist}.
 #'
 #' The upstream distances stored in \code{upDist} are used to calculate the upstream distance for
 #' sites in [updist_sites()] and the pairwise hydrologic distances used to fit spatial stream network models in
-#' the `SSN2` package. Do not modify the name of the column in any way or the values the \code{upDist}
+#' the 'SSN2' package. Do not modify the name of the column in any way or the values the \code{upDist}
 #' column contains.
 #'
-#' @return An \code{sf} object representing edges in the LSN, with a new \code{upDist} column. When \code{calc_length = TRUE} an additional column named \code{length_col}
+#' @return An `sf` object representing edges in the LSN, with a new \code{upDist} column. When \code{calc_length = TRUE} an additional column named \code{length_col}
 #' @export
 #'
 #' @examples

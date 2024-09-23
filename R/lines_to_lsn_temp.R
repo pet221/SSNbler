@@ -1,10 +1,10 @@
 #' @title Convert lines to a landscape network
-#' @description Convert an \code{sf} object containing features with
+#' @description Convert an `sf` object containing features with
 #'   LINESTRING geometry to a landscape network (LSN), which is a
 #'   topological data model of streams/rivers represented as a
 #'   directional graph embedded in 2-D geographic space. Relationship
 #'   tables are created and topological relationships are checked.
-#' @param streams An \code{sf} object with LINESTING geometry
+#' @param streams An `sf` object with LINESTING geometry
 #'   representing streams.
 #' @param lsn_path Pathname to a directory in character format specifying
 #'   where to store the outputs. The directory will be created if it
@@ -31,7 +31,7 @@
 #'   function progress will be printed to the console. Default is
 #'   \code{TRUE}.
 #'
-#' @details \code{lines_to_lsn} converts an \code{sf} object
+#' @details \code{lines_to_lsn} converts an `sf` object
 #'   representing streams to a landscape network
 #'   (LSN), which is a directional graph used to represent
 #'   the topological and geographic relationships between line
@@ -41,8 +41,8 @@
 #'
 #' The LSN is saved to a local directory defined by \code{lsn_path} and has 5 components:
 #' \itemize{
-#'   \item{ nodes.gpkg: A geopackage of features with POINT geometry representing topologic breaks in the stream network such as pseudonodes, confluences, stream sources, or stream outlets. A column containing a unique node identifier, pointid, is included. }
-#'   \item{ edges.gpkg: A geopackage of features with LINESTRING geometry representing flow paths (i.e. line features) from node to node. A new column named rid is added that contains a unique identifier for each line feature. }
+#'   \item{ nodes.gpkg: A GeoPackage of features with POINT geometry representing topologic breaks in the stream network such as pseudonodes, confluences, stream sources, or stream outlets. A column containing a unique node identifier, pointid, is included. }
+#'   \item{ edges.gpkg: A GeoPackage of features with LINESTRING geometry representing flow paths (i.e. line features) from node to node. A new column named rid is added that contains a unique identifier for each line feature. }
 #'   \item{nodexy.csv: a table with three columns: the pointid (unique node identifier), and the x-, y-coordinates for each node. }
 #'   \item{noderelationships.csv: a table describing the relationship between the nodes and their associated edges, as well as directionality in the LSN. The table contains three columns: the rid (for each edge), fromnode (pointid for the upstream node of each edge), and tonode (pointid for the downstream node of each edge). Directionality is defined based on the digitized direction of the line features. }
 #'   \item{relationships.csv: a table representing the downstream flow path from edge to edge. The table contains two columns: fromedge (upstream edge) and toedge (downstream edge). }
@@ -72,7 +72,7 @@
 #' iterative and must continue until the LSN is free of topological
 #' errors.
 #'
-#' @return An \code{sf} object representing edges in the LSN. The LSN, including edges.gpkg, nodes.gpkg, nodexy.csv, noderelationships.csv, and relationships.csv files, are saved locally to a directory defined by \code{lsn_path}. If \code{check_topology = TRUE} and topological errors are identified, then node_errors.gpkg is also saved to \code{lsn_path}.
+#' @return An `sf` object representing edges in the LSN. The LSN, including edges.gpkg, nodes.gpkg, nodexy.csv, noderelationships.csv, and relationships.csv files, are saved locally to a directory defined by \code{lsn_path}. If \code{check_topology = TRUE} and topological errors are identified, then node_errors.gpkg is also saved to \code{lsn_path}.
 #'
 #' @export
 lines_to_lsn_temp <- function(streams, lsn_path,
@@ -127,7 +127,7 @@ lines_to_lsn_temp <- function(streams, lsn_path,
   ## Add the field 'rid' (meaning reach identifier) and use it in all scripts as the rid / edgeid
   in_edges$rid <- seq.int(from = 1, to = n_edges) ## add and populate 1-based index rid column to edges
 
-  ## Write edges to geopackage
+  ## Write edges to GeoPackage
   if (overwrite == FALSE & file.exists(paste0(lsn_path, "/edges.gpkg"))) {
     stop(paste0(lsn_path, "/edges.gpkg"), " exists and overwrite == FALSE")
   } else {

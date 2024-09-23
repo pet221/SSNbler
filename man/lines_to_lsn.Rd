@@ -2,7 +2,7 @@
 % Please edit documentation in R/lines_to_lsn.R
 \name{lines_to_lsn}
 \alias{lines_to_lsn}
-\title{Convert lines to a landscape network}
+\title{Convert lines to a landscape network (LSN)}
 \usage{
 lines_to_lsn(
   streams,
@@ -71,8 +71,8 @@ than geographic coordinate system (i.e. not Longitude and Latitude).
 
 The LSN is saved to a local directory defined by \code{lsn_path} and has 5 components:
 \itemize{
-\item{ nodes.gpkg: A geopackage of features with POINT geometry representing topologic breaks in the stream network such as pseudonodes, confluences, stream sources, or stream outlets. A column containing a unique node identifier, pointid, is included. }
-\item{ edges.gpkg: A geopackage of features with LINESTRING geometry representing flow paths (i.e. line features) from node to node. A new column named rid is added that contains a unique identifier for each line feature. }
+\item{ nodes.gpkg: A GeoPackage of features with POINT geometry representing topologic breaks in the stream network such as pseudonodes, confluences, stream sources, or stream outlets. A column containing a unique node identifier, pointid, is included. }
+\item{ edges.gpkg: A GeoPackage of features with LINESTRING geometry representing flow paths (i.e. line features) from node to node. A new column named rid is added that contains a unique identifier for each line feature. }
 \item{nodexy.csv: a table with three columns: the pointid (unique node identifier), and the x-, y-coordinates for each node. }
 \item{noderelationships.csv: a table describing the relationship between the nodes and their associated edges, as well as directionality in the LSN. The table contains three columns: the rid (for each edge), fromnode (pointid for the upstream node of each edge), and tonode (pointid for the downstream node of each edge). Directionality is defined based on the digitized direction of the line features. }
 \item{relationships.csv: a table representing the downstream flow path from edge to edge. The table contains two columns: fromedge (upstream edge) and toedge (downstream edge). }

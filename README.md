@@ -5,9 +5,9 @@
 
 # SSNbler: Assemble SSN objects in R
 
-`SSNbler` imports, creates and assembles data needed to fit spatial-statistical stream-network models using the [SSN2 R package](https://usepa.github.io/SSN2/). Streams, observations, and prediction locations are represented as simple features and specific tools have been provided to define topological relationships between features; calculate the hydrologic distances (with flow-direction preserved) and the spatial additive function used to weight converging stream segments; and export the topological, spatial, and attribute information to an SSN object, which can be efficiently stored, accessed and analysed in R.  
+'SSNbler' imports, creates and assembles data needed to fit spatial-statistical stream-network models using the [SSN2 R package](https://usepa.github.io/SSN2/). Streams, observations, and prediction locations are represented as simple features and specific tools have been provided to define topological relationships between features; calculate the hydrologic distances (with flow-direction preserved) and the spatial additive function used to weight converging stream segments; and export the topological, spatial, and attribute information to an SSN object, which can be efficiently stored, accessed and analysed in R.  
 
-Learn more about `SSNbler` on [our website](https://pet221.github.io/SSNbler/).
+Learn more about 'SSNbler' on [our website](https://pet221.github.io/SSNbler/).
 
 ## Installation Instructions
 
@@ -18,7 +18,7 @@ install.packages("SSNbler")
 library(SSNbler)
 ```
 
-Install and load the most recent version of`SSNbler` from GitHub by running
+Install and load the most recent version of'SSNbler' from GitHub by running
 ```r
 # Installing from GitHub requires you first install the remotes package
 install.packages("remotes")
@@ -31,7 +31,7 @@ library(SSNbler)
 
 ## Citation
 
-If you use `SSNbler` in a formal publication or report, please cite it. Citing `SSNbler` lets us devote more resources to it in the future. View the `SSNbler` citation by running
+If you use 'SSNbler' in a formal publication or report, please cite it. Citing 'SSNbler' lets us devote more resources to it in the future. View the 'SSNbler' citation by running
 ```r
 citation(package = "SSNbler")
 ```
@@ -55,7 +55,7 @@ citation(package = "SSNbler")
 
 ## Example Usage
 
-Please see our [introductory vignette](https://pet221.github.io/SSNbler/articles/introduction.html) for a brief example showing how to use `SSNbler`. 
+Please see our [introductory vignette](https://pet221.github.io/SSNbler/articles/introduction.html) for a brief example showing how to use 'SSNbler'. 
 
 ## License
 

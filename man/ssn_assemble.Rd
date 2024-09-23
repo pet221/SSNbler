@@ -2,7 +2,7 @@
 % Please edit documentation in R/ssn_assemble.R
 \name{ssn_assemble}
 \alias{ssn_assemble}
-\title{Assemble an SSN object from a LSN}
+\title{Assemble an \code{SSN} object from an LSN}
 \usage{
 ssn_assemble(
   edges,
@@ -41,8 +41,8 @@ included.}
 returned as an \code{SSN} object. Defaults to \code{TRUE}.}
 
 \item{check}{Logical indicating whether the validity of the
-\code{SSN} should be checked using \code{[ssn_check]} when
-\code{import = TRUE}. Default = \code{TRUE}.}
+\code{SSN} should be checked using \code{[ssn_check]} when both
+\code{import = TRUE} and \code{verbose = TRUE}. Default = \code{TRUE}.}
 
 \item{afv_col}{Character vector containing the names of the
 additive function value columns that will be checked when
@@ -62,19 +62,19 @@ function progress and object validity check (when \code{check = TRUE} should be 
 The components of an \code{SSN} object are written to
 \code{ssn_path} (see Details). When \code{import = TRUE}, the
 function also returns an object of class \code{SSN}. If
-\code{check = TRUE}, the validity of the returned \code{SSN}
+\code{check = TRUE} and \code{verbose = TRUE}, the validity of the returned \code{SSN}
 object is checked using \code{[ssn_check]} and results are
 printed to the console.
 }
 \description{
-Create an SSN object from a Landscape Network (LSN).
+Create an \code{SSN} (spatial stream network) object from a Landscape Network (LSN).
 }
 \details{
 The \code{SSNbler} package is used to generate the
 spatial, topological, and attribute information needed to fit
-spatial stream-network models using the \code{SSN2} package. The
+spatial stream-network models using the 'SSN2' package. The
 \code{ssn_assemble} function will often be the final step in the
-\code{SSNbler} data-processing workflow and it is important that
+'SSNbler' data-processing workflow and it is important that
 the previous processing steps have been followed. Prior to
 running \code{ssn_assemble}, the \code{edges} must be processed
 using \code{link{lines_to_lsn}}, \code{link{updist_edges}}, and
@@ -90,15 +90,15 @@ with the Default = NULL. If \code{obs_sites = NULL}, an
 \code{SSN} object will be returned with NA stored in
 \code{ssn.object$obs} and a warning returned that
 \code{ssn.object$obs} is required for fitting spatial statistical
-models in \code{SSN2}.
+models in 'SSN2'.
 
 \code{ssn_assemble} stores the output locally in \code{ssn_path}. If
 \code{ssn_path} does not include the .ssn extension, it is added
 before the new directory is created. This directory contains:
 \itemize{
-\item edges.gpkg: edges in geopackage format. A new network identifier, netID, is added that is unique to each subnetwork.
-\item sites.gpkg: observed sites in geopackage format (if present). Three new ID columns are added that are unique to the measurement (pid), the location (locID), and the network (netID).
-\item prediction datasets in geopackage format (if present). The prediction sites also contain pid, locID, and netID. The naming convention is taken from the names provided in \code{preds_list}.
+\item edges.gpkg: edges in GeoPackage format. A new network identifier, netID, is added that is unique to each subnetwork.
+\item sites.gpkg: observed sites in GeoPackage format (if present). Three new ID columns are added that are unique to the measurement (pid), the location (locID), and the network (netID).
+\item prediction datasets in GeoPackage format (if present). The prediction sites also contain pid, locID, and netID. The naming convention is taken from the names provided in \code{preds_list}.
 \item netID.dat files for each distinct network, which store the binaryID values for line segments in edges.
 }
 A more detailed description of the .ssn directory and its contents is provided in Peterson and Ver Hoef (2014).

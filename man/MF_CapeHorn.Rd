@@ -17,7 +17,7 @@ MF_CapeHorn
 \code{MF_CapeHorn} is an \code{sf} object with POINT geometry representing prediction locations and covariates on Cape Horn Creek, Middle Fork Basin, Idaho, USA.
 }
 \details{
-The \code{sf} data.frame contains 654 point features and 9 columns:
+The \verb{sf data.frame} contains 654 point features and 9 columns:
 \itemize{
 \item COMID: Common identifier of an NHD feature or relationship
 \item AREAWTMAP: Area weighted mean annual precipitation (mm) at lowermost

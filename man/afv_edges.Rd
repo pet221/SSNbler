@@ -35,7 +35,7 @@ store the additive function value for each feature, in character
 format.}
 
 \item{save_local}{Logical indicating whether the updated
-\code{edges} should be saved to \code{lsn_path} in geopackage
+\code{edges} should be saved to \code{lsn_path} in GeoPackage
 format. Defaults to \code{TRUE}.}
 
 \item{overwrite}{A logical indicating whether results should be
@@ -55,7 +55,7 @@ feature in a Landscape Network (LSN)
 }
 \details{
 Spatial weights are used when fitting statistical models
-with \code{SSN2} to split the tail-up covariance function upstream of
+with 'SSN2' to split the tail-up covariance function upstream of
 network confluences, which allows for the disproportionate
 influence of one upstream edge over another (e.g., a large stream
 channel converges with a smaller one) on downstream
@@ -73,7 +73,7 @@ weights for observed and prediction sites.
 
 Steps 1) and 2) are undertaken in \code{afv_edges}, Step 3) is
 calculated in \code{\link[=afv_sites]{afv_sites()}}, and Step 4) is calculated in the
-package \code{SSN2} when spatial stream-network models that include the
+package 'SSN2' when spatial stream-network models that include the
 tail-up covariance function are fit using \code{\link[SSN2]{ssn_lm}}
 or \code{\link[SSN2]{ssn_glm}}.
 

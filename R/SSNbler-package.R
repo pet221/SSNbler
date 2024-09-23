@@ -16,9 +16,3 @@
 ## usethis namespace: start
 ## usethis namespace: end
 NULL
-
-# SSN2 just needs to be installed for the print/summary generic to work. I
-# am leaving it as "imported" right now, but we could replace it with
-# importFrom SSN2 any_function_name_from_SSN2
-# usually, you would need to import the generic, but since summary and print
-# are in base, this is not necessary

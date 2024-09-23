@@ -1,6 +1,6 @@
 Package: SSNbler
-Title: Assemble SSN Objects in R
-Version: 0.1.0
+Title: Assemble `SSN` Objects
+Version: 1.0.0
 Authors@R: c(
 	   person(given = "Erin",
     		 family = "Peterson",
@@ -16,7 +16,7 @@ Authors@R: c(
            	 family = "Pearse",
            	 role = "aut",
            	 comment = c(ORCID = "0000-0002-4133-8548")),
-      person(given = "Dan", 
+      person(given = "Dan",
                family = "Teleki",
                role = "ctb"),
     person(given = "Jay M.",
@@ -25,7 +25,7 @@ Authors@R: c(
        email = "jay.verhoef@noaa.gov",
        comment = c(ORCID = "0000-0003-4302-6895"))
 	   )
-Description: Import, create and assemble data needed to fit spatial-statistical stream-network models using the SSN2 R package. Streams, observations, and prediction locations are represented as simple features and specific tools have been provided to define topological relationships between features; calculate the hydrologic distances (with flow-direction preserved) and the spatial additive function used to weight converging stream segments; and export the topological, spatial, and attribute information to an SSN object, which can be efficiently stored, accessed and analysed in R. 
+Description: Import, create and assemble data needed to fit spatial-statistical stream-network models (Peterson, E.E. and Ver Hoef, J.M., (2014) <doi:10.18637/jss.v056.i02> using the 'SSN2' package for 'R'. Streams, observations, and prediction locations are represented as simple features and specific tools have been provided to define topological relationships between features; calculate the hydrologic distances (with flow-direction preserved) and the spatial additive function used to weight converging stream segments; and export the topological, spatial, and attribute information to an SSN (spatial stream network) object, which can be efficiently stored, accessed and analysed in 'R'.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
@@ -43,7 +43,7 @@ Imports:
 	RSQLite,
 	withr,
 	SSN2
-Suggests: 
+Suggests:
     ggplot2,
     knitr,
     rmarkdown,

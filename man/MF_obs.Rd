@@ -17,7 +17,7 @@ MF_obs
 \code{MF_obs} is an \code{sf} object with POINT geometry representing water temperature observations and covariates in the Middle Fork Basin, Idaho, USA collected in 2004.
 }
 \details{
-The \code{sf} data.frame contains 45 point features and 16 columns:
+The \verb{sf data.frame} contains 45 point features and 16 columns:
 \itemize{
 \item STREAMNAME: Stream name
 \item COMID: Common identifier of an NHD feature or relationship

@@ -20,7 +20,7 @@ MF_streams
 streams and rivers in the Middle Fork Basin, Idaho, USA.
 }
 \details{
-The \code{sf} data.frame contains a set of 163 features and 9 columns:
+The \verb{sf data.frame} contains a set of 163 features and 9 columns:
 \itemize{
 \item COMID: Common identifier of an NHD feature or relationship
 \item GNIS_NAME: Feature name as found in the Geographic Names Information System

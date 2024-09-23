@@ -1,14 +1,14 @@
 #' Incorporate sites into a Landscape Network
-#' @description Incorporates an \code{sf} object containing features
+#' @description Incorporates an `sf` object containing features
 #'   with POINT geometry into a landscape network (LSN), which is a
 #'   topological data model of streams/rivers represented as a
 #'   directional graph embedded in 2-D geographic space. Point
 #'   locations are 'snapped' to the closest edge location and new
 #'   information is generated describing the geographic and
 #'   topological location relative to other features in the LSN.
-#' @param sites An \code{sf} object with POINT geometry, typically
+#' @param sites An `sf` object with POINT geometry, typically
 #'   representing observed data or prediction locations.
-#' @param edges An \code{sf} object with LINESTING geometry created
+#' @param edges An `sf` object with LINESTING geometry created
 #'   using \code{\link{lines_to_lsn}}.
 #' @param snap_tolerance Numeric distance in map units >= 0. Sites that
 #'   are <= this distance from an edge feature will snapped to the
@@ -16,12 +16,12 @@
 #'   and all edges is > \code{snap_tolerance}, the point feature is not
 #'   snapped or included in the lsn_path.
 #' @param save_local Logical indicating whether the outputs should be
-#'   saved to a local directory in geopackage format. Defaults to
+#'   saved to a local directory in GeoPackage format. Defaults to
 #'   \code{TRUE}.
 #' @param lsn_path Pathname to the LSN. This is typically a directory created by
 #'   \code{\link{lines_to_lsn}}. Required if \code{save_local = TRUE}.
 #' @param file_name Filename for output sites, which are saved to \code{lsn_path}
-#'   in geopackage format (must include the .gpkg extension). Required if \code{save_local = TRUE}.
+#'   in GeoPackage format (must include the .gpkg extension). Required if \code{save_local = TRUE}.
 #' @param overwrite Logical indicating whether the outputs saved to
 #'   \code{lsn_path} should overwrite existing files if they
 #'   exist. Defaults to \code{FALSE}.
@@ -30,7 +30,7 @@
 #'
 #' @details The \code{sites_to_lsn} function is used to incorporate
 #'   observed and prediction sites into the LSN. The output is an
-#'   \code{sf} object with POINT geometry, which contains only the
+#'   `sf` object with POINT geometry, which contains only the
 #'   point features from \code{sites} that were found less than the
 #'   \code{snap_tolerance} distance from the closest edge
 #'   feature. When a \code{sites} point feature meets these
@@ -56,12 +56,12 @@
 #' Note that the \code{sites} and \code{edges}
 #'   must have the same projection.
 #'
-#' @return An \code{sf} object with POINT geometry containing the
+#' @return An `sf` object with POINT geometry containing the
 #'   features from \code{sites} that were found within the
 #'   \code{snap_tolerance} distance to the closest edge. In addition to
 #'   the original columns in \code{sites}, three new columns are
 #'   added: rid, ratio, and snapdist (see Details). If
-#'   \code{save_local = TRUE}, the \code{sf} object is also saved to
+#'   \code{save_local = TRUE}, the `sf` object is also saved to
 #'   \code{lsn_path}.
 #'
 #' @export

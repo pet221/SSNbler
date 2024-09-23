@@ -1,13 +1,13 @@
-#' @title Check a SSN object
+#' @title Check an `SSN` object
 #'
-#' @description Check a \code{SSN} object to ensure that it contains valid spatial, topological, and attribute information needed to fit spatial statistical stream network models using the \code{SSN2} package.
+#' @description Check an `SSN` (spatial stream network) object to ensure that it contains valid spatial, topological, and attribute information needed to fit spatial statistical stream network models using the 'SSN2' package.
 #'
-#' @param ssn.object A \code{SSN} object created using \code{\link[SSNbler]{ssn_assemble}} or imported using \code{\link[SSN2]{ssn_import}}.
+#' @param ssn.object An `SSN` object created using \code{\link[SSNbler]{ssn_assemble}} or imported using \code{\link[SSN2]{ssn_import}}.
 #' @param check_obs A logical indicating whether the observations should be checked. Default = \code{TRUE}.
 #' @param afv_col Character vector containing  names of columns containing additive function values. The Default = \code{NULL}.
-#' @param verbose Logical \code{TRUE/FALSE} indicating whether details describing the checks are printed to the console. If \code{verbose = FALSE}, a logical \code{TRUE/FALSE} is returned indicating whether the \code{SSN} object passed all of the checks. Default = \code{TRUE}.
+#' @param verbose Logical \code{TRUE/FALSE} indicating whether details describing the checks are printed to the console. If \code{verbose = FALSE}, a logical \code{TRUE/FALSE} is returned indicating whether the `SSN` object passed all of the checks. Default = \code{TRUE}.
 #'
-#' @return Boolean indicating whether the \code{SSN} object is valid. If \code{verbose = TRUE}, additional messages are printed to the console describing potential issues with the \code{SSN} object.
+#' @return Boolean indicating whether the `SSN` object is valid. If \code{verbose = TRUE}, additional messages are printed to the console describing potential issues with the `SSN` object.
 #'
 #' @export
 #'

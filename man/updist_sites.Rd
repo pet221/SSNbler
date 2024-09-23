@@ -2,7 +2,7 @@
 % Please edit documentation in R/updist_sites.R
 \name{updist_sites}
 \alias{updist_sites}
-\title{Get upstream distance for sites in an LSN}
+\title{Get upstream distance for sites in a Landscape Network (LSN)}
 \usage{
 updist_sites(
   sites,
@@ -52,7 +52,7 @@ new column named \code{upDist}.
 
 The upstream distances stored in \code{upDist} are used to
 calculate the pairwise hydrologic distances used to fit spatial
-stream network models in the \code{SSN2} package. Do not modify the name
+stream network models in the 'SSN2' package. Do not modify the name
 of the column in any way or the values the \code{upDist} column
 contains.}
 }
@@ -65,7 +65,7 @@ is saved in \code{lsn_path}. Output file names are assigned based
 on the input \code{sites} attribute \code{names}.
 }
 \description{
-Get upstream distance for sites in an LSN
+Get upstream distance for sites in a Landscape Network (LSN)
 }
 \examples{
 # Get temporary directory, where the example LSN will be stored
