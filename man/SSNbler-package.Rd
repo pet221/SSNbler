@@ -6,7 +6,7 @@
 \alias{SSNbler-package}
 \title{SSNbler: Assemble 'SSN' Objects}
 \description{
-Import, create and assemble data needed to fit spatial-statistical stream-network models (Peterson, E.E. and Ver Hoef, J.M., (2014) \doi{10.18637/jss.v056.i02}) using the 'SSN2' package for 'R'. Streams, observations, and prediction locations are represented as simple features and specific tools have been provided to define topological relationships between features; calculate the hydrologic distances (with flow-direction preserved) and the spatial additive function used to weight converging stream segments; and export the topological, spatial, and attribute information to an SSN (spatial stream network) object, which can be efficiently stored, accessed and analysed in 'R'.
+Import, create and assemble data needed to fit spatial-statistical stream-network models using the 'SSN2' package for 'R'. Streams, observations, and prediction locations are represented as simple features and specific tools provided to define topological relationships between features; calculate the hydrologic distances (with flow-direction preserved) and the spatial additive function used to weight converging stream segments; and export the topological, spatial, and attribute information to an `SSN` (spatial stream network) object, which can be efficiently stored, accessed and analysed in 'R'. A detailed description of methods used to calculate and format the spatial data can be found in Peterson, E.E. and Ver Hoef, J.M., (2014) \doi{10.18637/jss.v056.i02}.
 }
 \seealso{
 Useful links:

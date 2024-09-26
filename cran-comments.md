@@ -1,14 +1,28 @@
 ## Resubmission 1.0.1
 Resubmission to address CRAN comments.
 
+## R CMD check results SSNbler 1.0.1
+0 errors | 0 warnings | 0 notes
+
+win-builder results checking the development version of R (accessed by
+running `devtools::check_win_devel()`).
+
+There were no ERRORS or WARNINGS, but 1 NOTE:
+* checking CRAN incoming feasibility ... NOTE
+Maintainer: 'Erin Peterson <erin@peterson-consulting.com>'
+
+The maintainer's name and email address are correct.
+
+## Changes since last submission
 > The Title field should be in title case. Current version is: 'Assemble `SSN` Objects'. This is OK, but please use straight rather than directed single quotes.
 
 Fixed.
 
-
 > Is there some reference about the method you can add in the Description field in the form Authors (year) <doi:10.....>?
 
-Added (Peterson, E.E. and Ver Hoef, J.M., (2014) <doi:10.18637/jss.v056.i02>) to Description field.
+Modified Description field and added Peterson, E.E. and Ver Hoef, J.M., (2014) <doi:10.18637/jss.v056.i02>.
+
+
 
 ## Resubmission 1.0.0
 Resubmission to address CRAN comments.
@@ -80,6 +94,8 @@ ssn_assemble(), which returns a simple TRUE/FALSE when verbose = FALSE.
 
 In createBinaryID(), added an on.exit(setwd(old.wd)) call before
 changing the working directory using local_dir() (Lines 3-6).
+
+
 
 
 ## New Release 0.1.0
