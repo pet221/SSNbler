@@ -18,7 +18,7 @@ feature in a Landscape Network (LSN)"><!-- mathjax --><script src="https://cdnjs
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SSNbler</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.1</span>
       </span>
     </div>
 
@@ -33,7 +33,7 @@ feature in a Landscape Network (LSN)"><!-- mathjax --><script src="https://cdnjs
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/introduction.html">An Introduction to SSNbler: Assembling Spatial Stream Network (SSN) Objects in R</a>
+      <a href="../articles/introduction.html">An Introduction to 'SSNbler': Assembling Spatial Stream Network (`SSN`) Objects in R</a>
     </li>
   </ul></li>
 <li>
@@ -86,7 +86,7 @@ using <code><a href="lines_to_lsn.html">lines_to_lsn</a></code>.</p></dd>
 <dt>lsn_path</dt>
 <dd><p>Local pathname to a directory in character format
 specifying where relationships.csv resides, which is created
-using <code>link[SSNbler]{lines_to_lsn}</code>.</p></dd>
+using <code><a href="lines_to_lsn.html">lines_to_lsn</a></code>.</p></dd>
 
 
 <dt>infl_col</dt>
@@ -109,7 +109,7 @@ format.</p></dd>
 
 <dt>save_local</dt>
 <dd><p>Logical indicating whether the updated
-<code>edges</code> should be saved to <code>lsn_path</code> in geopackage
+<code>edges</code> should be saved to <code>lsn_path</code> in GeoPackage
 format. Defaults to <code>TRUE</code>.</p></dd>
 
 
@@ -129,7 +129,98 @@ exists in <code>edges</code>, or edges.gpkg already exists in
   = TRUE</code>, the updated version of <code>edges</code> will be saved as
 <code>edges.gpkg</code> in <code>lsn_path</code>.</p>
     </div>
+    <div id="details">
+    <h2>Details</h2>
+    <p>Spatial weights are used when fitting statistical models
+with 'SSN2' to split the tail-up covariance function upstream of
+network confluences, which allows for the disproportionate
+influence of one upstream edge over another (e.g., a large stream
+channel converges with a smaller one) on downstream
+values. Calculating the spatial weights is a four-step process:</p><ol><li><p>calculating the segment proportional influence (PI) values for
+the edges,</p></li>
+<li><p>calculating the additive function values (AFVs) for
+the edges,</p></li>
+<li><p>calculating the AFVs for the
+observed and prediction sites, and</p></li>
+<li><p>calculating the spatial
+weights for observed and prediction sites.</p></li>
+</ol><p>Steps 1) and 2) are undertaken in <code>afv_edges</code>, Step 3) is
+calculated in <code><a href="afv_sites.html">afv_sites()</a></code>, and Step 4) is calculated in the
+package 'SSN2' when spatial stream-network models that include the
+tail-up covariance function are fit using <code><a href="https://usepa.github.io/SSN2/reference/ssn_lm.html" class="external-link">ssn_lm</a></code>
+or <code><a href="https://usepa.github.io/SSN2/reference/ssn_glm.html" class="external-link">ssn_glm</a></code>.</p>
+<p>The segment PI for each edge, \(\omega_j\), is defined as the
+relative influence of the j-th edge feature on the edge directly
+downstream.  \(\omega_j\) is often based on
+cumulative watershed area for the downstream node of each edge,
+which is used as a surrogate for flow volume. However,
+simpler measures could be used, such as Shreve's stream order
+(Shreve 1966) or equal weighting, as long as a value exists for
+every line feature in <code>edges</code> (i.e., missing data are not
+allowed). It is also preferable to use a column that does not
+contain values equal to zero, which is explained below.</p>
+<p>The segment PI values produced in <code>afv_edges()</code> are
+ratios. Therefore, the sum of the PI values for edges directly
+upstream of a single node always sum to one. Also note that
+\(\omega_j=0\) when \(A_j=0\).</p>
+<p>The AFVs for the j-th edge, \(AFV_j\), is equal to the product of
+the segment PIs found in the path between the edge and the network
+outlet (i.e., most downstream edge in the network), including edge
+j itself. Therefore, \(0 \le AFV \le 1\). If \(\omega_j=0\),
+the AFV values for edges upstream of the j-th edge will also be
+equal to zero. This may not be problematic if the j-th edge is a
+headwater segment without an observed site. However, it can have a
+significant impact on the covariance structure of the tail-up model
+when the j-th edge is found lower in the stream network.</p>
+<p>A more detailed description of the segment PIs and the steps used to
+calculate AFVs are provided in Peterson and Ver Hoef (2010;
+Appendix A).</p>
+    </div>
+    <div id="references">
+    <h2>References</h2>
+    <p>Peterson, E.E. and Ver Hoef, J.M. (2010) A
+mixed-model moving-average approach to geostatistical modeling in
+stream networks. Ecology 91(3), 644–651.</p>
+    </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Get temporary directory, where the example LSN will be stored</span></span></span>
+<span class="r-in"><span><span class="co"># locally.</span></span></span>
+<span class="r-in"><span><span class="va">temp_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Build the LSN. When working with your own data, lsn_path will be</span></span></span>
+<span class="r-in"><span><span class="co"># a local folder of your choice rather than a temporary directory.</span></span></span>
+<span class="r-in"><span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="lines_to_lsn.html">lines_to_lsn</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  streams <span class="op">=</span> <span class="va">MF_streams</span>,</span></span>
+<span class="r-in"><span>  lsn_path <span class="op">=</span> <span class="va">temp_dir</span>,</span></span>
+<span class="r-in"><span>  snap_tolerance <span class="op">=</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  check_topology <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>  overwrite <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Calculate the AFV for the edges using an existing column</span></span></span>
+<span class="r-in"><span><span class="co"># representing watershed area for the downstream node of each line</span></span></span>
+<span class="r-in"><span><span class="co"># feature (h2oAreaKm2).</span></span></span>
+<span class="r-in"><span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu">afv_edges</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  edges <span class="op">=</span> <span class="va">edges</span>,</span></span>
+<span class="r-in"><span>  infl_col <span class="op">=</span> <span class="st">"h2oAreaKm2"</span>,</span></span>
+<span class="r-in"><span>  segpi_col <span class="op">=</span> <span class="st">"areaPI"</span>,</span></span>
+<span class="r-in"><span>  lsn_path <span class="op">=</span> <span class="va">temp_dir</span>,</span></span>
+<span class="r-in"><span>  afv_col <span class="op">=</span> <span class="st">"afvArea"</span>,</span></span>
+<span class="r-in"><span>  overwrite <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  save_local <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Check AFVs stored in new column afvArea to ensure that 0 &lt;= AFV</span></span></span>
+<span class="r-in"><span><span class="co"># &lt;= 1 and that there are no NULL values.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">edges</span><span class="op">$</span><span class="va">afvArea</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.004709 0.026168 0.066095 0.160335 0.169575 1.000000 </span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

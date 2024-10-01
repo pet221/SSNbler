@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>An Introduction to SSNbler: Assembling Spatial Stream Network (SSN) Objects in R • SSNbler</title>
+<title>An Introduction to 'SSNbler': Assembling Spatial Stream Network (`SSN`) Objects in R • SSNbler</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="An Introduction to SSNbler: Assembling Spatial Stream Network (SSN) Objects in R">
+<script src="../pkgdown.js"></script><meta property="og:title" content="An Introduction to 'SSNbler': Assembling Spatial Stream Network (`SSN`) Objects in R">
 <meta property="og:description" content="SSNbler">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SSNbler</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.1</span>
       </span>
     </div>
 
@@ -50,7 +50,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/introduction.html">An Introduction to SSNbler: Assembling Spatial Stream Network (SSN) Objects in R</a>
+      <a href="../articles/introduction.html">An Introduction to 'SSNbler': Assembling Spatial Stream Network (`SSN`) Objects in R</a>
     </li>
   </ul>
 </li>
@@ -78,8 +78,8 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>An Introduction to SSNbler: Assembling Spatial
-Stream Network (SSN) Objects in R</h1>
+      <h1 data-toc-skip>An Introduction to ‘SSNbler’: Assembling Spatial
+Stream Network (<code>SSN</code>) Objects in R</h1>
                         <h4 data-toc-skip class="author">Erin E
 Peterson, Michael Dumelle, Alan R Pearse, Dan Teleki, and Jay M Ver
 Hoef</h4>
@@ -99,30 +99,28 @@ Hoef</h4>
 spatial autocorrelation resulting from the branching network structure,
 longitudinal (i.e., upstream/downstream) connectivity, directional water
 flow, and differences in flow volume upstream of junctions (i.e.,
-confluences) in the network <span class="citation">(E. E. Peterson et
-al. 2013)</span>. In addition, stream networks are embedded within
+confluences) in the network <span class="citation">(Peterson et al.,
+2013)</span>. In addition, stream networks are embedded within
 geographic (i.e., 2-D) space, with the terrestrial landscape often
 having a strong influence on observations collected on the stream
-network. <span class="citation">Ver Hoef and Peterson (2010)</span>
+network. <span class="citation">Ver Hoef &amp; Peterson (2010)</span>
 describe how to fit spatial statistical models on stream networks (i.e.,
 spatial stream-network models) that capture the unique and complex
 spatial dependencies inherent in streams. These stream network models
-can be fit using the <code>SSN2</code> <strong>R</strong> package <span class="citation">(Dumelle et al. 2023)</span>. To use <code>SSN2</code>,
-however, users must provide the spatial, topological, and attribute data
-in a specific format called an SSN object. The <code>SSNbler</code>
-<strong>R</strong> package, which we introduce here, is an adaptation of
-the STARS ArcGIS toolset <span class="citation">(E. E. Peterson and Ver
-Hoef 2014)</span> to the <strong>R</strong> programming language.
-<code>SSNbler</code> generates formats, assembles, and validates SSN
-objects that can be used for statistical modeling in
-<code>SSN2</code>.</p>
-<p>In this vignette, we use <code>SSNbler</code> to create the SSN
-object <code>MiddleFork04.ssn</code> used by <code>SSN2</code>. First,
-we load <code>SSNbler</code> into our current <strong>R</strong>
-session.</p>
+can be fit using the ‘SSN2’ <strong>R</strong> package <span class="citation">(Dumelle, Peterson, Ver Hoef, Pearse, &amp; Isaak,
+2024)</span>. To use ‘SSN2’, however, users must provide the spatial,
+topological, and attribute data in a specific format called an
+<code>SSN</code> object. The ‘SSNbler’ <strong>R</strong> package, which
+we introduce here, is an adaptation of the STARS ArcGIS toolset <span class="citation">(Peterson &amp; Ver Hoef, 2014)</span> for the
+<strong>R</strong> programming language. ‘SSNbler’ generates formats,
+assembles, and validates <code>SSN</code> objects that can be used for
+statistical modeling in ‘SSN2’.</p>
+<p>In this vignette, we use ‘SSNbler’ to create the <code>SSN</code>
+object <code>MiddleFork04.ssn</code> used by ‘SSN2’. First, we load
+‘SSNbler’ into our current <strong>R</strong> session.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pet221/SSNbler" class="external-link">SSNbler</a></span><span class="op">)</span></span></code></pre></div>
-<p><code>SSNbler</code> has a few input datasets:</p>
+<p>A few input datasets are included in the ‘SSNbler’ package:</p>
 <ul>
 <li>
 <code>MF_streams</code>: An <code>sf</code> object with
@@ -130,8 +128,9 @@ session.</p>
 Fork stream network in Idaho, USA.</li>
 <li>
 <code>MF_obs</code>: An <code>sf</code> object with
-<code>POINT</code> geometry containing observed stream temperature data
-at 45 unique locations on <code>MF_streams</code>.</li>
+<code>POINT</code> geometry containing observed summer mean stream
+temperature observations at 45 unique locations on
+<code>MF_streams</code>.</li>
 <li>
 <code>MF_pred1km</code>: An <code>sf</code> object with
 <code>POINT</code> geometry containing unsampled locations spaced at
@@ -144,29 +143,32 @@ response variable (i.e., temperature) may be desired.</li>
 10-meter intervals throughout Cape Horn Creek in
 <code>MF_streams</code>.</li>
 </ul>
-<p>Documentation for each dataset can be found by running
-<code><a href="https://rdrr.io/r/utils/help.html" class="external-link">help()</a></code>. For example, to learn more about
+<p>To provide context, the observed data in <code>MF_obs</code> will be
+used to build statistical models and make predictions at the locations
+in <code>MF_pred1km</code> and <code>MF_CapeHorn</code> using the
+<strong>R</strong> package ‘SSN2’. Documentation for each dataset can be
+found by running <code><a href="https://rdrr.io/r/utils/help.html" class="external-link">help()</a></code>. For example, to learn more about
 <code>MF_streams</code>, run
-<code>help("MF_streams, package = "SSNbler")</code>.</p>
-<p>While these datasets come with <code>SSNbler</code> and can be loaded
-via <code><a href="https://rdrr.io/r/utils/data.html" class="external-link">data()</a></code>, we focus here on a more realistic workflow for
-the user. We start with a collection of spatial datasets installed
-alongside <code>SSNbler</code> in the <code>streamsdata</code> folder
-that represent the Middle Fork stream network. In
-<code>streamsdata</code> are GeoPackages (more on this later) for the
-stream network, observed data, and prediction data (optional) required
-to create an SSN object. To prevent <code>SSNbler</code> functions from
-reading and writing to this folder, we copy it to R’s temporary
-directory and store the path to this folder:</p>
+<code><a href="../reference/MF_streams.html">help("MF_streams", package = "SSNbler")</a></code>.</p>
+<p>While these datasets come with ‘SSNbler’ and can be loaded via
+<code><a href="https://rdrr.io/r/utils/data.html" class="external-link">data()</a></code>, we focus here on a more realistic workflow for the
+user. We start with a collection of spatial datasets installed alongside
+‘SSNbler’ in the <code>streamsdata</code> folder that represent the
+Middle Fork stream network. In <code>streamsdata</code> are GeoPackages
+(more on this later) representing the stream network, observed data, and
+prediction data (optional) required to create an SSN object. To prevent
+‘SSNbler’ functions from reading and writing to this folder, we copy it
+to R’s temporary directory and store the path to this folder:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/copy_streams_to_temp.html">copy_streams_to_temp</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/streamsdata"</span><span class="op">)</span></span></code></pre></div>
 <p>Then we can read in the relevant data using <code>st_read</code> from
-the <code>sf</code> <strong>R</strong> package <span class="citation">(Pebesma 2018)</span>, which comes installed alongside
-<code>SSNbler</code>. Note that the input data can be in any vector data
-format that can be imported into R and stored as an <code>sf</code>
-object with <code>LINESTRING</code> or <code>POINT</code> geometry
-(e.g., shapefile, GeoJSON, GeoPackage, Spatialite, PostGIS).</p>
+the ‘sf’ <strong>R</strong> package <span class="citation">(Pebesma,
+2018)</span>, which comes installed alongside ‘SSNbler’. Note that the
+input data can be in any vector data format that can be imported into R
+and stored as an <code>sf</code> object with <code>LINESTRING</code> or
+<code>POINT</code> geometry (e.g., shapefile, GeoJSON, GeoPackage,
+SpatiaLite, PostGIS).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
 <span><span class="va">MF_streams</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">path</span>, <span class="st">"/MF_streams.gpkg"</span><span class="op">)</span><span class="op">)</span></span>
@@ -176,65 +178,59 @@ object with <code>LINESTRING</code> or <code>POINT</code> geometry
 <p>Notice that the line (<code>MF_Streams</code>) and point features
 (<code>MF_obs</code>, <code>MF_pred1km</code>, and
 <code>MF_CapeHorn</code>) have <code>LINESTRING</code> and
-<code>POINT</code> geometry types, which are required in
-<code>SSNbler</code>. If these datasets had <code>MULTILINESTRING</code>
-or <code>MULTIPOINT</code> geometry types, the <code>sf</code> function
+<code>POINT</code> geometry types, which are required in ‘SSNbler’. If
+these datasets had <code>MULTILINESTRING</code> or
+<code>MULTIPOINT</code> geometry types, the ‘sf’ function
 <code>st_cast</code> could be used to convert to the required geometry
 types. All of the input data have an Albers Equal Area Conic projection
 (EPSG 102003) and distances are measured in meters. It is important that
 all input datasets have the same map projection, which must be a
 projected coordinate system and not a geographic coordinate system
-measured in Latitude and Longitude. The <code>sf</code> function
+measured in Latitude and Longitude. The ‘sf’ function
 <code>st_transform</code> can be used to reproject <code>sf</code>
-objects in <em>R</em>.</p>
+objects in <strong>R</strong>.</p>
 <p>We previously mentioned these data are stored in
 <code>streamsdata</code> in a GeoPackage format. GeoPackages, like
 shapefiles, are a way to store spatial data. We prefer GeoPackages over
 shapefiles because they offer better support for high precision numeric
 data compared to the traditional DBF (dBASE) format (used in
 shapefiles), which limits the precision to 10 decimal places when
-<em>writing</em> (not reading) to local files from <em>R</em>. This is
-problematic because several important columns <code>SSNbler</code> adds
-and <code>SSN2</code> uses contain very small values ranging from zero
-to one. If these columns are truncated it can lead to
-difficult-to-diagnose errors when models are fit in <code>SSN2</code>.
-GeoPackages do not have this limitation. To learn more about
-GeoPackages, <a href="https://www.geopackage.org/" class="external-link">visit here</a>.</p>
+<em>writing</em> (not reading) to local files from <strong>R</strong>.
+This is problematic because several important columns ‘SSNbler’ adds and
+‘SSN2’ uses contain very small values ranging from zero to one. If these
+columns are truncated it can lead to difficult-to-diagnose errors when
+models are fit in ‘SSN2’. GeoPackages do not have this limitation. To
+learn more about GeoPackages, <a href="https://www.geopackage.org/" class="external-link">visit here</a>.</p>
 <p>Before working with any of the input files, we visualize the stream
 network, observed sites, and prediction sites using the
-<code>ggplot2</code> <strong>R</strong> package <span class="citation">(Wickham 2016)</span>.</p>
+<strong>R</strong> package ‘ggplot2’ <span class="citation">(Wickham,
+2016)</span>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">MF_streams</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">MF_CapeHorn</span>, color <span class="op">=</span> <span class="st">"gold"</span>, size <span class="op">=</span> <span class="fl">1.7</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">MF_pred1km</span>, colour <span class="op">=</span> <span class="st">"purple"</span>, size <span class="op">=</span> <span class="fl">1.7</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">MF_obs</span>, color <span class="op">=</span> <span class="st">"blue"</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> </span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="introduction_files/figure-html/mf-input-1.png" alt="The Middle Fork Stream Network." width="75%"><p class="caption">
-The Middle Fork Stream Network.
-</p>
-</div>
-<p>In the Figure above, there are two subnetworks from
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">MF_obs</span>, color <span class="op">=</span> <span class="st">"blue"</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">coord_sf</a></span><span class="op">(</span>datum <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">MF_streams</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="introduction_files/figure-html/Plot_MF-1.png" alt="The Middle Fork Stream Network." width="75%" style="display: block; margin: auto;"></p>
+<p>In the figure above, there are two subnetworks from
 <code>MF_Streams</code> (black lines). Point features from
 <code>MF_obs</code> (blue dots) and <code>MF_pred1km</code> (purple
 dots) are found on both networks, while <code>MF_CapeHorn</code> point
-features (yellow dots) are only found on one of the two networks. In
-<code>SSN2</code>, the observed data in <code>MF_obs</code> are used to
-build statistical models and make predictions at the locations in
-<code>MF_pred1km</code> and <code>MF_CapeHorn</code>.</p>
+features (yellow dots) are only found on one of the two networks.</p>
 </div>
 <div class="section level2">
 <h2 id="the-landscape-network">The Landscape Network<a class="anchor" aria-label="anchor" href="#the-landscape-network"></a>
 </h2>
-<p><code>SSNbler</code> makes use of a data structure called a Landscape
-Network (LSN), which is a type of graph used to represent spatial
-context and relationships with additional geographic information <span class="citation">(Theobald et al. 2006)</span>. In a LSN, streams are
+<p>‘SSNbler’ makes use of a data structure called a Landscape Network
+(LSN), which is a type of graph used to represent spatial context and
+relationships with additional geographic information <span class="citation">(Theobald et al., 2006)</span>. In a LSN, streams are
 represented as a collection of directed edges, where the directionality
 is determined by the digitized direction of the line features. Nodes are
 located at the end points of edges (i.e., end nodes) and represent
 topologic breaks in the edges. For a more detailed description of the
-LSN, see <span class="citation">E. E. Peterson and Ver Hoef
+LSN, see <span class="citation">Peterson &amp; Ver Hoef
 (2014)</span>.</p>
 <p>There are four topologically valid node categories in a LSN:</p>
 <ul>
@@ -245,7 +241,7 @@ headwater segment. Source nodes do not receive flow from any upstream
 edges.</li>
 <li>
 <strong>Outlet</strong>: Flow terminates at these nodes. This node
-is the most downstream point in the edge network. We refer to an edge
+is the most downstream point in an edge network. We refer to an edge
 that terminates at an outlet as an outlet segment. Note that a streams
 dataset may contain multiple subnetworks with associated outlets.</li>
 <li>
@@ -261,7 +257,7 @@ geoprocessing operations for large datasets.</li>
 <img src="valid_nodes.png" alt="Valid Nodes" width="50%"><p class="caption">
 A landscape network (LSN). Nodes are denoted by blue circles, with the
 node category labelled. Edges are denoted by black arrows, with the
-arrow indicating flow direction (i.e., digitized direction)
+arrow indicating flow direction (i.e., digitized direction).
 </p>
 </div>
 <p>Each edge is associated with two nodes, which correspond to the
@@ -271,16 +267,16 @@ should always be a single node at the intersection of edges. If there is
 more or less than one node at an intersection, it is a topological
 error. If these errors are not corrected, the connectivity between line
 features and the observed and prediction sites associated with them will
-not be accurately represented in the SSN object or the spatial
-statistical models subsequently fit to the data. In this vignette, we
-assume that <code>MF_streams</code> has already been checked and
-topologically corrected. Two tutorials have been created with detailed
-instructions about identifying and correcting topological errors in the
-LSN, as well as other topological restrictions that are not permitted
-(please see ‘Correcting topological errors using SSNbler and QGIS’ or
-‘Correcting topological errors using SSNbler and ArcGIS Pro’). These
-tutorials are available for download within the relevant folders on
-GitHub at <a href="https://github.com/pet221/SSNbler/tree/main/inst/tutorials" class="external-link">this
+not be accurately represented in the <code>SSN</code> object or the
+spatial statistical models subsequently fit to the data. In this
+vignette, we assume that <code>MF_streams</code> has already been
+checked and topologically corrected. Two tutorials have been created
+with detailed instructions about identifying and correcting topological
+errors in the LSN, as well as other topological restrictions that are
+not permitted (please see ‘Correcting topological errors using SSNbler
+and QGIS’ or ‘Correcting topological errors using SSNbler and ArcGIS
+Pro’). These tutorials are available for download within the relevant
+folders on GitHub at <a href="https://github.com/pet221/SSNbler/tree/main/inst/tutorials" class="external-link">this
 link</a>.</p>
 <div class="section level3">
 <h3 id="building-the-landscape-network">Building the Landscape Network<a class="anchor" aria-label="anchor" href="#building-the-landscape-network"></a>
@@ -293,20 +289,21 @@ which generally requires these arguments:</p>
 <code>LINESTRING</code> geometry that represents the stream
 network.</li>
 <li>
-<code>lsn_path</code>: A path to the directory in which to store the
-LSN output. This directory will be created if it does not exist.</li>
+<code>lsn_path</code>: A path to the directory in which the LSN
+output files will be stored. This directory will be created if it does
+not exist.</li>
 <li>
 <code>check_topology</code>: Logical indicating whether to check for
 topological errors in <code>streams</code>.</li>
 <li>
 <code>snap_tolerance</code>: Two nodes separated by a Euclidean
-distance <span class="math inline">\(\leq\)</span>
+distance <span class="math inline">\(\le\)</span>
 <code>snap_tolerance</code> will be assumed connected. Distance is
 measured in map units (i.e., projection units for
 <code>streams</code>).</li>
 <li>
 <code>topo_tolerance</code>: Two nodes separated by a Euclidean
-distance <span class="math inline">\(\leq\)</span>
+distance <span class="math inline">\(\le\)</span>
 <code>topo_tolerance</code> are flagged as potential topological errors
 in the network.</li>
 </ul>
@@ -314,7 +311,7 @@ in the network.</li>
 running</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Set path for new folder for lsn</span></span>
-<span><span class="va">lsn.path</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/mf04"</span><span class="op">)</span></span>
+<span><span class="va">lsn.path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/mf04"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lines_to_lsn.html">lines_to_lsn</a></span><span class="op">(</span></span>
 <span>  streams <span class="op">=</span> <span class="va">MF_streams</span>,</span>
@@ -331,8 +328,8 @@ files to <code>lsn_path</code>:</p>
 <code>nodes.gpkg</code>: A GeoPackage with <code>POINT</code>
 geometry features representing LSN nodes. It contains a unique node
 identifier column, <code>pointid</code>, and another column named
-<code>nodecat</code>, which contains the node type (pseudonodes,
-confluences, sources, outlets).</li>
+<code>nodecat</code>, which contains the node type (pseudonode,
+confluence, source, outlet).</li>
 <li>
 <code>edges.gpkg</code>: A GeoPackage with <code>LINESTRING</code>
 geometry features representing LSN edges, which contains all of the
@@ -363,8 +360,8 @@ errors are identified, they are saved at the location specified by
 <code>lsn_path</code> as a GeoPackage named
 <code>node_errors.gpkg</code> with <code>POINT</code> geometry.</p>
 <p>It is important to pay attention to the output messages from
-<code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code> that are printed to the <em>R</em> console.
-In this example, the message is
+<code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code> that are printed to the <strong>R</strong>
+console. In this example, the message is
 <code>No obvious topological errors detected and node_errors.gpkg was NOT created.</code>
 This suggests that the LSN edges are error-free, but it is still a good
 idea in practice to visually assess maps of the node
@@ -407,7 +404,7 @@ by <code>file_name</code>.</li>
 via <code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code> is stored.</li>
 <li>
 <code>file_name</code>: Output file name for the snapped sites,
-which are saved in <code>lsn_path</code> with a GeoPackage format.</li>
+which are saved in <code>lsn_path</code> in GeoPackage format.</li>
 </ul>
 <p>We run <code>sites_to_lsn</code> for the <code>MF_obs</code>
 (observed) data:</p>
@@ -421,46 +418,48 @@ which are saved in <code>lsn_path</code> with a GeoPackage format.</li>
 <span>  save_local <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><code><a href="../reference/sites_to_lsn.html">sites_to_lsn()</a></code> writes a GeoPackage named
-<code>obs.gpkg</code> to <code>lsn_path</code> and also returns these
-snapped sites as an <code>sf</code> object named <code>obs</code>. The
-new dataset contains the original columns in <code>sites</code> and
+<p>In the code above, <code><a href="../reference/sites_to_lsn.html">sites_to_lsn()</a></code> writes a GeoPackage
+named <code>obs.gpkg</code> to <code>lsn_path</code> and also returns
+these snapped sites as an <code>sf</code> object named <code>obs</code>.
+The new dataset contains the original columns in <code>sites</code> and
 three new columns:</p>
 <ul>
 <li>
 <code>rid</code>: The edge <code>rid</code> value where the snapped
 site resides.</li>
 <li>
-<code>ratio</code>: The proportion of the site location along the
-length between the downstream end node and the upstream end node of the
-edge.</li>
+<code>ratio</code>: Describes the site location on the edge. It is
+calculated by dividing the length of the edge found between the
+downstream end node and the site location by the total edge length.</li>
 <li>
-<code>snapdist</code>: The distance in map units the site was
-moved.</li>
+<code>snapdist</code>: The Euclidean distance in map units the site
+was moved.</li>
 </ul>
 <p>The <code>rid</code> value provides information about where a site is
 in relation to all of the other edges and sites in an LSN, while the
 <code>ratio</code> value can be used to identify where <em>exactly</em>
-a site is on the edge. Note that to add sites to the LSN, the
-<code>sites_to_lsn</code> function must be run (even if the site
-locations already intersect the edge features).</p>
+a site is on the edge. Note that the <code>sites_to_lsn</code> function
+must be run for each dataset, even if the site locations already
+intersect edge features.</p>
 <p>It is important to pay attention to the message output in the
-<em>R</em> console because it indicates how many of the sites were
-successfully snapped to the LSN. In this case, the message says
+<strong>R</strong> console because it indicates how many of the sites
+were successfully snapped to the LSN. In this case, the message says
 <code>Snapped 45 out of 45 sites to LSN</code>. If some sites were not
 snapped, the <code>snap_tolerance</code> value should be increased until
 all sites are snapped. The <code>snapdist</code> column can then be used
 to identify sites that were moved relatively large distances to ensure
 they were snapped to the correct edge.</p>
-<p>Prediction datasets store locations at which predictions from a
-spatial stream network model may be desired. Prediction datasets are
-optional but must also be added to the LSN using
-<code><a href="../reference/sites_to_lsn.html">sites_to_lsn()</a></code>. We add the <code>MF_pred1km</code> and
+<p>Prediction datasets (optional) represent spatial locations where
+predictions from a spatial stream-network model may be desired. They are
+optional, but must also be incorporated into the LSN using
+<code><a href="../reference/sites_to_lsn.html">sites_to_lsn()</a></code> before predictions can be made using a
+fitted model. We add the <code>MF_pred1km</code> and
 <code>MF_capehorn</code> prediction datasets to the LSN by running</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">preds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sites_to_lsn.html">sites_to_lsn</a></span><span class="op">(</span></span>
 <span>  sites <span class="op">=</span> <span class="va">MF_pred1km</span>,</span>
 <span>  edges <span class="op">=</span> <span class="va">edges</span>,</span>
+<span>  save_local <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  lsn_path <span class="op">=</span> <span class="va">lsn.path</span>,</span>
 <span>  file_name <span class="op">=</span> <span class="st">"pred1km.gpkg"</span>,</span>
 <span>  snap_tolerance <span class="op">=</span> <span class="fl">100</span>,</span>
@@ -470,13 +469,14 @@ optional but must also be added to the LSN using
 <span><span class="va">capehorn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sites_to_lsn.html">sites_to_lsn</a></span><span class="op">(</span></span>
 <span>  sites <span class="op">=</span> <span class="va">MF_CapeHorn</span>,</span>
 <span>  edges <span class="op">=</span> <span class="va">edges</span>,</span>
+<span>  save_local <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  lsn_path <span class="op">=</span> <span class="va">lsn.path</span>,</span>
 <span>  file_name <span class="op">=</span> <span class="st">"CapeHorn.gpkg"</span>,</span>
 <span>  snap_tolerance <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Note that a LSN can contain an unlimited number of prediction
-datasets (but only one set of observations). The
+datasets, but only one set of observations. The
 <code>sites_to_lsn</code> function must be run separately for every
 observed and prediction dataset. While this may at first seem tedious,
 it provides the user the opportunity to examine each output dataset
@@ -500,13 +500,18 @@ six components. The edges, nodes, and observed sites contain the spatial
 features and attribute data <em>within</em> each dataset, while the
 three tables (nodexy, noderelationships, and relationships) describe the
 relationships <em>between</em> edges and sites. These tables are not
-stored in memory but are accessed by subsequent <code>SSNbler</code>
-functions. Prediction datasets may also be included in the LSN if
-desired.</p>
+stored in memory but are accessed by subsequent ‘SSNbler’ functions.
+Prediction datasets may also be included in the LSN if desired. By
+default, all ‘SSNbler’ functions will update the files stored locally in
+<code>lsn_path</code> <em>and</em> return an updated <code>sf</code>
+object. However, the <code>save_local</code> argument can be set to
+FALSE in most functions if the user would prefer not to save results
+locally.</p>
 <table class="table">
-<caption>LSN components are stored in memory as sf objects and also in a
-local LSN directory as GeoPackages and comma separated value (csv)
-files, which are accessed using other SSNbler functions.</caption>
+<caption>LSN components are stored in memory as <code>sf</code> objects
+and also in a local LSN directory as GeoPackages and comma separated
+value (csv) files, which are accessed using other SSNbler
+functions.</caption>
 <colgroup>
 <col width="32%">
 <col width="38%">
@@ -573,7 +578,7 @@ upDist_j = \sum_{k \in D_j}{L_k},
 \]</span></p>
 <p>where <span class="math inline">\(L_j\)</span> is the length of each
 edge and <span class="math inline">\(D_j\)</span> is the set of edges
-found in the path between the network outlet and the <span class="math inline">\(j\)</span>th edge. Note that the <span class="math inline">\(j\)</span>th edge is included in <span class="math inline">\(D_j\)</span> (including the <span class="math inline">\(j\)</span>th edge).</p>
+found in the path between the network outlet and the <span class="math inline">\(j\)</span>th edge, including the <span class="math inline">\(j\)</span>th edge.</p>
 <p>The upstream distance for each edge is calculated using the
 <code><a href="../reference/updist_edges.html">updist_edges()</a></code> function, which generally requires these
 arguments:</p>
@@ -582,8 +587,13 @@ arguments:</p>
 <code>edges</code>: An <code>sf</code> object containing the edges
 in the LSN generated using <code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code>.</li>
 <li>
+<code>save_local</code>: A logical indicating whether the updated
+edges should be saved to <code>lsn_path</code> in GeoPackage format.
+Default is TRUE.</li>
+<li>
 <code>lsn_path</code>: <code>LSN</code> pathname where
-<code>edges</code> and <code>relationships.csv</code> are stored.</li>
+<code>edges</code> and <code>relationships.csv</code> are stored
+locally.</li>
 <li>
 <code>calc_length</code>: A logical indicating whether a column
 representing line length should be calculated and added to
@@ -594,11 +604,12 @@ edited.</li>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/updist_edges.html">updist_edges</a></span><span class="op">(</span></span>
 <span>  edges <span class="op">=</span> <span class="va">edges</span>,</span>
+<span>  save_local <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  lsn_path <span class="op">=</span> <span class="va">lsn.path</span>,</span>
 <span>  calc_length <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edges</span><span class="op">)</span>           <span class="co">## View edges column names</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edges</span><span class="op">)</span> <span class="co">## View edges column names</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;  [1] "rid"        "COMID"      "GNIS_NAME"  "REACHCODE"  "FTYPE"     </span></span>
 <span><span class="co">#&gt;  [6] "FCODE"      "AREAWTMAP"  "SLOPE"      "rcaAreaKm2" "h2oAreaKm2"</span></span>
 <span><span class="co">#&gt; [11] "Length"     "upDist"     "geometry"</span></span></code></pre>
@@ -611,7 +622,7 @@ each <em>site</em>. The upstream distance for site <span class="math inline">\(i
 upDist_i = r_i L_i + \sum_{k \in D^*_j}{L_k},
 \]</span></p>
 <p>where <span class="math inline">\(r_i\)</span> is the
-<code>ratio</code> value for <span class="math inline">\(site_i\)</span>, <span class="math inline">\(L_i\)</span> is the length of the edge <span class="math inline">\(site_i\)</span> resides on, and <span class="math inline">\(D^*_k\)</span> is the set of edges found in the
+<code>ratio</code> value for <span class="math inline">\(site_i\)</span>, <span class="math inline">\(L_i\)</span> is the length of the edge <span class="math inline">\(site_i\)</span> resides on, and <span class="math inline">\(D^*_j\)</span> is the set of edges found in the
 path between the network outlet and <span class="math inline">\(site_i\)</span>, excluding the edge <span class="math inline">\(site_i\)</span> resides on.</p>
 <p>Upstream distance is calculated for each site using the
 <code><a href="../reference/updist_sites.html">updist_sites()</a></code> function, which generally requires a few
@@ -627,23 +638,33 @@ that have been processed using <code>lines_to_ssn()</code> and
 <code><a href="../reference/updist_edges.html">updist_edges()</a></code>.</li>
 <li>
 <code>length_col</code>: The name of the column in
-<code>edges</code> that represents edge.</li>
+<code>edges</code> that represents edge length.</li>
+<li>
+<code>save_local</code>: A logical indicating whether the updated
+sites should be saved to <code>lsn_path</code> in GeoPackage format.
+Default is TRUE.</li>
 <li>
 <code>lsn_path</code>: The LSN pathname where the <code>sites</code>
-and <code>edges</code> reside.</li>
+and <code>edges</code> GeoPackages reside. Must be specified if
+<code>save_local</code> is TRUE.</li>
 </ul>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">site.list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/updist_sites.html">updist_sites</a></span><span class="op">(</span></span>
-<span>  sites <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>obs <span class="op">=</span> <span class="va">obs</span>, pred1km <span class="op">=</span> <span class="va">preds</span>, CapeHorn <span class="op">=</span> <span class="va">capehorn</span><span class="op">)</span>,</span>
+<span>  sites <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    obs <span class="op">=</span> <span class="va">obs</span>,</span>
+<span>    pred1km <span class="op">=</span> <span class="va">preds</span>,</span>
+<span>    CapeHorn <span class="op">=</span> <span class="va">capehorn</span></span>
+<span>  <span class="op">)</span>,</span>
 <span>  edges <span class="op">=</span> <span class="va">edges</span>,</span>
-<span>  length_col<span class="op">=</span> <span class="st">"Length"</span>,</span>
+<span>  length_col <span class="op">=</span> <span class="st">"Length"</span>,</span>
+<span>  save_local <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  lsn_path <span class="op">=</span> <span class="va">lsn.path</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">)</span>           <span class="co">## View output site.list names</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">)</span> <span class="co">## View output site.list names</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "obs"      "pred1km"  "CapeHorn"</span></span></code></pre>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">$</span><span class="va">obs</span><span class="op">)</span>       <span class="co">## View column names in obs</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">$</span><span class="va">obs</span><span class="op">)</span> <span class="co">## View column names in obs</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;  [1] "rid"        "STREAMNAME" "COMID"      "AREAWTMAP"  "SLOPE"     </span></span>
 <span><span class="co">#&gt;  [6] "ELEV_DEM"   "Source"     "Summer_mn"  "MaxOver20"  "C16"       </span></span>
 <span><span class="co">#&gt; [11] "C20"        "C24"        "FlowCMS"    "AirMEANc"   "AirMWMTc"  </span></span>
@@ -651,43 +672,39 @@ and <code>edges</code> reside.</li>
 <span><span class="co">#&gt; [21] "upDist"</span></span></code></pre>
 <p>The data stored in <code>upDist</code> are later used to calculate
 the directional hydrologic distances between observed and prediction
-locations in the <code>SSN2</code> package. If we plot the edges and
-observations, assigning color based on the <code>upDist</code> column,
-it is apparent that the upstream distance increases from the outlet to
-headwater streams, as expected.</p>
+locations in the ‘SSN2’ package. If we plot the edges and observations,
+assigning color based on the <code>upDist</code> column, it is apparent
+that the upstream distance increases from the outlet to headwater
+streams, as expected.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">edges</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">upDist</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">site.list</span><span class="op">$</span><span class="va">obs</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">upDist</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">coord_sf</a></span><span class="op">(</span>datum <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">MF_streams</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_color_viridis_c</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="introduction_files/figure-html/unnamed-chunk-9-1.png" alt="Upstream Distance." width="75%"><p class="caption">
-Upstream Distance.
-</p>
-</div>
+<p><img src="introduction_files/figure-html/plot_updist-1.png" alt="Upstream Distance." width="75%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="calculating-additive-function-values-afvs">Calculating Additive Function Values (AFVs)<a class="anchor" aria-label="anchor" href="#calculating-additive-function-values-afvs"></a>
 </h2>
-<p>Spatial weights are used when fitting statistical models with
-<code>SSN2</code> to split the tail-up covariance function upstream of
-network confluences, which allows for the disproportionate influence of
-one upstream edge over another (e.g., a large stream channel converges
-with a smaller one) on downstream values. Calculating the spatial
-weights is a three-step process: 1) calculating the segment proportional
-influence (PI), 2) calculating the additive function values (AFVs), and
-3) calculating the spatial weights. Steps 1) and 2) are undertaken in
-<code>SSNbler</code>, while Step 3) is calculated in the package
-<code>SSN2</code> when spatial stream-network models are fit.</p>
+<p>Spatial weights are used to split the tail-up covariance function
+upstream of network confluences, which allows for the disproportionate
+influence of one upstream edge over another (e.g., a large stream
+channel converges with a smaller one) on downstream values. Calculating
+the spatial weights is a three-step process: 1) calculating the segment
+proportional influence (PI), 2) calculating the additive function values
+(AFVs), and 3) calculating the spatial weights. Steps 1) and 2) are
+undertaken in ‘SSNbler’, while Step 3) is calculated in the package
+‘SSN2’ when spatial stream-network models are fit.</p>
 <p>The segment PI for each edge, <span class="math inline">\(\omega_j\)</span>, is defined as the relative
 influence of the <span class="math inline">\(j\)</span>th edge feature
 on the edge directly downstream. In the following example, <span class="math inline">\(\omega_j\)</span> is based on cumulative watershed
 area for the downstream node of each edge, <span class="math inline">\(A_j\)</span>, which is used as a surrogate for
 flow volume. However, simpler measures could be used, such as Shreve’s
 stream order (Shreve 1966) or equal weighting, as long as a value exists
-for every line feature in <code>edges</code> (i.e., missing data are not
-allowed). It is also preferable to use a column that does not contain
-values equal to zero, which we explain in more detail below.</p>
+for every line feature in edges (i.e., missing data are not allowed). It
+is also preferable to use a column that does not contain values equal to
+zero, which we explain in more detail below.</p>
 <p>When two edges, denoted <span class="math inline">\(j\)</span> and
 <span class="math inline">\(k\)</span>, converge at a node, the segment
 PI for the <span class="math inline">\(j\)</span>th edge is:</p>
@@ -699,8 +716,8 @@ the PI values for edges directly upstream of a single node always sum to
 one. Also note that <span class="math inline">\(\omega_j=0\)</span> when
 <span class="math inline">\(A_j=0\)</span>.</p>
 <p>The AFVs for the <span class="math inline">\(j\)</span>th edge, <span class="math inline">\(AFV_j\)</span>, is equal to the product of the
-segment PIs found in the path between the edge and the network outlet
-(including edge <span class="math inline">\(j\)</span> itself).</p>
+segment PIs found in the path between the edge and the network outlet,
+including edge <span class="math inline">\(j\)</span> itself.</p>
 <p><span class="math display">\[
 AFV_j = \prod_{k \in D_j}{\omega_k}.
 \]</span></p>
@@ -729,6 +746,10 @@ segment PI values are stored.</li>
 <li>
 <code>afv_col</code>: The name of the new column in edges where AFVs
 are stored.</li>
+<li>
+<code>save_local</code>: A logical indicating whether the updated
+edges should be saved to <code>lsn_path</code> in GeoPackage format.
+Default is TRUE.</li>
 </ul>
 <p>Note that we use a variable representing cumulative watershed area
 that is already present in <code>edges</code> (<code>h2oAreaKm2</code>)
@@ -740,22 +761,22 @@ to create the segment PI values:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/afv_edges.html">afv_edges</a></span><span class="op">(</span></span>
 <span>  edges <span class="op">=</span> <span class="va">edges</span>,</span>
-<span>  infl_col <span class="op">=</span> <span class="st">"h2oAreaKm2"</span>, </span>
+<span>  infl_col <span class="op">=</span> <span class="st">"h2oAreaKm2"</span>,</span>
 <span>  segpi_col <span class="op">=</span> <span class="st">"areaPI"</span>,</span>
 <span>  afv_col <span class="op">=</span> <span class="st">"afvArea"</span>,</span>
 <span>  lsn_path <span class="op">=</span> <span class="va">lsn.path</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edges</span><span class="op">)</span>            <span class="co">## Look at edges column names</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edges</span><span class="op">)</span> <span class="co">## Look at edges column names</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;  [1] "rid"        "COMID"      "GNIS_NAME"  "REACHCODE"  "FTYPE"     </span></span>
 <span><span class="co">#&gt;  [6] "FCODE"      "AREAWTMAP"  "SLOPE"      "rcaAreaKm2" "h2oAreaKm2"</span></span>
 <span><span class="co">#&gt; [11] "Length"     "upDist"     "areaPI"     "afvArea"    "geometry"</span></span></code></pre>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">edges</span><span class="op">$</span><span class="va">afvArea</span><span class="op">)</span>  <span class="co">## Summarize the AFV column</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">edges</span><span class="op">$</span><span class="va">afvArea</span><span class="op">)</span> <span class="co">## Summarize the AFV column</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
 <span><span class="co">#&gt; 0.004709 0.026168 0.066095 0.160335 0.169575 1.000000</span></span></code></pre>
 <p>The AFVs are a product of ratios, which means that the AFVs are
-always between zero and one (<span class="math inline">\(0 \leq AFV \leq
+always between zero and one (<span class="math inline">\(0 \le AFV \le
 1\)</span>). The AFV for the most downstream edge in a network will
 always be one. If AFVs do not meet this requirement, then an error has
 occurred.</p>
@@ -765,7 +786,7 @@ site is equivalent to the AFV of the edge it resides on. If there are
 multiple sites on a single edge feature, their AFVs will be equal. Also
 note that when the AFV for the <span class="math inline">\(i\)</span>th
 site is zero, the covariance between data collected at the <span class="math inline">\(i\)</span>th site and every other site will also
-be zero. For more on additive function values, see <span class="citation">Ver Hoef and Peterson (2010)</span> and <span class="citation">E. Peterson and Ver Hoef (2010)</span>.</p>
+be zero. For more on additive function values, see <span class="citation">Ver Hoef &amp; Peterson (2010)</span> and <span class="citation">Peterson &amp; Ver Hoef (2010)</span>.</p>
 <p>The <code>afv_sites</code> function is used to create an AFV column
 in a list of observed and prediction sites. The inputs include:</p>
 <ul>
@@ -782,8 +803,12 @@ which contains <code>afv_col</code> created using
 <code>edges</code>. A new column with this name will be added to
 <code>sites</code>.</li>
 <li>
-<code>lsn_path</code>: The LSN pathname where the <code>sites</code>
-and <code>edges</code> reside.</li>
+<code>save_local</code>: If <code>TRUE</code> (the default), the
+updated sites are written to <code>lsn_path</code>.</li>
+<li>
+<code>lsn_path</code>: A path to the directory where the LSN created
+via <code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code> is stored. Required when
+<code>save_local = TRUE</code>.</li>
 </ul>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">site.list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/afv_sites.html">afv_sites</a></span><span class="op">(</span></span>
@@ -794,12 +819,12 @@ and <code>edges</code> reside.</li>
 <span>  lsn_path <span class="op">=</span> <span class="va">lsn.path</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">$</span><span class="va">pred1km</span><span class="op">)</span>            <span class="co">## View column names in pred1km</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">$</span><span class="va">pred1km</span><span class="op">)</span> <span class="co">## View column names in pred1km</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;  [1] "rid"        "COMID"      "AREAWTMAP"  "SLOPE"      "ELEV_DEM"  </span></span>
 <span><span class="co">#&gt;  [6] "FlowCMS"    "AirMEANc"   "AirMWMTc"   "rcaAreaKm2" "h2oAreaKm2"</span></span>
 <span><span class="co">#&gt; [11] "ratio"      "snapdist"   "upDist"     "afvArea"    "geometry"</span></span></code></pre>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">$</span><span class="va">pred1km</span><span class="op">$</span><span class="va">afvArea</span><span class="op">)</span>  <span class="co">## Summarize AFVs in pred1km and look for zeros</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">$</span><span class="va">pred1km</span><span class="op">$</span><span class="va">afvArea</span><span class="op">)</span> <span class="co">## Summarize AFVs in pred1km and look for zeros</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
 <span><span class="co">#&gt; 0.009894 0.031219 0.047469 0.104969 0.112882 1.000000</span></span></code></pre>
 <p>Each <code>sf</code> dataset in <code>sites.list</code> now has an
@@ -810,9 +835,8 @@ they are between zero and one.</p>
 <div class="section level2">
 <h2 id="assembling-the-ssn-object">Assembling the SSN Object<a class="anchor" aria-label="anchor" href="#assembling-the-ssn-object"></a>
 </h2>
-<p>The last data processing step is to assemble the SSN object using
-<code>ssn_assemble</code> so that it can be used to fit spatial
-stream-network models in <code>SSN2</code>.</p>
+<p>The last data processing step is to assemble the <code>SSN</code>
+object using the <code>ssn_assemble</code> function.</p>
 <p>The key arguments in <code><a href="../reference/ssn_assemble.html">ssn_assemble()</a></code> include:</p>
 <ul>
 <li>
@@ -823,23 +847,32 @@ that has been processed using <code><a href="../reference/lines_to_lsn.html">lin
 <code>lsn_path</code>: The LSN pathname where the <code>edges</code>
 and all observation and prediction site datasets reside.</li>
 <li>
-<code>obs_sites:</code> A single <code>sf</code> object representing
-observed sites, which has been processed using
+<code>obs_sites:</code> Optional. A single <code>sf</code> object
+representing observed sites, which has been processed using
 <code><a href="../reference/sites_to_lsn.html">sites_to_lsn()</a></code>, <code><a href="../reference/updist_sites.html">updist_sites()</a></code>, and
-<code><a href="../reference/afv_sites.html">afv_sites()</a></code>.</li>
+<code><a href="../reference/afv_sites.html">afv_sites()</a></code>. Default is is NULL.</li>
 <li>
-<code>preds_list</code>: A named list of one or more <code>sf</code>
-objects representing prediction site datasets that have been processed
-using <code><a href="../reference/sites_to_lsn.html">sites_to_lsn()</a></code>, <code><a href="../reference/updist_sites.html">updist_sites()</a></code>, and
-<code><a href="../reference/afv_sites.html">afv_sites()</a></code>.</li>
+<code>preds_list</code>: Optional. A named list of one or more
+<code>sf</code> objects representing prediction site datasets that have
+been processed using <code><a href="../reference/sites_to_lsn.html">sites_to_lsn()</a></code>,
+<code><a href="../reference/updist_sites.html">updist_sites()</a></code>, and <code><a href="../reference/afv_sites.html">afv_sites()</a></code>. Default is
+NULL.</li>
 <li>
-<code>ssn_path</code>: The path to a local directory where the files
-making up the new <code>SSN</code> object will be saved. If the
-<code>ssn_path</code> does not include a <code>.ssn</code> extension, it
-will be added.</li>
+<code>ssn_path</code>: The path to a local directory where the
+output files will be saved. A <code>.ssn</code> extension will be added
+if it is not included.</li>
 <li>
-<code>import</code>: Logical indicating whether the SSN object be
-automatically imported into <strong>R</strong>.</li>
+<code>import</code>: Logical indicating whether the output files
+should be imported and returned as an <code>SSN</code> object.</li>
+<li>
+<code>check</code>: Logical indicating whether the validity of the
+<code>SSN</code> object should be checked using
+<code><a href="../reference/ssn_check.html">ssn_check()</a></code>. Default is TRUE.</li>
+<li>
+<code>afv_col</code>: Character vector containing the names of the
+AFV columns that will be checked when <code>check = TRUE</code>. Columns
+must be present in <code>edges</code>, <code>obs_sites</code>, and
+<code>preds_list</code>, if they are included.</li>
 </ul>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mf04_ssn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssn_assemble.html">ssn_assemble</a></span><span class="op">(</span></span>
@@ -849,15 +882,21 @@ automatically imported into <strong>R</strong>.</li>
 <span>  preds_list <span class="op">=</span> <span class="va">site.list</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pred1km"</span>, <span class="st">"CapeHorn"</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>  ssn_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">path</span>, <span class="st">"/MiddleFork04.ssn"</span><span class="op">)</span>,</span>
 <span>  import <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  check <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  afv_col <span class="op">=</span> <span class="st">"afvArea"</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">mf04_ssn</span><span class="op">)</span>         <span class="co">## Get class</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; [1] "SSN"</span></span></code></pre>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; SSN object is valid: TRUE</span></span></code></pre>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">mf04_ssn</span><span class="op">)</span>         <span class="co">## print names of SSN object</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; [1] "edges" "obs"   "preds" "path"</span></span></code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">mf04_ssn</span><span class="op">)</span> <span class="co">## Get class</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; [1] "SSN"</span></span></code></pre>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">mf04_ssn</span><span class="op">$</span><span class="va">preds</span><span class="op">)</span>   <span class="co">## print names of prediction datasets</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">mf04_ssn</span><span class="op">)</span> <span class="co">## print names of SSN object</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; [1] "edges" "obs"   "preds" "path"</span></span></code></pre>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">mf04_ssn</span><span class="op">$</span><span class="va">preds</span><span class="op">)</span> <span class="co">## print names of prediction datasets</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "pred1km"  "CapeHorn"</span></span></code></pre>
 <p>The outputs of <code><a href="../reference/ssn_assemble.html">ssn_assemble()</a></code> are stored locally in a
 directory with a <code>.ssn</code> extension and in memory as an object
@@ -878,15 +917,15 @@ subnetwork in edges containing information describing the topological
 relationships between edges.</li>
 </ol>
 <p>When <code>import = TRUE</code>, the spatial data stored in the
-<code>.ssn</code> directory are imported into <em>R</em> and stored in
-memory as a <code>SSN</code> object. The <code>netIDx.dat</code> files
-are combined behind the scenes into an SQLite database named
-<code>binaryID.db</code>, which is saved in the <code>.ssn</code>
-directory. Most users will not need to access the
+<code>.ssn</code> directory are imported into <strong>R</strong> and
+stored in memory as an <code>SSN</code> object. The
+<code>netIDx.dat</code> files are combined behind the scenes into an
+SQLite database named <code>binaryID.db</code>, which is saved in the
+<code>.ssn</code> directory. Most users will not need to access the
 <code>binaryID.db</code> or the <code>netIDx.dat</code> files, but a
 more detailed description about how the topological relationships are
-stored can be found in <span class="citation">E. E. Peterson and Ver
-Hoef (2014)</span>.</p>
+stored can be found in <span class="citation">Peterson &amp; Ver Hoef
+(2014)</span>.</p>
 <p>The <code>SSN</code> object itself is a list containing four
 elements:</p>
 <ol style="list-style-type: decimal">
@@ -903,11 +942,20 @@ representing prediction site datasets.</li>
 <code>.ssn</code> where the <code>SSN</code> components are stored
 locally.</li>
 </ol>
+<p>Including observed sites is optional in <code>ssn_assemble</code> and
+when they are missing <code>obs</code> will contain <code>NA</code>
+rather than an <code>sf</code> object. Most users will likely include
+observations because they are needed to fit spatial statistical
+stream-network models. Nevertheless, this option provides the
+flexibility to include additional functionality in future ‘SSNbler’
+versions. More specifically to create an <code>SSN</code> object based
+on existing stream network data, generate artificial observed locations
+at various locations throughout the network, and simulate data at those
+locations using the ‘SSN2’ function <code>ssn_simulate</code>.</p>
 <p>The <code>path</code> element provides a critical link between the
 <code>.ssn</code> directory and the <code>SSN</code> object stored in R.
-This is important because the <code>SSN2</code> package reads and writes
-data to this directory during the spatial stream-network modelling
-workflow.</p>
+This is important because the ‘SSN2’ package reads and writes data to
+this directory during the spatial stream-network modelling workflow.</p>
 <p>The <code>ssn_assemble</code> function also adds several important
 columns to the edges, obs, and prediction datasets.</p>
 <ul>
@@ -958,25 +1006,24 @@ data, which in turn could change how relationships are represented in
 spatial stream-network models.</p>
 </div>
 <div class="section level2">
-<h2 id="plotting-a-ssn-object">Plotting a SSN Object<a class="anchor" aria-label="anchor" href="#plotting-a-ssn-object"></a>
+<h2 id="plotting-an-ssn-object">Plotting an SSN Object<a class="anchor" aria-label="anchor" href="#plotting-an-ssn-object"></a>
 </h2>
-<p>The <code>SSNbler</code> and <code>SSN2</code> packages do not
-include generic plotting functions for SSN objects because the
-functionality is already available in the package <code>ggplot2</code>.
-As an example, we create a plot of the SSN object. The edges are
-displayed in blue, with the linewidth proportional to cumulative
-watershed area column, <code>h2oAreaKm2</code>. The summer stream
-temperature observations (<code>Summer_mn</code>) are shown using the
-viridis color palette, with <code>pred1km</code> locations shown as
-smaller white dots:</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<p>The ‘SSNbler’ and ‘SSN2’ packages do not include generic plotting
+functions for <code>SSN</code> objects because the functionality is
+already available in the package ‘ggplot2’. As an example, we create a
+plot of the <code>SSN</code> object. The edges are displayed in blue,
+with the linewidth proportional to cumulative watershed area column,
+<code>h2oAreaKm2</code>. The summer stream temperature observations
+(<code>Summer_mn</code>) are shown using the viridis color palette, with
+<code>pred1km</code> locations shown as smaller white dots:</p>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">mf04_ssn</span><span class="op">$</span><span class="va">edges</span>,</span>
 <span>    color <span class="op">=</span> <span class="st">"medium blue"</span>,</span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="va">h2oAreaKm2</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_linewidth.html" class="external-link">scale_linewidth</a></span><span class="op">(</span>range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">2.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_linewidth.html" class="external-link">scale_linewidth</a></span><span class="op">(</span>range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">2.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">mf04_ssn</span><span class="op">$</span><span class="va">preds</span><span class="op">$</span><span class="va">pred1km</span>,</span>
 <span>    size <span class="op">=</span> <span class="fl">1.5</span>,</span>
@@ -985,10 +1032,11 @@ smaller white dots:</p>
 <span>    color <span class="op">=</span> <span class="st">"dark grey"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span></span>
-<span>    data <span class="op">=</span> <span class="va">mf04_ssn</span><span class="op">$</span><span class="va">obs</span>, </span>
+<span>    data <span class="op">=</span> <span class="va">mf04_ssn</span><span class="op">$</span><span class="va">obs</span>,</span>
 <span>    size <span class="op">=</span> <span class="fl">1.7</span>,</span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">Summer_mn</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">coord_sf</a></span><span class="op">(</span>datum <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">MF_streams</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_color_viridis_c</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"Temperature"</span>, linewidth <span class="op">=</span> <span class="st">"WS Area"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span></span>
@@ -996,20 +1044,49 @@ smaller white dots:</p>
 <span>    legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="introduction_files/figure-html/unnamed-chunk-13-1.png" alt="Mean summer stream temperature and cumulative watershed area." width="75%"><p class="caption">
+<img src="introduction_files/figure-html/plot_SSN-1.png" alt="Mean summer stream temperature and cumulative watershed area." width="75%"><p class="caption">
 Mean summer stream temperature (Temperature) and cumulative watershed
 area (WS AREA) for the Middle Fork stream network. Prediction locations
 are white circles.
 </p>
 </div>
 <p>Notice the different ways the sf objects for the edges, obs, and
-pred1km datasets are accessed in the SSN object and used for plotting in
-the calls to <code>geom_sf</code>. Any valid plotting function for sf
-objects and ggplot in general can be used to create attractive plots of
-SSN object components.</p>
+pred1km datasets are accessed in the <code>SSN</code> object and used
+for plotting in the calls to <code>geom_sf</code>. Any valid plotting
+function for sf objects and ggplot in general can be used to create
+attractive plots of <code>SSN</code> object components.</p>
 </div>
 <div class="section level2">
-<h2 id="creating-a-spatial-stream-network-model-using-ssn2">Creating a Spatial Stream Network Model Using SSN2<a class="anchor" aria-label="anchor" href="#creating-a-spatial-stream-network-model-using-ssn2"></a>
+<h2 id="incorporating-data-into-an-sf-or-ssn-object">Incorporating Data Into an sf or SSN Object<a class="anchor" aria-label="anchor" href="#incorporating-data-into-an-sf-or-ssn-object"></a>
+</h2>
+<p>The edges, observations, and prediction locations are stored as
+<code>sf</code> objects, which allows these data to be accessed,
+manipulated, deleted, or replaced in the same way as other
+<code>sf</code> objects. The <code>sf</code> objects found in an
+<code>SSN</code> object can be accessed just like an element in any
+named list. In this example, the edges and observed sites are accessed
+using calls to <code>mf04_ssn$edges</code> and
+<code>mf04_ssn$obs</code>, respectively. The prediction sites are
+accessed a bit differently (e.g. <code>mf04_ssn$preds$pred1km</code>)
+because <code>preds</code> is itself a named list.</p>
+<p>Users often want to incorporate additional data into the edges,
+observations, or prediction datasets to generate AFVs, for use as model
+covariates, or to create more meaningful plots. For example, the US
+EPA’s StreamCat database <span class="citation">(Hill, Weber, Leibowitz,
+R, &amp; Thornbrugh, 2015)</span> contains hundreds of variables
+describing stream segment characteristics in the conterminous US. It is
+relatively easy to join these and other data to the <code>sf</code>
+objects in <strong>R</strong> before or after the <code>SSN</code>
+object is assembled. An online search will show there are numerous
+functions available for joining an <code>sf</code> object to a variety
+of data formats (e.g. <code>data.frames</code>, <code>tibbles</code>,
+<code>vectors</code>, <code>sp</code> objects). However, if the result
+of the join is not an <code>sf</code> object, it must be converted to
+one before running additional functions in ‘SSNbler’ and ‘SSN2’ (see
+<code>st_as_sf</code> in the ‘sf’ package).</p>
+</div>
+<div class="section level2">
+<h2 id="fitting-a-spatial-stream-network-model-using-ssn2">Fitting a Spatial Stream Network Model Using SSN2<a class="anchor" aria-label="anchor" href="#fitting-a-spatial-stream-network-model-using-ssn2"></a>
 </h2>
 <p>We can now use the mf04_ssn object to fit a spatial stream-network
 model relating mean summer temperature to elevation
@@ -1019,9 +1096,13 @@ tail-down, and Gaussian Euclidean covariance functions. Notice that
 <code>additive = "afvArea"</code>, which is the column we created
 earlier using the <code>afv_edges</code> and <code>afv_sites</code>
 functions.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://usepa.github.io/SSN2/" class="external-link">SSN2</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Generate hydrologic distance matrices</span></span>
 <span><span class="fu"><a href="https://usepa.github.io/SSN2/reference/ssn_create_distmat.html" class="external-link">ssn_create_distmat</a></span><span class="op">(</span><span class="va">mf04_ssn</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Fit the model</span></span>
 <span><span class="va">ssn_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://usepa.github.io/SSN2/reference/ssn_lm.html" class="external-link">ssn_lm</a></span><span class="op">(</span></span>
 <span>  formula <span class="op">=</span> <span class="va">Summer_mn</span> <span class="op">~</span> <span class="va">ELEV_DEM</span> <span class="op">+</span> <span class="va">AREAWTMAP</span>,</span>
 <span>  ssn.object <span class="op">=</span> <span class="va">mf04_ssn</span>,</span>
@@ -1064,11 +1145,11 @@ functions.</p>
 &lt; 0.001\)</span>) that elevation is negatively related to mean summer
 temperature, while there is moderate evidence (<span class="math inline">\(p \approx 0.05\)</span>) that precipitation is
 negatively related to mean summer temperature. To learn more about
-fitting spatial stream-network models using the <code>SSN2</code>
-package, visit the package website at <a href="https://usepa.github.io/SSN2/" class="external-link">https://usepa.github.io/SSN2/</a>.</p>
+fitting spatial stream-network models using the ‘SSN2’ package, visit
+the package website at <a href="https://usepa.github.io/SSN2/" class="external-link">https://usepa.github.io/SSN2/</a>.</p>
 <!--# From STARS and openSTARS to SSNbler (ADD Later)
 
-| `STARS` Function Name | `openSTARS` Function Name | `SSNbler` Function Name |
+| `STARS` Function Name | `openSTARS` Function Name | 'SSNbler' Function Name |
 |:----------------------|:--------------------------|:------------------------|
 | text                  | text                      | `lines_to_lsn()`        |
 | text                  | text                      | `sites_to_lsn()`        |
@@ -1078,7 +1159,7 @@ package, visit the package website at <a href="https://usepa.github.io/SSN2/" cl
 <div class="section level2">
 <h2 class="unnumbered" id="r-code-appendix">R Code Appendix<a class="anchor" aria-label="anchor" href="#r-code-appendix"></a>
 </h2>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pet221/SSNbler" class="external-link">SSNbler</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/copy_streams_to_temp.html">copy_streams_to_temp</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/streamsdata"</span><span class="op">)</span></span>
@@ -1092,10 +1173,11 @@ package, visit the package website at <a href="https://usepa.github.io/SSN2/" cl
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">MF_streams</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">MF_CapeHorn</span>, color <span class="op">=</span> <span class="st">"gold"</span>, size <span class="op">=</span> <span class="fl">1.7</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">MF_pred1km</span>, colour <span class="op">=</span> <span class="st">"purple"</span>, size <span class="op">=</span> <span class="fl">1.7</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">MF_obs</span>, color <span class="op">=</span> <span class="st">"blue"</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">MF_obs</span>, color <span class="op">=</span> <span class="st">"blue"</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">coord_sf</a></span><span class="op">(</span>datum <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">MF_streams</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="st">"valid_nodes.png"</span><span class="op">)</span></span>
 <span><span class="co">## Set path for new folder for lsn</span></span>
-<span><span class="va">lsn.path</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/mf04"</span><span class="op">)</span></span>
+<span><span class="va">lsn.path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/mf04"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lines_to_lsn.html">lines_to_lsn</a></span><span class="op">(</span></span>
 <span>  streams <span class="op">=</span> <span class="va">MF_streams</span>,</span>
@@ -1117,6 +1199,7 @@ package, visit the package website at <a href="https://usepa.github.io/SSN2/" cl
 <span><span class="va">preds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sites_to_lsn.html">sites_to_lsn</a></span><span class="op">(</span></span>
 <span>  sites <span class="op">=</span> <span class="va">MF_pred1km</span>,</span>
 <span>  edges <span class="op">=</span> <span class="va">edges</span>,</span>
+<span>  save_local <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  lsn_path <span class="op">=</span> <span class="va">lsn.path</span>,</span>
 <span>  file_name <span class="op">=</span> <span class="st">"pred1km.gpkg"</span>,</span>
 <span>  snap_tolerance <span class="op">=</span> <span class="fl">100</span>,</span>
@@ -1126,6 +1209,7 @@ package, visit the package website at <a href="https://usepa.github.io/SSN2/" cl
 <span><span class="va">capehorn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sites_to_lsn.html">sites_to_lsn</a></span><span class="op">(</span></span>
 <span>  sites <span class="op">=</span> <span class="va">MF_CapeHorn</span>,</span>
 <span>  edges <span class="op">=</span> <span class="va">edges</span>,</span>
+<span>  save_local <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  lsn_path <span class="op">=</span> <span class="va">lsn.path</span>,</span>
 <span>  file_name <span class="op">=</span> <span class="st">"CapeHorn.gpkg"</span>,</span>
 <span>  snap_tolerance <span class="op">=</span> <span class="fl">100</span>,</span>
@@ -1133,38 +1217,43 @@ package, visit the package website at <a href="https://usepa.github.io/SSN2/" cl
 <span><span class="op">)</span></span>
 <span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/updist_edges.html">updist_edges</a></span><span class="op">(</span></span>
 <span>  edges <span class="op">=</span> <span class="va">edges</span>,</span>
+<span>  save_local <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  lsn_path <span class="op">=</span> <span class="va">lsn.path</span>,</span>
 <span>  calc_length <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edges</span><span class="op">)</span>           <span class="co">## View edges column names</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edges</span><span class="op">)</span> <span class="co">## View edges column names</span></span>
 <span><span class="va">site.list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/updist_sites.html">updist_sites</a></span><span class="op">(</span></span>
-<span>  sites <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>obs <span class="op">=</span> <span class="va">obs</span>, pred1km <span class="op">=</span> <span class="va">preds</span>, CapeHorn <span class="op">=</span> <span class="va">capehorn</span><span class="op">)</span>,</span>
+<span>  sites <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    obs <span class="op">=</span> <span class="va">obs</span>,</span>
+<span>    pred1km <span class="op">=</span> <span class="va">preds</span>,</span>
+<span>    CapeHorn <span class="op">=</span> <span class="va">capehorn</span></span>
+<span>  <span class="op">)</span>,</span>
 <span>  edges <span class="op">=</span> <span class="va">edges</span>,</span>
-<span>  length_col<span class="op">=</span> <span class="st">"Length"</span>,</span>
+<span>  length_col <span class="op">=</span> <span class="st">"Length"</span>,</span>
+<span>  save_local <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  lsn_path <span class="op">=</span> <span class="va">lsn.path</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">)</span>           <span class="co">## View output site.list names</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">$</span><span class="va">obs</span><span class="op">)</span>       <span class="co">## View column names in obs</span></span>
-<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">)</span> <span class="co">## View output site.list names</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">$</span><span class="va">obs</span><span class="op">)</span> <span class="co">## View column names in obs</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">edges</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">upDist</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">site.list</span><span class="op">$</span><span class="va">obs</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">upDist</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">coord_sf</a></span><span class="op">(</span>datum <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">MF_streams</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_color_viridis_c</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">edges</span><span class="op">$</span><span class="va">h2oAreaKm2</span><span class="op">)</span> <span class="co">## Summarize and check for zeros</span></span>
 <span></span>
 <span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/afv_edges.html">afv_edges</a></span><span class="op">(</span></span>
 <span>  edges <span class="op">=</span> <span class="va">edges</span>,</span>
-<span>  infl_col <span class="op">=</span> <span class="st">"h2oAreaKm2"</span>, </span>
+<span>  infl_col <span class="op">=</span> <span class="st">"h2oAreaKm2"</span>,</span>
 <span>  segpi_col <span class="op">=</span> <span class="st">"areaPI"</span>,</span>
 <span>  afv_col <span class="op">=</span> <span class="st">"afvArea"</span>,</span>
 <span>  lsn_path <span class="op">=</span> <span class="va">lsn.path</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edges</span><span class="op">)</span>            <span class="co">## Look at edges column names</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">edges</span><span class="op">$</span><span class="va">afvArea</span><span class="op">)</span>  <span class="co">## Summarize the AFV column</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edges</span><span class="op">)</span> <span class="co">## Look at edges column names</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">edges</span><span class="op">$</span><span class="va">afvArea</span><span class="op">)</span> <span class="co">## Summarize the AFV column</span></span>
 <span><span class="va">site.list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/afv_sites.html">afv_sites</a></span><span class="op">(</span></span>
 <span>  sites <span class="op">=</span> <span class="va">site.list</span>,</span>
 <span>  edges <span class="op">=</span> <span class="va">edges</span>,</span>
@@ -1173,9 +1262,8 @@ package, visit the package website at <a href="https://usepa.github.io/SSN2/" cl
 <span>  lsn_path <span class="op">=</span> <span class="va">lsn.path</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">$</span><span class="va">pred1km</span><span class="op">)</span>            <span class="co">## View column names in pred1km</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">$</span><span class="va">pred1km</span><span class="op">$</span><span class="va">afvArea</span><span class="op">)</span>  <span class="co">## Summarize AFVs in pred1km and look for zeros</span></span>
-<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">$</span><span class="va">pred1km</span><span class="op">)</span> <span class="co">## View column names in pred1km</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">$</span><span class="va">pred1km</span><span class="op">$</span><span class="va">afvArea</span><span class="op">)</span> <span class="co">## Summarize AFVs in pred1km and look for zeros</span></span>
 <span><span class="va">mf04_ssn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssn_assemble.html">ssn_assemble</a></span><span class="op">(</span></span>
 <span>  edges <span class="op">=</span> <span class="va">edges</span>,</span>
 <span>  lsn_path <span class="op">=</span> <span class="va">lsn.path</span>,</span>
@@ -1183,18 +1271,21 @@ package, visit the package website at <a href="https://usepa.github.io/SSN2/" cl
 <span>  preds_list <span class="op">=</span> <span class="va">site.list</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pred1km"</span>, <span class="st">"CapeHorn"</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>  ssn_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">path</span>, <span class="st">"/MiddleFork04.ssn"</span><span class="op">)</span>,</span>
 <span>  import <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  check <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  afv_col <span class="op">=</span> <span class="st">"afvArea"</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">mf04_ssn</span><span class="op">)</span>         <span class="co">## Get class</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">mf04_ssn</span><span class="op">)</span>         <span class="co">## print names of SSN object</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">mf04_ssn</span><span class="op">$</span><span class="va">preds</span><span class="op">)</span>   <span class="co">## print names of prediction datasets</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">mf04_ssn</span><span class="op">)</span> <span class="co">## Get class</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">mf04_ssn</span><span class="op">)</span> <span class="co">## print names of SSN object</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">mf04_ssn</span><span class="op">$</span><span class="va">preds</span><span class="op">)</span> <span class="co">## print names of prediction datasets</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">mf04_ssn</span><span class="op">$</span><span class="va">edges</span>,</span>
 <span>    color <span class="op">=</span> <span class="st">"medium blue"</span>,</span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="va">h2oAreaKm2</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_linewidth.html" class="external-link">scale_linewidth</a></span><span class="op">(</span>range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">2.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_linewidth.html" class="external-link">scale_linewidth</a></span><span class="op">(</span>range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">2.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">mf04_ssn</span><span class="op">$</span><span class="va">preds</span><span class="op">$</span><span class="va">pred1km</span>,</span>
 <span>    size <span class="op">=</span> <span class="fl">1.5</span>,</span>
@@ -1203,10 +1294,11 @@ package, visit the package website at <a href="https://usepa.github.io/SSN2/" cl
 <span>    color <span class="op">=</span> <span class="st">"dark grey"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span></span>
-<span>    data <span class="op">=</span> <span class="va">mf04_ssn</span><span class="op">$</span><span class="va">obs</span>, </span>
+<span>    data <span class="op">=</span> <span class="va">mf04_ssn</span><span class="op">$</span><span class="va">obs</span>,</span>
 <span>    size <span class="op">=</span> <span class="fl">1.7</span>,</span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">Summer_mn</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">coord_sf</a></span><span class="op">(</span>datum <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">MF_streams</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_color_viridis_c</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"Temperature"</span>, linewidth <span class="op">=</span> <span class="st">"WS Area"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span></span>
@@ -1214,7 +1306,11 @@ package, visit the package website at <a href="https://usepa.github.io/SSN2/" cl
 <span>    legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://usepa.github.io/SSN2/" class="external-link">SSN2</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Generate hydrologic distance matrices</span></span>
 <span><span class="fu"><a href="https://usepa.github.io/SSN2/reference/ssn_create_distmat.html" class="external-link">ssn_create_distmat</a></span><span class="op">(</span><span class="va">mf04_ssn</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Fit the model</span></span>
 <span><span class="va">ssn_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://usepa.github.io/SSN2/reference/ssn_lm.html" class="external-link">ssn_lm</a></span><span class="op">(</span></span>
 <span>  formula <span class="op">=</span> <span class="va">Summer_mn</span> <span class="op">~</span> <span class="va">ELEV_DEM</span> <span class="op">+</span> <span class="va">AREAWTMAP</span>,</span>
 <span>  ssn.object <span class="op">=</span> <span class="va">mf04_ssn</span>,</span>
@@ -1228,50 +1324,56 @@ package, visit the package website at <a href="https://usepa.github.io/SSN2/" cl
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0" line-spacing="2">
 <div id="ref-dumelle2024SSN2" class="csl-entry">
-Dumelle, Michael, Erin Peterson, Jay M. Ver Hoef, Alan Pearse, and Dan
-Isaak. 2023. <em><span>SSN2</span>: Spatial Modeling on Stream Networks
-in <span>R</span></em>.
+Dumelle, M., Peterson, E. E., Ver Hoef, J. M., Pearse, A. R., &amp;
+Isaak, D. J. (2024). <span>SSN2</span>: The next generation of spatial
+stream network modeling in <span>R</span>. <em>Journal of Open Source
+Software</em>, <em>9</em>(99), 6389. <a href="https://doi.org/10.21105/joss.06389" class="external-link">https://doi.org/10.21105/joss.06389</a>
+</div>
+<div id="ref-hill2015stream" class="csl-entry">
+Hill, R. A., Weber, M. H., Leibowitz, S. G., R, O. A., &amp; Thornbrugh,
+D. J. (2015). The stream-catchment (StreamCat) dataset: A database of
+watershed metrics for the conterminous united states. <em>Journal of the
+American Water Resources Association</em>, <em>52</em>(1), 120–128. <a href="https://doi.org/10.1111/1752-1688.12372" class="external-link">https://doi.org/10.1111/1752-1688.12372</a>
 </div>
 <div id="ref-pebesma2018sf" class="csl-entry">
-Pebesma, Edzer. 2018. <span>“<span class="nocase">Simple Features for R:
-Standardized Support for Spatial Vector Data</span>.”</span>
-<em><span>The R Journal</span></em> 10 (1): 439–46. <a href="https://doi.org/10.32614/RJ-2018-009" class="external-link">https://doi.org/10.32614/RJ-2018-009</a>.
+Pebesma, E. (2018). <span class="nocase">Simple Features for R:
+Standardized Support for Spatial Vector Data</span>. <em><span>The R
+Journal</span></em>, <em>10</em>(1), 439–446. <a href="https://doi.org/10.32614/RJ-2018-009" class="external-link">https://doi.org/10.32614/RJ-2018-009</a>
 </div>
 <div id="ref-peterson2014stars" class="csl-entry">
-Peterson, Erin E, and Jay Ver Hoef. 2014. <span>“STARS: An ArcGIS
-Toolset Used to Calculate the Spatial Information Needed to Fit Spatial
-Statistical Models to Stream Network Data.”</span> <em>Journal of
-Statistical Software</em> 56: 1–17.
-</div>
-<div id="ref-peterson2013modelling" class="csl-entry">
-Peterson, Erin E, Jay M Ver Hoef, Dan J Isaak, Jeffrey A Falke,
-Marie-Jose Fortin, Chris E Jordan, Kristina McNyset, et al. 2013.
-<span>“Modelling Dendritic Ecological Networks in Space: An Integrated
-Network Perspective.”</span> <em>Ecology Letters</em> 16 (5): 707–19.
+Peterson, E. E., &amp; Ver Hoef, J. (2014). STARS: An ArcGIS toolset
+used to calculate the spatial information needed to fit spatial
+statistical models to stream network data. <em>Journal of Statistical
+Software</em>, <em>56</em>, 1–17.
 </div>
 <div id="ref-peterson2010mixed" class="csl-entry">
-Peterson, Erin, and Jay Ver Hoef. 2010. <span>“A Mixed-Model
-Moving-Average Approach to Geostatistical Modeling in Stream
-Networks.”</span> <em>Ecology</em> 91 (3): 644–51.
+Peterson, E. E., &amp; Ver Hoef, J. M. (2010). A mixed-model
+moving-average approach to geostatistical modeling in stream networks.
+<em>Ecology</em>, <em>91</em>(3), 644–651.
+</div>
+<div id="ref-peterson2013modelling" class="csl-entry">
+Peterson, E. E., Ver Hoef, J. M., Isaak, D. J., Falke, J. A., Fortin,
+M.-J., Jordan, C. E., … Wenger, S. J. (2013). Modelling dendritic
+ecological networks in space: An integrated network perspective.
+<em>Ecology Letters</em>, <em>16</em>(5), 707–719.
 </div>
 <div id="ref-theobald2006functional" class="csl-entry">
-Theobald, David M, John B Norman, E Peterson, S Ferraz, A Wade, and MR
-Sherburne. 2006. <span>“Functional Linkage of Water Basins and Streams
-(FLoWS) V1 User’s Guide: ArcGIS Tools for Network-Based Analysis of
-Freshwater Ecosystems.”</span> <em>Natural Resource Ecology Lab,
-Colorado State University, Fort Collins, CO</em> 43.
+Theobald, D. M., Norman, J. B., Peterson, E., Ferraz, S., Wade, A.,
+&amp; Sherburne, M. (2006). Functional linkage of water basins and
+streams (FLoWS) v1 user’s guide: ArcGIS tools for network-based analysis
+of freshwater ecosystems. <em>Natural Resource Ecology Lab, Colorado
+State University, Fort Collins, CO</em>, <em>43</em>.
 </div>
 <div id="ref-ver2010moving" class="csl-entry">
-Ver Hoef, Jay M, and Erin E Peterson. 2010. <span>“A Moving Average
-Approach for Spatial Statistical Models of Stream Networks.”</span>
-<em>Journal of the American Statistical Association</em> 105 (489):
-6–18.
+Ver Hoef, J. M., &amp; Peterson, E. E. (2010). A moving average approach
+for spatial statistical models of stream networks. <em>Journal of the
+American Statistical Association</em>, <em>105</em>(489), 6–18.
 </div>
 <div id="ref-wickham2016ggplot2" class="csl-entry">
-Wickham, Hadley. 2016. <em>Ggplot2: Elegant Graphics for Data
-Analysis</em>. Springer-Verlag New York. <a href="https://ggplot2.tidyverse.org" class="external-link">https://ggplot2.tidyverse.org</a>.
+Wickham, H. (2016). <em>ggplot2: Elegant graphics for data
+analysis</em>. Springer-Verlag New York. Retrieved from <a href="https://ggplot2.tidyverse.org" class="external-link">https://ggplot2.tidyverse.org</a>
 </div>
 </div>
 </div>

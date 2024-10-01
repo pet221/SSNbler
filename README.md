@@ -1,9 +1,11 @@
 <!-- badges: start -->
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![R-CMD-check](https://github.com/pet221/SSNbler/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/pet221/SSNbler/actions/workflows/R-CMD-check.yaml)
+[![CRAN](http://www.r-pkg.org/badges/version/SSNbler)](https://cran.r-project.org/package=SSNbler)
+[![cran checks](https://badges.cranchecks.info/worst/SSNbler.svg)](https://cran.r-project.org/web/checks/check_results_SSNbler.html)
 <!-- badges: end -->
 
-# SSNbler: Assemble SSN objects in R
+# SSNbler: Assemble 'SSN' objects
 
 'SSNbler' imports, creates and assembles data needed to fit spatial-statistical stream-network models using the [SSN2 R package](https://usepa.github.io/SSN2/). Streams, observations, and prediction locations are represented as simple features and specific tools have been provided to define topological relationships between features; calculate the hydrologic distances (with flow-direction preserved) and the spatial additive function used to weight converging stream segments; and export the topological, spatial, and attribute information to an SSN object, which can be efficiently stored, accessed and analysed in R.  
 
