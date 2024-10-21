@@ -73,7 +73,7 @@ ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TR
   empty.edges <- sum(st_is_empty(ssn.object$edges))
 
   if (empty.edges > 0) {
-    out.message <- paste0(out.message, "edges contain missing geometries. Use sf:st_is_empty() to identify these line features.\n")
+    out.message <- paste0(out.message, "edges contain missing geometries. Use sf::st_is_empty() to identify these line features.\n")
     valid <- FALSE
   }
 
@@ -149,7 +149,7 @@ ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TR
     if (empty.obs > 0) {
       out.message <- paste0(
         out.message,
-        "obs contain missing geometries. Use sf:st_is_empty() to identify these point features.\n"
+        "obs contain missing geometries. Use sf::st_is_empty() to identify these point features.\n"
       )
       valid <- FALSE
     }
@@ -227,7 +227,7 @@ ssn_check <- function(ssn.object, check_obs = TRUE, afv_col = NULL, verbose = TR
       if (empty.preds > 0) {
         out.message <- paste0(
           out.message, pred.names[p],
-          " contains missing geometries. Use sf:st_is_empty() to identify these point features.\n"
+          " contains missing geometries. Use sf::st_is_empty() to identify these point features.\n"
         )
         valid <- FALSE
       }

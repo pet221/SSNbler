@@ -212,6 +212,8 @@ lines_to_lsn <- function(streams, lsn_path,
 
   if (verbose == TRUE) message("Building Edge Relationships ...\n")
 
+
+
   ##### SLOW VERSION WITHOUT ERROR
   ## First and last point of each last segment, stored as an SF object
   ## from_point <- st_line_sample(st_transform(in_edges, epsg), sample = 0)
@@ -311,7 +313,7 @@ lines_to_lsn <- function(streams, lsn_path,
   )
 
   ## Check topology at this step, if it's been asked for
-  if (check_topology) {
+    if (check_topology) {
     ## Print message
     if (verbose == TRUE) message("Checking network topology\n")
 
