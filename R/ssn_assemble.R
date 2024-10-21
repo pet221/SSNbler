@@ -21,8 +21,8 @@
 #' @param check Logical indicating whether the validity of the
 #'   `SSN` should be checked using \code{[ssn_check]} when both
 #'   \code{import = TRUE} and \code{verbose = TRUE}. Default = \code{TRUE}.
-#' @param afv_col Character vector containing the names of the
-#'   additive function value columns that will be checked when
+#' @param afv_col Character vector containing the name(s) of the
+#'   additive function value column(s) that will be checked when
 #'   \code{check = TRUE}. Columns must be present in \code{edges},
 #'   \code{obs_sites} and \code{preds_list}, if all are
 #'   included. Default is \code{NULL}.
@@ -30,7 +30,7 @@
 #'   already exists, the contents of \code{ssn_path} will be
 #'   overwritten. Defaults to \code{FALSE}.
 #' @param verbose Logical. Indicates whether messages about the
-#'   function progress and object validity check (when \code{check = TRUE} should be printed to the console. Defaults to
+#'   function progress and object validity check (when \code{check = TRUE}) should be printed to the console. Defaults to
 #'   \code{TRUE}.
 #'
 #' @details The \code{SSNbler} package is used to generate the
@@ -719,22 +719,22 @@ ssn_assemble <- function(edges, lsn_path = NULL, obs_sites = NULL,
     createBinaryID(ssnlist, overwrite = overwrite)
 
     ## ## Check the SSN object
-    if (check == TRUE & verbose == TRUE) {
+    if (check == TRUE) {
 
         message("\nChecking the SSN object")
 
 
-      if (obs.exist) {
-          check.msg <- ssn_check(ssnlist,
+        if (obs.exist) {
+            check.msg <- ssn_check(ssnlist,
                                  afv_col = afv_col,
                                  verbose = verbose)
-      } else {
-        check.msg <- ssn_check(ssnlist,
-          check_obs = FALSE,
-          afv_col = afv_col,
-          verbose = verbose
-        )
-      }
+        } else {
+            check.msg <- ssn_check(ssnlist,
+                                   check_obs = FALSE,
+                                   afv_col = afv_col,
+                                   verbose = verbose
+                                   )
+        }
         cat(check.msg)
 
     }
