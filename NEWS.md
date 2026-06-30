@@ -1,3 +1,15 @@
+# SSNbler 1.1.1.9000
+
+## Minor updates
+* Fixed typo in lines_to_lsn() error message.
+
+## Major updates
+
+## Bug fixes
+
+
+
+
 # SSNbler 1.1.1
 
 ## Minor updates

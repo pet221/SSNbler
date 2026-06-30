@@ -160,12 +160,12 @@ lines_to_lsn <- function(streams,
     stop("snap_tolerance and topo_tolerance must be >= 0")
   }
   
-  ## Check that snap_tolerance > length of shortest line
+  ## Check that snap_tolerance < length of shortest line
   if(check_topology == TRUE & snap_tolerance > 0) {
   	sm_edges<- sum(as.numeric(st_length(in_edges)) < snap_tolerance)
   	
   	if(sm_edges > 0) {
-  		stop("snap_tolerance must be > than the length of the smallest line feature in streams. Use sf::st_length() to obtain line feature lengths.")
+  		stop("snap_tolerance must be < than the length of the smallest line feature in streams. Use sf::st_length() to obtain line feature lengths.")
   	}
   	
   }
