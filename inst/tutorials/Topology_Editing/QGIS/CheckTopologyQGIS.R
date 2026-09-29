@@ -34,7 +34,7 @@ lsn_path1<- "c:/temp/topology/work/lsn1"
 edges<- lines_to_lsn(
   streams = river_net,
   lsn_path = lsn_path1, 
-  snap_tolerance = 1,    ## Must be > min line length
+  snap_tolerance = 1,    ## Must be < min line length
   check_topology = TRUE,
   topo_tolerance = 20, 
   overwrite = TRUE,
