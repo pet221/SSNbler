@@ -50,7 +50,7 @@ files sharing the same names as the outputs exist in the
 
 \item{use_parallel}{Logical. if \code{TRUE} parallel processing will be used. Default is \code{FALSE}.}
 
-\item{no_cores}{Integer representing the number of cores used when \code{use_parallel = TRUE}.}
+\item{no_cores}{Integer representing the number of cores to use in parallel processing. Default is \code{NULL}. When \code{use_parallel = TRUE}, \code{no_cores} is required and must be > 0.}
 
 \item{verbose}{Logical. If \code{TRUE}, messages describing
 function progress will be printed to the console. Default is
@@ -114,5 +114,7 @@ idea to set the \code{snap_tolerance} to a relatively small value
 compared to the \code{topo_tolerance} argument. Nodes separated by
 a Euclidean distance <= \code{snap_tolerance} are assumed to be
 connected.  If this distance <= snap_tolerance, the nodes
-are automatically snapped when \code{check_topology = TRUE}. Similarly, when snap_tolerance < distance <= topo_tolerance, nodes are flagged as potential errors. Note that \code{snap_tolerance} must always be < the length of the shortest line feature found in \code{streams}. Use the \code{\link[sf]{st_length}} to obtain and check the length of each line feature.
+are automatically snapped when \code{check_topology = TRUE}. Similarly, when snap_tolerance < distance <= topo_tolerance, nodes are flagged as potential errors.
+
+WARNING: \code{snap_tolerance} must always be less than the length of the shortest line feature found in \code{streams}. Use the \code{\link[sf]{st_length}} to obtain and check the minimum length of the line features.
 }

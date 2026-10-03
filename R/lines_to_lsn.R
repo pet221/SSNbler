@@ -27,8 +27,8 @@
 #'   overwrite existing files with the same names. If \code{FALSE} and
 #'   files sharing the same names as the outputs exist in the
 #'   \code{lsn_path}, the function will exit early with an error.
-#' @param no_cores Integer representing the number of cores used when \code{use_parallel = TRUE}.
-#' @param use_parallel Logical. if \code{TRUE} parallel processing will be used. Default is \code{FALSE}.
+#' @param use_parallel Logical. if \code{TRUE} parallel processing will be used. Default is \code{FALSE}. 
+#' @param no_cores Integer representing the number of cores to use in parallel processing. Default is \code{NULL}. When \code{use_parallel = TRUE}, \code{no_cores} is required and must be > 0. 
 #' @param verbose Logical. If \code{TRUE}, messages describing
 #'   function progress will be printed to the console. Default is
 #'   \code{TRUE}.
@@ -80,7 +80,9 @@
 #' compared to the \code{topo_tolerance} argument. Nodes separated by
 #' a Euclidean distance <= \code{snap_tolerance} are assumed to be
 #' connected.  If this distance <= snap_tolerance, the nodes
-#' are automatically snapped when \code{check_topology = TRUE}. Similarly, when snap_tolerance < distance <= topo_tolerance, nodes are flagged as potential errors. Note that \code{snap_tolerance} must always be < the length of the shortest line feature found in \code{streams}. Use the \code{\link[sf]{st_length}} to obtain and check the length of each line feature. 
+#' are automatically snapped when \code{check_topology = TRUE}. Similarly, when snap_tolerance < distance <= topo_tolerance, nodes are flagged as potential errors. 
+#' 
+#' WARNING: \code{snap_tolerance} must always be less than the length of the shortest line feature found in \code{streams}. Use the \code{\link[sf]{st_length}} to obtain and check the minimum length of the line features. 
 #'
 #' @return An `sf` object representing edges in the LSN. The LSN, including edges.gpkg, nodes.gpkg, nodexy.csv, noderelationships.csv, and relationships.csv files, are saved locally to a directory defined by \code{lsn_path}. If \code{check_topology = TRUE} and topological errors are identified, then node_errors.gpkg is also saved to \code{lsn_path}.
 #'
@@ -101,7 +103,6 @@ lines_to_lsn <- function(streams,
 	##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
 	## Check Inputs ----
 	##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
-	
 	
 	# check sf object
   if (!inherits(streams, "sf")) {
@@ -170,8 +171,35 @@ lines_to_lsn <- function(streams,
   	
   }
 
+  # Check edge # and parallelization parameters
   if (inherits(in_edges, "sf")) n_edges <- nrow(in_edges)
   if (inherits(in_edges, "sfc")) n_edges <- length(in_edges)
+
+  if (!is.logical(use_parallel) || length(use_parallel) != 1 || is.na(use_parallel)) {
+  	stop("use_parallel must be a single TRUE or FALSE value.", call. = FALSE)
+  }
+  
+  if (use_parallel == TRUE) {
+  	if (!is.numeric(no_cores) || length(no_cores) != 1 || is.na(no_cores) ||
+  			no_cores < 1 || no_cores %% 1 != 0) {
+  		stop("no_cores must be a single whole number >= 1.", call. = FALSE)
+  	}
+  	
+  	avail.cores <- parallel::detectCores()
+  	if (!is.na(avail.cores) && no_cores > avail.cores) {
+  		stop("no_cores (", no_cores, ") exceeds the number of available cores (",
+  				 avail.cores, ").", call. = FALSE)
+  	}
+  }
+
+  # Maximum number of edges without parallelization
+  max.edges <- 46340
+  
+  if (n_edges >= max.edges && (!use_parallel || no_cores < 1)) {
+  	stop("in_edges contains ", n_edges, " edges, which is >= ", max.edges,
+  			 ". \nSet use_parallel = TRUE and no_cores >= 1.", call. = FALSE)
+  }
+  
 
   # check column names
   if ("rid" %in% colnames(in_edges)) {
