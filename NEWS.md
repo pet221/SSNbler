@@ -1,14 +1,14 @@
-# SSNbler 1.1.1.9000
+# SSNbler 1.1.2
 
 ## Minor updates
-* Fixed typo in lines_to_lsn() error message.
 
-## Major updates
+* Added informative error messages to lines_to_lsn(), ensuring that use_parallel = TRUE and no_cores > 0 when the number of line features in streams is > 46340.
+* Minor updates to the Introduction vignette.
+* Updates to Topology Editing and Delineating RCA tutorials.
 
 ## Bug fixes
 
-
-
+* Fixed typo in lines_to_lsn() error message.
 
 # SSNbler 1.1.1
 

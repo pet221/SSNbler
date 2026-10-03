@@ -20,7 +20,7 @@ install.packages("SSNbler")
 library(SSNbler)
 ```
 
-Install and load the most recent version of'SSNbler' from GitHub by running
+Install and load the most recent version of 'SSNbler' from GitHub by running
 ```r
 # Installing from GitHub requires you first install the remotes package
 install.packages("remotes")
