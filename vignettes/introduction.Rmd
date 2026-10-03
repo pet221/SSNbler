@@ -7,7 +7,7 @@ output:
   html_document:
     theme: flatly
     number_sections: true
-    highlighted: default
+    highlight: default
     toc: yes
     toc_float:
       collapsed: no
@@ -215,7 +215,7 @@ function, which generally requires these arguments:
 * `check_topology`: Logical indicating whether to check for
   topological errors in `streams`.
 * `snap_tolerance`: Two nodes separated by a Euclidean distance $\le$
-  `snap_tolerance` will be assumed connected. Distance is measured in map units (i.e., projection units for `streams`).
+  `snap_tolerance` will be assumed connected. Distance is measured in map units (i.e., projection units for `streams`). Must be < minimum line feature length in `streams`.
 * `topo_tolerance`: Two nodes separated by a Euclidean distance $\le$ `topo_tolerance` are flagged as potential topological errors in the network.
 
 We create a LSN associated with `MF_streams` by running
@@ -224,11 +224,14 @@ We create a LSN associated with `MF_streams` by running
 ## Set path for new folder for lsn
 lsn.path <- paste0(tempdir(), "/mf04")
 
+## Check minimum line feature length
+min(sf::st_length(MF_streams))
+
 edges <- lines_to_lsn(
   streams = MF_streams,
   lsn_path = lsn.path,
   check_topology = TRUE,
-  snap_tolerance = 0.05,
+  snap_tolerance = 0.05, # must be < min line length
   topo_tolerance = 20,
   overwrite = TRUE
 )
@@ -271,6 +274,8 @@ values to look for obvious errors, as described in the topology
 editing tutorials mentioned previously. If `node_errors.gpkg` was created, then potential
 topological errors were identified, which must be checked and
 corrected before moving on to the next spatial processing steps.
+
+Also notice that we checked the minimum line length in `MF_streams` before running `lines_to_lsn()`. It is important that the `snap_tolerance` distance provided is smaller than the shortest line feature's length; otherwise, the end nodes of a line feature will be snapped to each other, forming a loop and introducing new topological errors that are difficult to identify. 
 
 ## Incorporating Sites Into the Landscape Network
 
