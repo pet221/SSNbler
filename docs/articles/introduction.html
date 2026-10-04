@@ -6,20 +6,19 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>An Introduction to 'SSNbler': Assembling Spatial Stream Network (`SSN`) Objects in R • SSNbler</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="An Introduction to 'SSNbler': Assembling Spatial Stream Network (`SSN`) Objects in R">
-<meta property="og:description" content="SSNbler">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -33,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SSNbler</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.2</span>
       </span>
     </div>
 
@@ -45,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -62,7 +61,7 @@
 <li>
   <a href="https://github.com/pet221/SSNbler/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul>
@@ -73,7 +72,7 @@
 </div>
 <!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -213,7 +212,7 @@ network, observed sites, and prediction sites using the
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">MF_pred1km</span>, colour <span class="op">=</span> <span class="st">"purple"</span>, size <span class="op">=</span> <span class="fl">1.7</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">MF_obs</span>, color <span class="op">=</span> <span class="st">"blue"</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">coord_sf</a></span><span class="op">(</span>datum <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">MF_streams</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction_files/figure-html/Plot_MF-1.png" alt="The Middle Fork Stream Network." width="75%" style="display: block; margin: auto;"></p>
+<p><img src="introduction_files/figure-html/Plot_MF-1.png" class="r-plt" alt="The Middle Fork Stream Network." width="75%" style="display: block; margin: auto;"></p>
 <p>In the figure above, there are two subnetworks from
 <code>MF_Streams</code> (black lines). Point features from
 <code>MF_obs</code> (blue dots) and <code>MF_pred1km</code> (purple
@@ -254,7 +253,7 @@ problematic, an excessive number of pseudonodes can slow down
 geoprocessing operations for large datasets.</li>
 </ul>
 <div class="figure" style="text-align: center">
-<img src="valid_nodes.png" alt="Valid Nodes" width="50%"><p class="caption">
+<img src="valid_nodes.png" class="r-plt" alt="Valid Nodes" width="50%"><p class="caption">
 A landscape network (LSN). Nodes are denoted by blue circles, with the
 node category labelled. Edges are denoted by black arrows, with the
 arrow indicating flow direction (i.e., digitized direction).
@@ -297,14 +296,14 @@ not exist.</li>
 topological errors in <code>streams</code>.</li>
 <li>
 <code>snap_tolerance</code>: Two nodes separated by a Euclidean
-distance <span class="math inline">\(\le\)</span>
-<code>snap_tolerance</code> will be assumed connected. Distance is
-measured in map units (i.e., projection units for
-<code>streams</code>).</li>
+distance
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≤</mo><annotation encoding="application/x-tex">\le</annotation></semantics></math><code>snap_tolerance</code> will be assumed connected. Distance is
+measured in map units (i.e., projection units for <code>streams</code>).
+Must be &lt; minimum line feature length in <code>streams</code>.</li>
 <li>
 <code>topo_tolerance</code>: Two nodes separated by a Euclidean
-distance <span class="math inline">\(\le\)</span>
-<code>topo_tolerance</code> are flagged as potential topological errors
+distance
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≤</mo><annotation encoding="application/x-tex">\le</annotation></semantics></math><code>topo_tolerance</code> are flagged as potential topological errors
 in the network.</li>
 </ul>
 <p>We create a LSN associated with <code>MF_streams</code> by
@@ -313,11 +312,15 @@ running</p>
 <code class="sourceCode R"><span><span class="co">## Set path for new folder for lsn</span></span>
 <span><span class="va">lsn.path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/mf04"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lines_to_lsn.html">lines_to_lsn</a></span><span class="op">(</span></span>
+<span><span class="co">## Check minimum line feature length</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_measures.html" class="external-link">st_length</a></span><span class="op">(</span><span class="va">MF_streams</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; 16.55352 [m]</span></span></code></pre>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lines_to_lsn.html">lines_to_lsn</a></span><span class="op">(</span></span>
 <span>  streams <span class="op">=</span> <span class="va">MF_streams</span>,</span>
 <span>  lsn_path <span class="op">=</span> <span class="va">lsn.path</span>,</span>
 <span>  check_topology <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  snap_tolerance <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  snap_tolerance <span class="op">=</span> <span class="fl">0.05</span>, <span class="co"># must be &lt; min line length</span></span>
 <span>  topo_tolerance <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -370,6 +373,13 @@ the topology editing tutorials mentioned previously. If
 <code>node_errors.gpkg</code> was created, then potential topological
 errors were identified, which must be checked and corrected before
 moving on to the next spatial processing steps.</p>
+<p>Also notice that we checked the minimum line length in
+<code>MF_streams</code> before running <code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code>. It
+is important that the <code>snap_tolerance</code> distance provided is
+smaller than the shortest line feature’s length; otherwise, the end
+nodes of a line feature will be snapped to each other, forming a loop
+and introducing new topological errors that are difficult to
+identify.</p>
 </div>
 <div class="section level3">
 <h3 id="incorporating-sites-into-the-landscape-network">Incorporating Sites Into the Landscape Network<a class="anchor" aria-label="anchor" href="#incorporating-sites-into-the-landscape-network"></a>
@@ -408,7 +418,7 @@ which are saved in <code>lsn_path</code> in GeoPackage format.</li>
 </ul>
 <p>We run <code>sites_to_lsn</code> for the <code>MF_obs</code>
 (observed) data:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">obs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sites_to_lsn.html">sites_to_lsn</a></span><span class="op">(</span></span>
 <span>  sites <span class="op">=</span> <span class="va">MF_obs</span>,</span>
 <span>  edges <span class="op">=</span> <span class="va">edges</span>,</span>
@@ -455,7 +465,7 @@ optional, but must also be incorporated into the LSN using
 <code><a href="../reference/sites_to_lsn.html">sites_to_lsn()</a></code> before predictions can be made using a
 fitted model. We add the <code>MF_pred1km</code> and
 <code>MF_capehorn</code> prediction datasets to the LSN by running</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">preds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sites_to_lsn.html">sites_to_lsn</a></span><span class="op">(</span></span>
 <span>  sites <span class="op">=</span> <span class="va">MF_pred1km</span>,</span>
 <span>  edges <span class="op">=</span> <span class="va">edges</span>,</span>
@@ -571,14 +581,23 @@ information needed to fit spatial stream-network models.</p>
 distance between locations when movement is restricted to the stream
 network) between the network outlet and each feature. For an edge, the
 distance is measured to the upstream end node of the line feature. The
-upstream distance for the <span class="math inline">\(j\)</span>th edge,
-<span class="math inline">\(upDist_j\)</span>, is:</p>
-<p><span class="math display">\[
+upstream distance for the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>th
+edge,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mi>p</mi><mi>D</mi><mi>i</mi><mi>s</mi><msub><mi>t</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">upDist_j</annotation></semantics></math>,
+is:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mi>p</mi><mi>D</mi><mi>i</mi><mi>s</mi><msub><mi>t</mi><mi>j</mi></msub><mo>=</mo><munder><mo>∑</mo><mrow><mi>k</mi><mo>∈</mo><msub><mi>D</mi><mi>j</mi></msub></mrow></munder><msub><mi>L</mi><mi>k</mi></msub><mo>,</mo></mrow><annotation encoding="application/x-tex">
 upDist_j = \sum_{k \in D_j}{L_k},
-\]</span></p>
-<p>where <span class="math inline">\(L_j\)</span> is the length of each
-edge and <span class="math inline">\(D_j\)</span> is the set of edges
-found in the path between the network outlet and the <span class="math inline">\(j\)</span>th edge, including the <span class="math inline">\(j\)</span>th edge.</p>
+</annotation></semantics></math></p>
+<p>where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>L</mi><mi>j</mi></msub><annotation encoding="application/x-tex">L_j</annotation></semantics></math>
+is the length of each edge and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>D</mi><mi>j</mi></msub><annotation encoding="application/x-tex">D_j</annotation></semantics></math>
+is the set of edges found in the path between the network outlet and the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>th
+edge, including the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>th
+edge.</p>
 <p>The upstream distance for each edge is calculated using the
 <code><a href="../reference/updist_edges.html">updist_edges()</a></code> function, which generally requires these
 arguments:</p>
@@ -601,7 +620,7 @@ representing line length should be calculated and added to
 <code>calc_length = TRUE</code> if the edge features have been
 edited.</li>
 </ul>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/updist_edges.html">updist_edges</a></span><span class="op">(</span></span>
 <span>  edges <span class="op">=</span> <span class="va">edges</span>,</span>
 <span>  save_local <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -618,12 +637,27 @@ edited.</li>
 <code>upDist</code> is the upstream distance for each edge.</p>
 <p>For sites, the upstream distance is calculated a little differently
 because it is the hydrologic distance between the network outlet and
-each <em>site</em>. The upstream distance for site <span class="math inline">\(i\)</span>, <span class="math inline">\(upDist_i\)</span>, is calculated as: <span class="math display">\[
+each <em>site</em>. The upstream distance for site
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mi>p</mi><mi>D</mi><mi>i</mi><mi>s</mi><msub><mi>t</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">upDist_i</annotation></semantics></math>,
+is calculated as:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mi>p</mi><mi>D</mi><mi>i</mi><mi>s</mi><msub><mi>t</mi><mi>i</mi></msub><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>L</mi><mi>i</mi></msub><mo>+</mo><munder><mo>∑</mo><mrow><mi>k</mi><mo>∈</mo><msubsup><mi>D</mi><mi>j</mi><mo>*</mo></msubsup></mrow></munder><msub><mi>L</mi><mi>k</mi></msub><mo>,</mo></mrow><annotation encoding="application/x-tex">
 upDist_i = r_i L_i + \sum_{k \in D^*_j}{L_k},
-\]</span></p>
-<p>where <span class="math inline">\(r_i\)</span> is the
-<code>ratio</code> value for <span class="math inline">\(site_i\)</span>, <span class="math inline">\(L_i\)</span> is the length of the edge <span class="math inline">\(site_i\)</span> resides on, and <span class="math inline">\(D^*_j\)</span> is the set of edges found in the
-path between the network outlet and <span class="math inline">\(site_i\)</span>, excluding the edge <span class="math inline">\(site_i\)</span> resides on.</p>
+</annotation></semantics></math></p>
+<p>where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>r</mi><mi>i</mi></msub><annotation encoding="application/x-tex">r_i</annotation></semantics></math>
+is the <code>ratio</code> value for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mi>i</mi><mi>t</mi><msub><mi>e</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">site_i</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>L</mi><mi>i</mi></msub><annotation encoding="application/x-tex">L_i</annotation></semantics></math>
+is the length of the edge
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mi>i</mi><mi>t</mi><msub><mi>e</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">site_i</annotation></semantics></math>
+resides on, and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>D</mi><mi>j</mi><mo>*</mo></msubsup><annotation encoding="application/x-tex">D^*_j</annotation></semantics></math>
+is the set of edges found in the path between the network outlet and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mi>i</mi><mi>t</mi><msub><mi>e</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">site_i</annotation></semantics></math>,
+excluding the edge
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mi>i</mi><mi>t</mi><msub><mi>e</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">site_i</annotation></semantics></math>
+resides on.</p>
 <p>Upstream distance is calculated for each site using the
 <code><a href="../reference/updist_sites.html">updist_sites()</a></code> function, which generally requires a few
 arguments:</p>
@@ -648,7 +682,7 @@ Default is TRUE.</li>
 and <code>edges</code> GeoPackages reside. Must be specified if
 <code>save_local</code> is TRUE.</li>
 </ul>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">site.list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/updist_sites.html">updist_sites</a></span><span class="op">(</span></span>
 <span>  sites <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    obs <span class="op">=</span> <span class="va">obs</span>,</span>
@@ -663,7 +697,7 @@ and <code>edges</code> GeoPackages reside. Must be specified if
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">)</span> <span class="co">## View output site.list names</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "obs"      "pred1km"  "CapeHorn"</span></span></code></pre>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">$</span><span class="va">obs</span><span class="op">)</span> <span class="co">## View column names in obs</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;  [1] "rid"        "STREAMNAME" "COMID"      "AREAWTMAP"  "SLOPE"     </span></span>
 <span><span class="co">#&gt;  [6] "ELEV_DEM"   "Source"     "Summer_mn"  "MaxOver20"  "C16"       </span></span>
@@ -676,13 +710,13 @@ locations in the ‘SSN2’ package. If we plot the edges and observations,
 assigning color based on the <code>upDist</code> column, it is apparent
 that the upstream distance increases from the outlet to headwater
 streams, as expected.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">edges</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">upDist</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">site.list</span><span class="op">$</span><span class="va">obs</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">upDist</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">coord_sf</a></span><span class="op">(</span>datum <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">MF_streams</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_color_viridis_c</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction_files/figure-html/plot_updist-1.png" alt="Upstream Distance." width="75%" style="display: block; margin: auto;"></p>
+<p><img src="introduction_files/figure-html/plot_updist-1.png" class="r-plt" alt="Upstream Distance." width="75%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="calculating-additive-function-values-afvs">Calculating Additive Function Values (AFVs)<a class="anchor" aria-label="anchor" href="#calculating-additive-function-values-afvs"></a>
@@ -696,37 +730,59 @@ proportional influence (PI), 2) calculating the additive function values
 (AFVs), and 3) calculating the spatial weights. Steps 1) and 2) are
 undertaken in ‘SSNbler’, while Step 3) is calculated in the package
 ‘SSN2’ when spatial stream-network models are fit.</p>
-<p>The segment PI for each edge, <span class="math inline">\(\omega_j\)</span>, is defined as the relative
-influence of the <span class="math inline">\(j\)</span>th edge feature
-on the edge directly downstream. In the following example, <span class="math inline">\(\omega_j\)</span> is based on cumulative watershed
-area for the downstream node of each edge, <span class="math inline">\(A_j\)</span>, which is used as a surrogate for
-flow volume. However, simpler measures could be used, such as Shreve’s
-stream order (Shreve 1966) or equal weighting, as long as a value exists
-for every line feature in edges (i.e., missing data are not allowed). It
-is also preferable to use a column that does not contain values equal to
-zero, which we explain in more detail below.</p>
-<p>When two edges, denoted <span class="math inline">\(j\)</span> and
-<span class="math inline">\(k\)</span>, converge at a node, the segment
-PI for the <span class="math inline">\(j\)</span>th edge is:</p>
-<p><span class="math display">\[
+<p>The segment PI for each edge,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ω</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\omega_j</annotation></semantics></math>,
+is defined as the relative influence of the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>th
+edge feature on the edge directly downstream. In the following example,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ω</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\omega_j</annotation></semantics></math>
+is based on cumulative watershed area for the downstream node of each
+edge,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>A</mi><mi>j</mi></msub><annotation encoding="application/x-tex">A_j</annotation></semantics></math>,
+which is used as a surrogate for flow volume. However, simpler measures
+could be used, such as Shreve’s stream order (Shreve 1966) or equal
+weighting, as long as a value exists for every line feature in edges
+(i.e., missing data are not allowed). It is also preferable to use a
+column that does not contain values equal to zero, which we explain in
+more detail below.</p>
+<p>When two edges, denoted
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>,
+converge at a node, the segment PI for the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>th
+edge is:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ω</mi><mi>j</mi></msub><mo>=</mo><mfrac><msub><mi>A</mi><mi>j</mi></msub><mrow><msub><mi>A</mi><mi>j</mi></msub><mo>+</mo><msub><mi>A</mi><mi>k</mi></msub></mrow></mfrac><mi>.</mi></mrow><annotation encoding="application/x-tex">
 \omega_j=\frac{A_j}{A_j + A_k}.
-\]</span></p>
+</annotation></semantics></math></p>
 <p>Notice that the segment PI values are ratios. Therefore, the sum of
 the PI values for edges directly upstream of a single node always sum to
-one. Also note that <span class="math inline">\(\omega_j=0\)</span> when
-<span class="math inline">\(A_j=0\)</span>.</p>
-<p>The AFVs for the <span class="math inline">\(j\)</span>th edge, <span class="math inline">\(AFV_j\)</span>, is equal to the product of the
-segment PIs found in the path between the edge and the network outlet,
-including edge <span class="math inline">\(j\)</span> itself.</p>
-<p><span class="math display">\[
+one. Also note that
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ω</mi><mi>j</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\omega_j=0</annotation></semantics></math>
+when
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>A</mi><mi>j</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">A_j=0</annotation></semantics></math>.</p>
+<p>The AFVs for the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>th
+edge,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>F</mi><msub><mi>V</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">AFV_j</annotation></semantics></math>,
+is equal to the product of the segment PIs found in the path between the
+edge and the network outlet, including edge
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+itself.</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>F</mi><msub><mi>V</mi><mi>j</mi></msub><mo>=</mo><munder><mo>∏</mo><mrow><mi>k</mi><mo>∈</mo><msub><mi>D</mi><mi>j</mi></msub></mrow></munder><msub><mi>ω</mi><mi>k</mi></msub><mi>.</mi></mrow><annotation encoding="application/x-tex">
 AFV_j = \prod_{k \in D_j}{\omega_k}.
-\]</span></p>
-<p>If <span class="math inline">\(\omega_j=0\)</span>, the AFV values
-for edges upstream of the <span class="math inline">\(j\)</span>th edge
-will also be equal to zero. This may not be problematic if the <span class="math inline">\(j\)</span>th edge is a headwater segment without
-an observed site. However, it can have a significant impact on the
-covariance structure of the tail-up model when the <span class="math inline">\(j\)</span>th edge is found lower in the stream
-network.</p>
+</annotation></semantics></math></p>
+<p>If
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ω</mi><mi>j</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\omega_j=0</annotation></semantics></math>,
+the AFV values for edges upstream of the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>th
+edge will also be equal to zero. This may not be problematic if the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>th
+edge is a headwater segment without an observed site. However, it can
+have a significant impact on the covariance structure of the tail-up
+model when the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>th
+edge is found lower in the stream network.</p>
 <p>AFVs are calculated for every edge in the network using
 <code><a href="../reference/afv_edges.html">afv_edges()</a></code>, which generally requires these arguments:</p>
 <ul>
@@ -754,11 +810,11 @@ Default is TRUE.</li>
 <p>Note that we use a variable representing cumulative watershed area
 that is already present in <code>edges</code> (<code>h2oAreaKm2</code>)
 to create the segment PI values:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">edges</span><span class="op">$</span><span class="va">h2oAreaKm2</span><span class="op">)</span> <span class="co">## Summarize and check for zeros</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
 <span><span class="co">#&gt;   0.0036   2.4534   5.9877  22.6237  28.2600 209.8989</span></span></code></pre>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/afv_edges.html">afv_edges</a></span><span class="op">(</span></span>
 <span>  edges <span class="op">=</span> <span class="va">edges</span>,</span>
 <span>  infl_col <span class="op">=</span> <span class="st">"h2oAreaKm2"</span>,</span>
@@ -771,22 +827,27 @@ to create the segment PI values:</p>
 <pre><code><span><span class="co">#&gt;  [1] "rid"        "COMID"      "GNIS_NAME"  "REACHCODE"  "FTYPE"     </span></span>
 <span><span class="co">#&gt;  [6] "FCODE"      "AREAWTMAP"  "SLOPE"      "rcaAreaKm2" "h2oAreaKm2"</span></span>
 <span><span class="co">#&gt; [11] "Length"     "upDist"     "areaPI"     "afvArea"    "geom"</span></span></code></pre>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">edges</span><span class="op">$</span><span class="va">afvArea</span><span class="op">)</span> <span class="co">## Summarize the AFV column</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
 <span><span class="co">#&gt; 0.004709 0.026168 0.066095 0.160335 0.169575 1.000000</span></span></code></pre>
 <p>The AFVs are a product of ratios, which means that the AFVs are
-always between zero and one (<span class="math inline">\(0 \le AFV \le
-1\)</span>). The AFV for the most downstream edge in a network will
-always be one. If AFVs do not meet this requirement, then an error has
-occurred.</p>
+always between zero and one
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn><mo>≤</mo><mi>A</mi><mi>F</mi><mi>V</mi><mo>≤</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">0 \le AFV \le 1</annotation></semantics></math>).
+The AFV for the most downstream edge in a network will always be one. If
+AFVs do not meet this requirement, then an error has occurred.</p>
 <p>Once the AFVs have been added to edges, they can be calculated for
 the observations and (if relevant) prediction sites. The AFV for any
 site is equivalent to the AFV of the edge it resides on. If there are
 multiple sites on a single edge feature, their AFVs will be equal. Also
-note that when the AFV for the <span class="math inline">\(i\)</span>th
-site is zero, the covariance between data collected at the <span class="math inline">\(i\)</span>th site and every other site will also
-be zero. For more on additive function values, see <span class="citation">Ver Hoef &amp; Peterson (2010)</span> and <span class="citation">Peterson &amp; Ver Hoef (2010)</span>.</p>
+note that when the AFV for the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>th
+site is zero, the covariance between data collected at the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>th
+site and every other site will also be zero. For more on additive
+function values, see <span class="citation">Ver Hoef &amp; Peterson
+(2010)</span> and <span class="citation">Peterson &amp; Ver Hoef
+(2010)</span>.</p>
 <p>The <code>afv_sites</code> function is used to create an AFV column
 in a list of observed and prediction sites. The inputs include:</p>
 <ul>
@@ -810,7 +871,7 @@ updated sites are written to <code>lsn_path</code>.</li>
 via <code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code> is stored. Required when
 <code>save_local = TRUE</code>.</li>
 </ul>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">site.list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/afv_sites.html">afv_sites</a></span><span class="op">(</span></span>
 <span>  sites <span class="op">=</span> <span class="va">site.list</span>,</span>
 <span>  edges <span class="op">=</span> <span class="va">edges</span>,</span>
@@ -823,10 +884,10 @@ via <code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code> is 
 <pre><code><span><span class="co">#&gt;  [1] "rid"        "COMID"      "AREAWTMAP"  "SLOPE"      "ELEV_DEM"  </span></span>
 <span><span class="co">#&gt;  [6] "FlowCMS"    "AirMEANc"   "AirMWMTc"   "rcaAreaKm2" "h2oAreaKm2"</span></span>
 <span><span class="co">#&gt; [11] "ratio"      "snapdist"   "upDist"     "afvArea"    "geom"</span></span></code></pre>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">$</span><span class="va">pred1km</span><span class="op">$</span><span class="va">afvArea</span><span class="op">)</span> <span class="co">## Summarize AFVs in pred1km and look for zeros</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
-<span><span class="co">#&gt; 0.009894 0.031219 0.047469 0.104969 0.112882 1.000000</span></span></code></pre>
+<span><span class="co">#&gt; 0.009894 0.031219 0.047470 0.104969 0.112882 1.000000</span></span></code></pre>
 <p>Each <code>sf</code> dataset in <code>sites.list</code> now has an
 AFV column, <code>afvArea</code>, which was generated based on
 cumulative watershed area. All AFVs should meet the requirement that
@@ -874,7 +935,7 @@ AFV columns that will be checked when <code>check = TRUE</code>. Columns
 must be present in <code>edges</code>, <code>obs_sites</code>, and
 <code>preds_list</code>, if they are included.</li>
 </ul>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mf04_ssn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssn_assemble.html">ssn_assemble</a></span><span class="op">(</span></span>
 <span>  edges <span class="op">=</span> <span class="va">edges</span>,</span>
 <span>  lsn_path <span class="op">=</span> <span class="va">lsn.path</span>,</span>
@@ -889,13 +950,13 @@ must be present in <code>edges</code>, <code>obs_sites</code>, and
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; SSN object is valid: TRUE</span></span></code></pre>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">mf04_ssn</span><span class="op">)</span> <span class="co">## Get class</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "SSN"</span></span></code></pre>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">mf04_ssn</span><span class="op">)</span> <span class="co">## print names of SSN object</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "edges" "obs"   "preds" "path"</span></span></code></pre>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">mf04_ssn</span><span class="op">$</span><span class="va">preds</span><span class="op">)</span> <span class="co">## print names of prediction datasets</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "pred1km"  "CapeHorn"</span></span></code></pre>
 <p>The outputs of <code><a href="../reference/ssn_assemble.html">ssn_assemble()</a></code> are stored locally in a
@@ -991,11 +1052,12 @@ another. The format of the <code>netgeom</code> column differs depending
 on whether it is describing a feature with <code>LINESTRING</code> or
 <code>POINT</code> geometry. For <code>edges</code>, the format of
 <code>netgeom</code> is</p>
-<p><span class="math display">\[
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="monospace">𝙴𝙽𝙴𝚃𝚆𝙾𝚁𝙺 (𝚗𝚎𝚝𝙸𝙳 𝚛𝚒𝚍 𝚞𝚙𝙳𝚒𝚜𝚝)</mtext><mo>,</mo></mrow><annotation encoding="application/x-tex">
 \texttt{ENETWORK (netID rid upDist)},
-\]</span> and for sites <span class="math display">\[
+</annotation></semantics></math> and for sites
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="monospace">𝚂𝙽𝙴𝚃𝚆𝙾𝚁𝙺 (𝚗𝚎𝚝𝙸𝙳 𝚛𝚒𝚍 𝚞𝚙𝙳𝚒𝚜𝚝 𝚛𝚊𝚝𝚒𝚘 𝚙𝚒𝚍 𝚕𝚘𝚌𝙸𝙳)</mtext><mi>.</mi></mrow><annotation encoding="application/x-tex">
 \texttt{SNETWORK (netID rid upDist ratio pid locID)}.
-\]</span></p>
+</annotation></semantics></math></p>
 <p>The information stored in these columns is used to keep track of the
 spatial and topological relationships in the network. The data used to
 define <code>netgeom</code> is stored in the edges, observed sites, and
@@ -1016,7 +1078,7 @@ with the linewidth proportional to cumulative watershed area column,
 <code>h2oAreaKm2</code>. The summer stream temperature observations
 (<code>Summer_mn</code>) are shown using the viridis color palette, with
 <code>pred1km</code> locations shown as smaller white dots:</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">mf04_ssn</span><span class="op">$</span><span class="va">edges</span>,</span>
@@ -1044,7 +1106,7 @@ with the linewidth proportional to cumulative watershed area column,
 <span>    legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="introduction_files/figure-html/plot_SSN-1.png" alt="Mean summer stream temperature and cumulative watershed area." width="75%"><p class="caption">
+<img src="introduction_files/figure-html/plot_SSN-1.png" class="r-plt" alt="Mean summer stream temperature and cumulative watershed area." width="75%"><p class="caption">
 Mean summer stream temperature (Temperature) and cumulative watershed
 area (WS AREA) for the Middle Fork stream network. Prediction locations
 are white circles.
@@ -1096,7 +1158,7 @@ tail-down, and Gaussian Euclidean covariance functions. Notice that
 <code>additive = "afvArea"</code>, which is the column we created
 earlier using the <code>afv_edges</code> and <code>afv_sites</code>
 functions.</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://usepa.github.io/SSN2/" class="external-link">SSN2</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## Generate hydrologic distance matrices</span></span>
@@ -1141,12 +1203,14 @@ functions.</p>
 <span><span class="co">#&gt;      euclid gaussian  de (parsill)  1.092e-04</span></span>
 <span><span class="co">#&gt;      euclid gaussian         range  1.805e+05</span></span>
 <span><span class="co">#&gt;               nugget        nugget  1.660e-02</span></span></code></pre>
-<p>As expected, there is strong evidence (<span class="math inline">\(p
-&lt; 0.001\)</span>) that elevation is negatively related to mean summer
-temperature, while there is moderate evidence (<span class="math inline">\(p \approx 0.05\)</span>) that precipitation is
-negatively related to mean summer temperature. To learn more about
-fitting spatial stream-network models using the ‘SSN2’ package, visit
-the package website at <a href="https://usepa.github.io/SSN2/" class="external-link">https://usepa.github.io/SSN2/</a>.</p>
+<p>As expected, there is strong evidence
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>&lt;</mo><mn>0.001</mn></mrow><annotation encoding="application/x-tex">p &lt; 0.001</annotation></semantics></math>)
+that elevation is negatively related to mean summer temperature, while
+there is moderate evidence
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>≈</mo><mn>0.05</mn></mrow><annotation encoding="application/x-tex">p \approx 0.05</annotation></semantics></math>)
+that precipitation is negatively related to mean summer temperature. To
+learn more about fitting spatial stream-network models using the ‘SSN2’
+package, visit the package website at <a href="https://usepa.github.io/SSN2/" class="external-link">https://usepa.github.io/SSN2/</a>.</p>
 <!--# From STARS and openSTARS to SSNbler (ADD Later)
 
 | `STARS` Function Name | `openSTARS` Function Name | 'SSNbler' Function Name |
@@ -1159,7 +1223,7 @@ the package website at <a href="https://usepa.github.io/SSN2/" class="external-l
 <div class="section level2">
 <h2 class="unnumbered" id="r-code-appendix">R Code Appendix<a class="anchor" aria-label="anchor" href="#r-code-appendix"></a>
 </h2>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pet221/SSNbler" class="external-link">SSNbler</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/copy_streams_to_temp.html">copy_streams_to_temp</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/streamsdata"</span><span class="op">)</span></span>
@@ -1179,11 +1243,14 @@ the package website at <a href="https://usepa.github.io/SSN2/" class="external-l
 <span><span class="co">## Set path for new folder for lsn</span></span>
 <span><span class="va">lsn.path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/mf04"</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co">## Check minimum line feature length</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_measures.html" class="external-link">st_length</a></span><span class="op">(</span><span class="va">MF_streams</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
 <span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lines_to_lsn.html">lines_to_lsn</a></span><span class="op">(</span></span>
 <span>  streams <span class="op">=</span> <span class="va">MF_streams</span>,</span>
 <span>  lsn_path <span class="op">=</span> <span class="va">lsn.path</span>,</span>
 <span>  check_topology <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  snap_tolerance <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  snap_tolerance <span class="op">=</span> <span class="fl">0.05</span>, <span class="co"># must be &lt; min line length</span></span>
 <span>  topo_tolerance <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
@@ -1324,7 +1391,7 @@ the package website at <a href="https://usepa.github.io/SSN2/" class="external-l
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent" line-spacing="2">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0" line-spacing="2">
 <div id="ref-dumelle2024SSN2" class="csl-entry">
 Dumelle, M., Peterson, E. E., Ver Hoef, J. M., Pearse, A. R., &amp;
 Isaak, D. J. (2024). <span>SSN2</span>: The next generation of spatial
@@ -1381,9 +1448,7 @@ analysis</em>. Springer-Verlag New York. Retrieved from <a href="https://ggplot2
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 
@@ -1396,16 +1461,16 @@ analysis</em>. Springer-Verlag New York. Retrieved from <a href="https://ggplot2
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>
 </div>
 
-  
 
 
-  
+
+
 
   </body>
 </html>
