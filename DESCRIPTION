@@ -1,6 +1,6 @@
 Package: SSNbler
 Title: Assemble 'SSN' Objects
-Version: 1.1.2
+Version: 1.1.2.9000
 Authors@R: c(
 	   person(given = "Erin",
     		 family = "Peterson",
