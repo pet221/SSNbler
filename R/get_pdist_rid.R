@@ -36,7 +36,7 @@ get_pdist_rid<- function(from_xy, to_xy, ncores, snap_tolerance) {
 	rid_confl<- foreach(to.index = 1:length(to_xy_list),
 											.combine = 'c',
 											.inorder = TRUE,
-											.packages = c("pdist", "SSNbler"),
+											.packages = c("SSNbler"),
 											.export = c("pdist_rid_confl"),
 											.errorhandling = "stop") %dopar% {
 

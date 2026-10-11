@@ -1,9 +1,7 @@
 
 pdist_rid_confl <- function(to_xy, from_xy, snap_tolerance = NULL) {
 	
-	node_dist <- pdist(from_xy, to_xy)
-	
-	dist_matrix <- as.matrix(node_dist)
+	dist_matrix <- dist_xy(from_xy, to_xy)
 	colnames(dist_matrix) <- rownames(to_xy)
 	rownames(dist_matrix) <- rownames(from_xy)
 	

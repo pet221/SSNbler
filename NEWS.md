@@ -1,5 +1,9 @@
 # SSNbler (development version)
 
+## Bug fixes
+
+* lines_to_lsn() measured node distances with pdist::pdist(), which rounds coordinates to single precision before subtracting, so at projected coordinates two points several cm apart can read as 0 apart. A line a few cm long could then read as two unsnapped nodes and two downstream divergences, with wrong edge relationships. Distances are now computed in double precision, and pdist is no longer a dependency (#8).
+
 # SSNbler 1.1.2
 
 ## Minor updates

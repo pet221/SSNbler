@@ -36,7 +36,6 @@ Depends:
 Imports:
 	sf,
 	dplyr,
-	pdist,
 	stats,
 	utils,
 	igraph,

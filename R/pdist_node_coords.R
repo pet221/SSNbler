@@ -3,9 +3,7 @@ pdist_node_coords <- function(node_coords, other_xy,
 															snap_tolerance = NULL,
 															node_dir) {
   
-	node_dist <- pdist(node_coords, other_xy)
-	
-	dist_matrix <- as.matrix(node_dist)
+	dist_matrix <- dist_xy(node_coords, other_xy)
 	# colnames(dist_matrix) <- rownames(other_xy)
 	# rownames(dist_matrix) <- rownames(node_coords)
 	
