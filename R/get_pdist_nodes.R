@@ -30,9 +30,8 @@ get_pdist_nodes<- function(other_xy,
 	node_xy_list <- split_matrix(node_xy, chunk.no)
 
 	## Calculate distances, identify FC edges that share end node,
-	## return as list of rids or counts
+	## return a list with one element per chunk
 	out.list<- foreach(node.index = 1:length(node_xy_list),
-													.combine = 'c',
 													.inorder = TRUE,
 													.packages = c("SSNbler"),
 													.export = c("pdist_node_coords"),
@@ -44,18 +43,30 @@ get_pdist_nodes<- function(other_xy,
 																							node_dir = node_dir)
 													}
 
-	n_flow <- unlist(lapply(seq_along(out.list), function(i) {
-		if (names(out.list)[i] == "n_flow") out.list[[i]]
-	}))
+	return(combine_node_chunks(out.list))
+}
 
-	snap_check <- unlist(lapply(seq_along(out.list), function(i) {
-		if (names(out.list)[i] == "snap_check") out.list[[i]]
-	}))
-	
-	unsnapped_tonodes <- unlist(lapply(seq_along(out.list), function(i) {
-		if (names(out.list)[i] == "unsnapped_tonodes") out.list[[i]]
-	}))
+## Combine the per-chunk results of pdist_node_coords() into the vectors the serial
+## path computes from the whole node matrix. Rows in each chunk's zero_pairs are
+## offset by the rows of the chunks before it, and duplicate to nodes are counted
+## over all chunks, so a pair split between two chunks is found.
+combine_node_chunks <- function(chunks) {
 
-	return(list(n_flow = n_flow, snap_check = snap_check, 
+	n_flow <- unlist(lapply(chunks, function(x) x$n_flow))
+	snap_check <- unlist(lapply(chunks, function(x) x$snap_check))
+	unsnapped_tonodes <- NULL
+
+	if (!is.null(chunks[[1]]$zero_pairs)) {
+		chunk_rows <- vapply(chunks, function(x) length(x$n_flow), 1L)
+		offsets <- cumsum(c(0L, chunk_rows[-length(chunk_rows)]))
+		zero_pairs <- do.call(rbind, lapply(seq_along(chunks), function(i) {
+			z <- chunks[[i]]$zero_pairs
+			cbind(z[, 1] + offsets[i], z[, 2])
+		}))
+		dbl_tonodes <- which(tabulate(zero_pairs[, 2]) > 1)
+		unsnapped_tonodes <- sort(unique(zero_pairs[zero_pairs[, 2] %in% dbl_tonodes, 1]))
+	}
+
+	return(list(n_flow = n_flow, snap_check = snap_check,
 							unsnapped_tonodes = unsnapped_tonodes))
 }

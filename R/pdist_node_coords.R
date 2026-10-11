@@ -14,11 +14,11 @@ pdist_node_coords <- function(node_coords, other_xy,
 	})
 	
 	if(node_dir == "to") {
-		dbl_tonodes <- which(colSums(dist_matrix == 0) > 1)
-		unsnapped_tonodes <- which(rowSums(dist_matrix[, dbl_tonodes,
-																								 drop = FALSE] == 0) > 0)
+		## (row, column) of every zero distance, rows numbered within this chunk.
+		## Duplicate to nodes are found across all chunks by combine_node_chunks()
+		zero_pairs <- which(dist_matrix == 0, arr.ind = TRUE)
 		return(out.list = list(n_flow = n_flow, snap_check = snap_check,
-													 unsnapped_tonodes = unsnapped_tonodes))
+													 zero_pairs = zero_pairs))
 	} else {
 	
 		return(out.list = list(n_flow = n_flow, snap_check = snap_check))
