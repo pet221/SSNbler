@@ -4,6 +4,7 @@
 
 * lines_to_lsn() measured node distances with pdist::pdist(), which rounds coordinates to single precision before subtracting, so at projected coordinates two points several cm apart can read as 0 apart. A line a few cm long could then read as two unsnapped nodes and two downstream divergences, with wrong edge relationships. Distances are now computed in double precision, and pdist is no longer a dependency (#8).
 * With use_parallel = TRUE, lines_to_lsn() found to nodes shared by more than one node within each chunk of up to 500 nodes only, and returned their row numbers within the chunk, which were then applied to the whole node list: the Unsnapped Node flags from every chunk after the first landed on the wrong nodes, and a pair split across two chunks was missed. Chunks now return their zero-distance pairs, offset to global rows, and the duplicates are counted across all chunks (#8).
+* With use_parallel = TRUE, a last chunk of one row became a vector and lost its row name, so that edge's relationships were wrong. Chunks now stay matrices (#8).
 
 # SSNbler 1.1.2
 

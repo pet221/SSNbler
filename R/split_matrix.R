@@ -8,7 +8,7 @@ split_matrix = function(mat, n) {
 	mat.list = list()
 	for(i in 1:n) {
 		if(ix[i] > n.mat) break
-		mat.list[[i]] = mat[ix[i]:(ix[i+1]-1),]
+		mat.list[[i]] = mat[ix[i]:(ix[i+1]-1), , drop = FALSE]
 	}
 	
 	return(mat.list)
