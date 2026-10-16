@@ -345,12 +345,10 @@ lines_to_lsn <- function(streams,
   
   if(use_parallel == FALSE) {
     	## Find the distance between the from_xy of each line segment and
-    	## the to_xy of every line segment. from in the rows, tos in the columns
-    	node_dist <- pdist(from_xy, to_xy)
-
-    	## convert to matrix for easier searching. row/column elements
-    	## labelled by rid
-    	dist_matrix <- as.matrix(node_dist)
+    	## the to_xy of every line segment. from in the rows, tos in the columns.
+    	## proxy::dist() computes distances in double precision; unclass() returns
+    	## a plain matrix for easier searching. row/column elements labelled by rid
+    	dist_matrix <- unclass(proxy::dist(as.matrix(from_xy), as.matrix(to_xy)))
     	colnames(dist_matrix) <- rownames(dist_matrix) <- in_edges$rid
 
     	## Returns a list == length(edges) with dist_matrix names containing
@@ -389,8 +387,8 @@ lines_to_lsn <- function(streams,
     	if (verbose == TRUE) message("Checking network topology\n")
 	
     	if(use_parallel == FALSE){
-    		nodes_vs_from <- as.matrix(pdist(node_coords, from_xy))
-    		nodes_vs_to <- as.matrix(pdist(node_coords, to_xy))
+    		nodes_vs_from <- unclass(proxy::dist(as.matrix(node_coords), as.matrix(from_xy)))
+    		nodes_vs_to <- unclass(proxy::dist(as.matrix(node_coords), as.matrix(to_xy)))
     		
     		# Summarise the number of node-edge intersections based on this distance matrix
     		# Returns a vector with length==nrow(node_coords) containing number of line

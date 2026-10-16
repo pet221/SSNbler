@@ -34,7 +34,7 @@ get_pdist_nodes<- function(other_xy,
 	out.list<- foreach(node.index = 1:length(node_xy_list),
 													.combine = 'c',
 													.inorder = TRUE,
-													.packages = c("pdist", "SSNbler"),
+													.packages = c("SSNbler"),
 													.export = c("pdist_node_coords"),
 													.errorhandling = "stop") %dopar% {
 

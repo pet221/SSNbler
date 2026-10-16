@@ -7,7 +7,7 @@
 #' st_linestring st_nearest_feature st_nearest_points st_read st_sfc st_write st_zm write_sf
 #' @importFrom stats filter
 #' @importFrom utils read.csv read.table write.table
-#' @importFrom pdist pdist
+#' @importFrom proxy dist
 #' @importFrom dplyr distinct left_join pull
 #' @importFrom igraph decompose graph_from_data_frame reverse_edges shortest_paths subcomponent vertex_attr
 #' @importFrom RSQLite dbConnect dbDisconnect dbExistsTable dbListTables dbReadTable dbRemoveTable dbWriteTable SQLite

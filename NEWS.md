@@ -1,5 +1,13 @@
 # SSNbler (development version)
 
+## Bug fixes
+
+* `lines_to_lsn()` computed distances between line end nodes with `pdist::pdist()`, which converts coordinates to single precision before subtracting. At projected coordinates (e.g. ~1e6 m), points a few cm apart could be read as 0 m apart, giving wrong edge relationships and false Unsnapped Node and Downstream Divergence errors for very short line features, and `snap_tolerance` values of a few cm or less could not be honoured. Distances are now computed in double precision using `proxy::dist()`, and 'pdist' is no longer a dependency (#8).
+
+## Behaviour changes
+
+* Because distances are now exact, cm-scale gaps between line ends that were previously read as 0 m (connected, and sometimes flagged as Unsnapped Node) are now measured correctly. If such a gap is larger than `snap_tolerance`, the lines are no longer connected and no error is reported, so a network may now split at that location. Check outputs from `lines_to_lsn()` for networks with very small gaps between line features.
+
 # SSNbler 1.1.2
 
 ## Minor updates

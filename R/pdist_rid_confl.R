@@ -1,9 +1,8 @@
 
 pdist_rid_confl <- function(to_xy, from_xy, snap_tolerance = NULL) {
 	
-	node_dist <- pdist(from_xy, to_xy)
-	
-	dist_matrix <- as.matrix(node_dist)
+	## proxy::dist() computes distances in double precision
+	dist_matrix <- unclass(proxy::dist(as.matrix(from_xy), as.matrix(to_xy)))
 	colnames(dist_matrix) <- rownames(to_xy)
 	rownames(dist_matrix) <- rownames(from_xy)
 	

@@ -3,9 +3,8 @@ pdist_node_coords <- function(node_coords, other_xy,
 															snap_tolerance = NULL,
 															node_dir) {
   
-	node_dist <- pdist(node_coords, other_xy)
-	
-	dist_matrix <- as.matrix(node_dist)
+	## proxy::dist() computes distances in double precision
+	dist_matrix <- unclass(proxy::dist(as.matrix(node_coords), as.matrix(other_xy)))
 	# colnames(dist_matrix) <- rownames(other_xy)
 	# rownames(dist_matrix) <- rownames(node_coords)
 	
