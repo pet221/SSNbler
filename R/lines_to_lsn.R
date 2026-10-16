@@ -355,7 +355,8 @@ lines_to_lsn <- function(streams,
     	## the rid value for other flow-connected edges connecting to the
     	## same node. Does not capture flow-unconnected
     	rid_confl <- apply(dist_matrix, 2, function(x) which(x <= snap_tolerance))
-
+      rm(dist_matrix)
+      
   } else {
   		rid_confl <- get_pdist_rid(from_xy = from_xy,
   															 to_xy = to_xy,
