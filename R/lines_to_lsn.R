@@ -19,16 +19,19 @@
 #' @param topo_tolerance Distance in map units >= 0. Only used if
 #'   \code{check_topology = TRUE}. Two nodes on the network separated
 #'   by a distance less than or equal to \code{topo_tolerance} are
-#'   flagged as potential topological errors in the network. Defaults
-#'   to 0.
+#'   flagged as potential topological errors in the network. Must be
+#'   greater than \code{snap_tolerance} when \code{check_topology =
+#'   TRUE} and \code{snap_tolerance} > 0. Defaults to 0.
 #' @param remove_ZM Logical. If \code{TRUE}, Z and M dimensions are
-#'   removed from streams, if they exist. Default is \code{FALSE}.
+#'   removed from streams, if they exist. If \code{FALSE} and
+#'   \code{streams} has Z and/or M dimensions, the function stops with
+#'   an error. Default is \code{FALSE}.
 #' @param overwrite Logical. If \code{TRUE}, output files will
-#'   overwrite existing files with the same names. If \code{FALSE} and
-#'   files sharing the same names as the outputs exist in the
-#'   \code{lsn_path}, the function will exit early with an error.
-#' @param use_parallel Logical. if \code{TRUE} parallel processing will be used. Default is \code{FALSE}. 
-#' @param no_cores Integer representing the number of cores to use in parallel processing. Default is \code{NULL}. When \code{use_parallel = TRUE}, \code{no_cores} is required and must be > 0. 
+#'   overwrite existing files with the same names, and a
+#'   node_errors.gpkg file from an earlier run is deleted. If
+#'   \code{FALSE} and files sharing the same names as the outputs exist
+#'   in the \code{lsn_path}, the function will exit early with an
+#'   error.
 #' @param verbose Logical. If \code{TRUE}, messages describing
 #'   function progress will be printed to the console. Default is
 #'   \code{TRUE}.
@@ -50,6 +53,17 @@
 #'   \item{relationships.csv: a table representing the downstream flow path from edge to edge. The table contains two columns: fromedge (upstream edge) and toedge (downstream edge). }
 #' }
 #'
+#' Line end nodes separated by a Euclidean distance <=
+#' \code{snap_tolerance} are snapped together into a single node, and
+#' nodes, noderelationships.csv and relationships.csv are all built
+#' from this rule. Snapping is transitive: if end A is within
+#' \code{snap_tolerance} of end B, and B is within \code{snap_tolerance}
+#' of end C, then A, B and C form one node even if A and C are further
+#' apart. The upstream and downstream ends of the same line feature
+#' are never snapped into one node. The node takes the coordinates of
+#' the first line end assigned to it. There is no limit on the number
+#' of line features in \code{streams}.
+#'
 #' Topological errors are common in spatial data and must be corrected
 #' to ensure that the LSN accurately represents direction and
 #' connectivity within the stream network. When \code{check_topology =
@@ -61,13 +75,22 @@
 #' addition to the pointid, \code{node_errors.gpkg} contains a column
 #' containing the node class (nodecat), which can take on values of
 #' Pseudonode, Confluence, Source, or Outlet. A second column (error)
-#' defines the potential error type and can take on values of Complex
-#' Confluence, Converging Node, Dangling Node, Intersection Without
-#' Node, Downstream Divergence and Unsnapped Node. The nodecat column
+#' defines the potential error type and can take on values of:
+#' \itemize{
+#'   \item{Complex Confluence: three or more edges flow into the node.}
+#'   \item{Converging Node: two edges flow into the node and none flow out.}
+#'   \item{Dangling Node: an outlet within \code{topo_tolerance} of another edge, or an edge end that touches another edge without a node.}
+#'   \item{Downstream Divergence: two or more edges flow out of the node.}
+#'   \item{Intersection Without Node: two edges cross without a node.}
+#'   \item{Self-loop: the upstream and downstream ends of a line feature have identical coordinates. The line feature is not included in relationships.csv.}
+#'   \item{Unsnapped Node: a line end <= \code{snap_tolerance} from another line end was not snapped to it, because this would have put both ends of a line feature into one node (e.g. a line whose ends nearly meet, or a short line whose ends are both near the same node).}
+#' }
+#' The nodecat column
 #' is also added to nodes.gpkg. A node_errors.gpkg file is not
 #' produced if no obvious errors are identified. There is no guarantee
 #' that all topological errors will be identified and included in
-#' node_errors.gpkg. Therefore, potential errors *and* node classes
+#' node_errors.gpkg. For example, a line end that stops just short of
+#' another line (an undershoot) is not always reported. Therefore, potential errors *and* node classes
 #' found in node_errors.gpkg and nodes.gpkg must be checked in a GIS
 #' and topological errors in \code{streams} corrected before
 #' rebuilding the LSN using \code{lines_to_lsn()}. This process is
@@ -75,35 +98,33 @@
 #' errors.
 #'
 #' The arguments \code{snap_tolerance} and \code{topo_tolerance} are
-#' both provided in map units and must be >= 0. It is generally a good
+#' both provided in map units and must be >= 0. When
+#' \code{check_topology = TRUE} and \code{snap_tolerance} > 0,
+#' \code{topo_tolerance} must be greater than \code{snap_tolerance}. It is generally a good
 #' idea to set the \code{snap_tolerance} to a relatively small value
 #' compared to the \code{topo_tolerance} argument. Nodes separated by
 #' a Euclidean distance <= \code{snap_tolerance} are assumed to be
-#' connected.  If this distance <= snap_tolerance, the nodes
-#' are automatically snapped when \code{check_topology = TRUE}. Similarly, when snap_tolerance < distance <= topo_tolerance, nodes are flagged as potential errors. 
-#' 
-#' WARNING: \code{snap_tolerance} must always be less than the length of the shortest line feature found in \code{streams}. Use the \code{\link[sf]{st_length}} to obtain and check the minimum length of the line features. 
+#' connected and are snapped together. When snap_tolerance < distance <= topo_tolerance, nodes are flagged as potential errors.
+#'
+#' WARNING: \code{snap_tolerance} must always be less than the length of the shortest line feature found in \code{streams}. Use the \code{\link[sf]{st_length}} to obtain and check the minimum length of the line features.
 #'
 #' @return An `sf` object representing edges in the LSN. The LSN, including edges.gpkg, nodes.gpkg, nodexy.csv, noderelationships.csv, and relationships.csv files, are saved locally to a directory defined by \code{lsn_path}. If \code{check_topology = TRUE} and topological errors are identified, then node_errors.gpkg is also saved to \code{lsn_path}.
 #'
 #' @export
 #'
-lines_to_lsn <- function(streams, 
-												 lsn_path,
+lines_to_lsn <- function(streams,
+                         lsn_path,
                          check_topology = TRUE,
                          snap_tolerance = 0,
                          topo_tolerance = 0,
                          remove_ZM = FALSE,
                          overwrite = FALSE,
-												 use_parallel = FALSE,
-												 no_cores = NULL,
                          verbose = TRUE) {
-  
-	
+
 	##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
 	## Check Inputs ----
 	##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
-	
+
 	# check sf object
   if (!inherits(streams, "sf")) {
     stop("streams must be an sf object.", call. = FALSE)
@@ -139,19 +160,18 @@ lines_to_lsn <- function(streams,
     }
   }
 
-  ## ## Make sure geometry column is named geometry rather than geom
   edge.geom.name <- attributes(in_edges)$sf_column
 
-  if (grepl("M", edge_geom) == TRUE & remove_ZM == FALSE) {
-    stop("XYM or XYZM geometries are not supported. Set remove_ZM = TRUE to drop Z and/or M dimensions from feature geometries.")
+  if (grepl("Z|M", edge_geom) == TRUE & remove_ZM == FALSE) {
+    stop("XYZ, XYM or XYZM geometries are not supported. Set remove_ZM = TRUE to drop Z and/or M dimensions from feature geometries.")
   }
 
-  ## Remove ZM dimensions if they exist
-  if (grepl("M", edge_geom) == TRUE & remove_ZM == TRUE) {
+  ## Remove Z and/or M dimensions if they exist
+  if (grepl("Z|M", edge_geom) == TRUE & remove_ZM == TRUE) {
     in_edges <- st_zm(in_edges)
   }
 
-  ## if output directory doesn't exist, print warning and create it now
+  ## if output directory doesn't exist, create it now
   if (!file.exists(lsn_path)) {
     dir.create(lsn_path)
   }
@@ -160,46 +180,22 @@ lines_to_lsn <- function(streams,
   if (snap_tolerance < 0 | topo_tolerance < 0) {
     stop("snap_tolerance and topo_tolerance must be >= 0")
   }
-  
+
+  ## Check that topo_tolerance > snap_tolerance
+  if (check_topology == TRUE & snap_tolerance > 0 & topo_tolerance <= snap_tolerance) {
+    stop("topo_tolerance must be > snap_tolerance when check_topology = TRUE and snap_tolerance > 0")
+  }
+
   ## Check that snap_tolerance < length of shortest line
   if(check_topology == TRUE & snap_tolerance > 0) {
   	sm_edges<- sum(as.numeric(st_length(in_edges)) < snap_tolerance)
-  	
+
   	if(sm_edges > 0) {
   		stop("snap_tolerance must be < than the length of the smallest line feature in streams. Use sf::st_length() to obtain line feature lengths.")
   	}
-  	
   }
 
-  # Check edge # and parallelization parameters
-  if (inherits(in_edges, "sf")) n_edges <- nrow(in_edges)
-  if (inherits(in_edges, "sfc")) n_edges <- length(in_edges)
-
-  if (!is.logical(use_parallel) || length(use_parallel) != 1 || is.na(use_parallel)) {
-  	stop("use_parallel must be a single TRUE or FALSE value.", call. = FALSE)
-  }
-  
-  if (use_parallel == TRUE) {
-  	if (!is.numeric(no_cores) || length(no_cores) != 1 || is.na(no_cores) ||
-  			no_cores < 1 || no_cores %% 1 != 0) {
-  		stop("no_cores must be a single whole number >= 1.", call. = FALSE)
-  	}
-  	
-  	avail.cores <- parallel::detectCores()
-  	if (!is.na(avail.cores) && no_cores > avail.cores) {
-  		stop("no_cores (", no_cores, ") exceeds the number of available cores (",
-  				 avail.cores, ").", call. = FALSE)
-  	}
-  }
-
-  # Maximum number of edges without parallelization
-  max.edges <- 46340
-  
-  if (n_edges >= max.edges && (!use_parallel || no_cores < 1)) {
-  	stop("in_edges contains ", n_edges, " edges, which is >= ", max.edges,
-  			 ". \nSet use_parallel = TRUE and no_cores >= 1.", call. = FALSE)
-  }
-  
+  n_edges <- nrow(in_edges)
 
   # check column names
   if ("rid" %in% colnames(in_edges)) {
@@ -210,19 +206,8 @@ lines_to_lsn <- function(streams,
     }
   }
   check_names_case(names(in_edges), "rid", "streams")
-  
-  # check that no_cores is set if use_parallel = TRUE
-  if(use_parallel == TRUE & is.null(no_cores)){
-  	stop("Argument no_cores must be set if use_parallel = TRUE")
-  }
-  
-  if(!is.null(no_cores) & use_parallel == TRUE){
-  	if(detectCores() < no_cores) {
-  		stop(paste0("no_cores > number of cores on your computer"))
-  	}
-  }
 
-  ## If fid file exists and overwrite is TRUE
+  ## If fid column exists and overwrite is TRUE
   if ("fid" %in% colnames(in_edges)) {
     if (overwrite) {
       in_edges$fid <- NULL
@@ -232,12 +217,11 @@ lines_to_lsn <- function(streams,
   }
   check_names_case(names(in_edges), "fid", "streams")
 
-  ## Add the field rid 
+  ## Add the field rid
   in_edges$rid <- seq.int(from = 1, to = n_edges) ## add and populate 1-based index rid column to edges
-  
-  
+
   ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
-  ## Build edge relationships ----
+  ## Build nodes ----
   ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
 
   ## Write edges to GeoPackage
@@ -252,203 +236,101 @@ lines_to_lsn <- function(streams,
 
   if (verbose == TRUE) message(paste0("\nSaved ", lsn_path, "/edges.gpkg", "\n"))
 
-  ## create empty nodexy_mat matrix to be filled with  pointid, xcoord, ycoord
-  nodexy_mat <- matrix(data = NA, nrow = 3 * n_edges, ncol = 3, byrow = TRUE)
-  colnames(nodexy_mat) <- c("pointid", "xcoord", "ycoord")
-
-  ## Create empty noderelationships matrix to be filled with rid, fromnode and tonode pointid.
-  node_relate <- matrix(data = NA, nrow = 3 * n_edges, ncol = 3, byrow = TRUE)
-  colnames(node_relate) <- c("rid", "fromnode", "tonode")
-
-  ## Create empty relationships matrix that rids for fromfeat and tofeat
-  edge_relate <- matrix(data = NA, nrow = 3 * n_edges, ncol = 2, byrow = TRUE)
-  colnames(edge_relate) <- c("fromfeat", "tofeat")
-
-  if (verbose == TRUE) message("Building Edge Relationships ...\n")
-
-  ## Get sfc of edge end node coordinates
-  all_nodes <- st_line_sample(in_edges, sample = c(0, 1))
-
-  ## Convert from MULTIPOINT to POINT
-  all_nodes_as_single <- st_cast(all_nodes, "POINT")
-
-  ## Get table of all edge end node coordinates
-  to_from_coords <- st_coordinates(all_nodes)
-
-  ## Remove to/from nodes with identical coordinates
-  node_coords <- as.data.frame(unique(to_from_coords[, 1:2]))
-
-  ## Create nodexy table: get coords and assign pointid
-  nodexy_mat <- node_coords
-  pid <- seq(1, nrow(node_coords), by = 1)
-  nodexy_mat <- as.data.frame(cbind(pid, nodexy_mat))
-  colnames(nodexy_mat) <- c("pointid", "xcoord", "ycoord")
-
-  ## Remove nodes within snap_tolerance of one another
-  #ndec <- get_decimals(snap_tolerance / 1e4)
-  if(snap_tolerance < 1) {
-  	ndec <- get_decimals(snap_tolerance) - 1
-  } else {
-  	ndec <- 0
+  ## Remove node_errors.gpkg from an earlier run, so it isn't mistaken
+  ## for errors in this LSN when this run finds none
+  if (overwrite == TRUE & file.exists(paste0(lsn_path, "/node_errors.gpkg"))) {
+    unlink(paste0(lsn_path, "/node_errors.gpkg"))
   }
 
-  tmp <- as.data.frame(apply(nodexy_mat[, 2:3], 2, round, ndec))
-  tmp <- data.frame(cbind(pointid = nodexy_mat$pointid, tmp))
-  ind.dup <- duplicated(tmp[, 2:3])
+  if (verbose == TRUE) message("Building nodes and edge relationships ...\n")
 
-  ## Save table of removed nodes, new node pointid and coords
-  removed_nodes <- tmp[ind.dup, ]
-
-  if (nrow(removed_nodes) > 0) {
-    tmp <- tmp[!ind.dup, ]
-    colnames(tmp)[1] <- c("new.pointid")
-
-    ## Get corresponding pointid (new.pointid) and remove rounded coords
-    removed_nodes <- merge(removed_nodes, as.data.frame(tmp),
-      by = c("xcoord", "ycoord"),
-      all.x = TRUE
-    )
-    removed_nodes <- removed_nodes[, !colnames(removed_nodes) %in% c("xcoord", "ycoord")]
-
-    ## get unrounded coords for new.pointid (new.X, new.Y)
-    removed_nodes <- merge(removed_nodes, nodexy_mat,
-      by.x = "new.pointid", by.y = "pointid",
-      all.x = TRUE
-    )
-    colnames(removed_nodes)[3:4] <- c("new.X", "new.Y")
-
-    ## get unrounded coords for old pointid (pointid)
-    removed_nodes <- merge(removed_nodes, nodexy_mat,
-      by.x = "pointid", by.y = "pointid",
-      all.x = TRUE
-    )
-    rm(tmp)
+  ## Edge end coordinates (first and last vertex of each line), in the
+  ## order from1, to1, from2, to2, ... Taken straight from the vertices,
+  ## which is much faster than st_line_sample()
+  ind.from <- seq(1, 2 * n_edges, by = 2)
+  ind.to <- seq(2, 2 * n_edges, by = 2)
+  line.xy <- st_coordinates(in_edges)
+  first.v <- which(!duplicated(line.xy[, "L1"]))
+  if (length(first.v) != n_edges) {
+  	stop("Could not extract exactly two end nodes for every line feature.")
   }
+  last.v <- c(first.v[-1] - 1, nrow(line.xy))
+  end.xy <- matrix(NA_real_, nrow = 2 * n_edges, ncol = 2,
+  									dimnames = list(NULL, c("X", "Y")))
+  end.xy[ind.from, ] <- line.xy[first.v, c("X", "Y")]
+  end.xy[ind.to, ] <- line.xy[last.v, c("X", "Y")]
+  rm(line.xy, first.v, last.v)
 
-  node_coords <- node_coords[!ind.dup, ]
+  ## End nodes as POINTs, used to find intersections without nodes
+  all_nodes_as_single <- st_geometry(st_as_sf(as.data.frame(end.xy),
+  																									coords = c("X", "Y"), crs = lst_crs))
 
-  ## Finish creating the sf object for all edge endpoints
-  nodexy_sf <- st_as_sf(as.data.frame(nodexy_mat[!ind.dup, ]),
+  ## Pairs of ends <= snap_tolerance apart, grouped into nodes
+  end.pairs <- grid_pairs(end.xy, snap_tolerance)
+  g <- igraph::make_empty_graph(n = 2 * n_edges, directed = FALSE)
+  g <- igraph::add_edges(g, as.vector(t(end.pairs)))
+  memb <- igraph::components(g)$membership
+  rm(g)
+
+  ## Never put the from and to ends of a line in the same node
+  split.res <- split_self_loops(end.pairs, end.xy, memb)
+  memb <- split.res$memb
+  blocked.ends <- split.res$blocked
+  rm(end.pairs, split.res)
+
+  ## pointid numbered in order of first appearance; each node takes the
+  ## coordinates of its first end
+  first <- !duplicated(memb)
+  node.of.end <- match(memb, memb[first])
+  nodexy_mat <- data.frame(pointid = seq_len(sum(first)),
+  												 xcoord = end.xy[first, 1],
+  												 ycoord = end.xy[first, 2])
+  n.nodes <- nrow(nodexy_mat)
+
+  ## Ends that were moved to snap them to their node
+  snapped <- end.xy[, 1] != nodexy_mat$xcoord[node.of.end] |
+  	end.xy[, 2] != nodexy_mat$ycoord[node.of.end]
+  snapped_xy <- data.frame(xcoord = end.xy[snapped, 1],
+  												 ycoord = end.xy[snapped, 2])
+
+  nodexy_sf <- st_as_sf(nodexy_mat,
     coords = c("xcoord", "ycoord"),
     crs = lst_crs,
     sf_column_name = edge.geom.name
   )
-  
-  ## First and last point of each last segment, stored as an SF object
-  from_point <- st_line_sample(in_edges, sample = 0)
-  to_point <- st_line_sample(in_edges, sample = 1)
-  from_xy <- do.call(rbind, lapply(from_point, function(x) x[1:2]))
-  to_xy <- do.call(rbind, lapply(to_point, function(x) x[1:2]))
-  
-  rownames(to_xy)<- in_edges$rid
-  rownames(from_xy)<- in_edges$rid
-  
-  if(use_parallel == FALSE) {
-    	## Find the distance between the from_xy of each line segment and
-    	## the to_xy of every line segment. from in the rows, tos in the columns.
-    	## proxy::dist() computes distances in double precision; unclass() returns
-    	## a plain matrix for easier searching. row/column elements labelled by rid
-    	dist_matrix <- unclass(proxy::dist(as.matrix(from_xy), as.matrix(to_xy)))
-    	colnames(dist_matrix) <- rownames(dist_matrix) <- in_edges$rid
 
-    	## Returns a list == length(edges) with dist_matrix names containing
-    	## the rid value for other flow-connected edges connecting to the
-    	## same node. Does not capture flow-unconnected
-    	rid_confl <- apply(dist_matrix, 2, function(x) which(x <= snap_tolerance))
-      rm(dist_matrix)
-      
-  } else {
-  		rid_confl <- get_pdist_rid(from_xy = from_xy,
-  															 to_xy = to_xy,
-  															 ncores = no_cores,
-  															 snap_tolerance = snap_tolerance)
-  }
-  
-  # # Identify line segments that are snapped to themselves
-  # sri <- which(mapply(function(name, values) as.numeric(name) %in% values, 
-  # 											 names(rid_confl), rid_confl))
-  # 
-  # # Remove the self-referencing ID from the corresponding list elements
-  # rid_confl[sri] <- lapply(sri, function(i) {
-  # 	rid_confl[[i]][rid_confl[[i]] != as.numeric(names(rid_confl)[i])]
-  # })
-  
-  ## Find all outlet edges -- these are just edges that do not flow into another edge
-  ## Returns a vector of TRUE/FALSE
-  outlets <- unlist(lapply(rid_confl, function(x) length(x) == 0)) ## logical vector
-  
+  node_relate <- data.frame(
+    rid = in_edges$rid,
+    fromnode = node.of.end[ind.from],
+    tonode = node.of.end[ind.to]
+  )
+
+  ## Edges whose from and to ends are in the same node
+  self_loop_rids <- node_relate$rid[node_relate$fromnode == node_relate$tonode]
+
+  ## Edge A flows into edge B where A's tonode is B's fromnode.
+  ## Self-loops are excluded.
+  edge_relate <- merge(data.frame(fromedge = node_relate$rid, node = node_relate$tonode),
+  										 data.frame(toedge = node_relate$rid, node = node_relate$fromnode),
+  										 by = "node", sort = FALSE)
+  edge_relate <- edge_relate[edge_relate$fromedge != edge_relate$toedge,
+  													 c("fromedge", "toedge")]
+  edge_relate <- edge_relate[order(edge_relate$fromedge, edge_relate$toedge), ]
+
   ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
   ## Check topology ----
   ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
 
-  ## Check topology at this step, if it's been asked for
-    if (check_topology) {
+  if (check_topology) {
 
-    	## Print message
-    	if (verbose == TRUE) message("Checking network topology\n")
-	
-    	if(use_parallel == FALSE){
-    		nodes_vs_from <- unclass(proxy::dist(as.matrix(node_coords), as.matrix(from_xy)))
-    		nodes_vs_to <- unclass(proxy::dist(as.matrix(node_coords), as.matrix(to_xy)))
-    		
-    		# Summarise the number of node-edge intersections based on this distance matrix
-    		# Returns a vector with length==nrow(node_coords) containing number of line
-    		# segments flowing in/out
-    		n_inflow <- apply(nodes_vs_to, 1, function(x) {
-    			sum(x <= snap_tolerance)
-    		})
-    		n_outflow <- apply(nodes_vs_from, 1, function(x) {
-    			sum(x <= snap_tolerance)
-    		})
-    		
-    		## Find any unsnapped intersections for line endpoints and line
-    		## start points based on snap_tolerance. Apply to each row. Value
-    		## of 0 means already at same location
-    		snap_check_1 <- apply(nodes_vs_to, 1, function(x) {
-    			sum(x > 0 & x <= snap_tolerance)
-    		})
-    		snap_check_2 <- apply(nodes_vs_from, 1, function(x) {
-    			sum(x > 0 & x <= snap_tolerance)
-    		})
+  	if (verbose == TRUE) message("Checking network topology\n")
 
-    		dbl_tonodes <- which(colSums(nodes_vs_to == 0) > 1)
-    		unsnapped_tonodes <- which(rowSums(nodes_vs_to[, dbl_tonodes,
-    																									 drop = FALSE] == 0) > 0)
-    		
-    	} else {
-
-    		## Return a list with n_inflow, snap_check_1
-    		## Old nodes_vs_to
-    		in.list<- get_pdist_nodes(node_xy = node_coords, 
-    															other_xy = to_xy, 
-    															ncores = no_cores, 
-    															snap_tolerance = snap_tolerance,
-    															node_dir = "to")
-
-    		n_inflow <- in.list[[1]]
-    		snap_check_1 <- in.list[[2]]
-    		unsnapped_tonodes <- in.list[[3]]
-    		
-    		rm(in.list)
-    		
-    		out.list<- get_pdist_nodes(node_xy = node_coords, 
-    															other_xy = from_xy, 
-    															ncores = no_cores, 
-    															snap_tolerance = snap_tolerance,
-    															node_dir = "from")
-    		n_outflow <- out.list[[1]]
-    		snap_check_2 <- out.list[[2]]
-    		
-    	}
-		
-    unsnapped_connection <- (snap_check_1 + snap_check_2) > 0
-    
-    if(length(unsnapped_tonodes) > 0) {
-    	unsnapped_connection[unsnapped_tonodes]<- TRUE
-    }
+  	## Number of edges flowing in/out of each node
+  	n_inflow <- tabulate(node_relate$tonode, n.nodes)
+  	n_outflow <- tabulate(node_relate$fromnode, n.nodes)
 
     ## Categorise nodes based on the number of inflow/outflow edges
-    ## Returns a vector with T/F length = nrow(node_coords)
+    ## Returns a vector with T/F length = n.nodes
     outlet_nodes <- (n_inflow >= 1 & n_outflow == 0)
     headwaters <- (n_inflow == 0 & n_outflow >= 1)
     confluences <- (n_inflow >= 2 & n_outflow >= 1)
@@ -478,14 +360,10 @@ lines_to_lsn <- function(streams,
     buffer_ids <- unlist(buffer_ids)
 
     crossings <- table(buffer_ids)
-    
+
     hanging_nodes <- as.numeric(names(crossings)[which(crossings > 1)])
-    #hanging_nodes <- unname(which(crossings > 1)) ## error happening here
 
     ## Subset by node error, add an error column, combine at end
-    unsnapped <- nodexy_sf[unsnapped_connection, ]
-    if (nrow(unsnapped) > 0) unsnapped$error <- "Unsnapped Node"
-
     comp_conf <- nodexy_sf[complex_confluences, ]
     if (nrow(comp_conf) > 0) comp_conf$error <- "Complex Confluence"
 
@@ -494,6 +372,15 @@ lines_to_lsn <- function(streams,
 
     down_dive <- nodexy_sf[downstream_divergence, ]
     if (nrow(down_dive) > 0) down_dive$error <- "Downstream Divergence"
+
+    ## One error per node where an edge flows into itself
+    self_loop <- nodexy_sf[unique(node_relate$fromnode[self_loop_rids]), ]
+    if (nrow(self_loop) > 0) self_loop$error <- "Self-loop"
+
+    ## Nodes with ends <= snap_tolerance from an end in another node,
+    ## left unsnapped so a line's from and to ends stay in separate nodes
+    unsnapped <- nodexy_sf[unique(node.of.end[blocked.ends]), ]
+    if (nrow(unsnapped) > 0) unsnapped$error <- "Unsnapped Node"
 
     hanging <- outlets_only[hanging_nodes, ]
     ind <- hanging$pointid %in% conv_node$pointid
@@ -505,12 +392,40 @@ lines_to_lsn <- function(streams,
     ## Combine errors - suppress warnings if there are no errors
     suppressWarnings(errors <- rbind(
       unsnapped, comp_conf, conv_node,
-      down_dive, hanging
+      down_dive, self_loop, hanging
     ))
 
-    ## Find edge intersections without nodes
+    ## Find edge intersections without nodes. Only two kinds of pair
+    ## can give an error: lines whose interiors cross, and a line end on
+    ## another line's interior. Pairs that only touch at shared ends
+    ## (confluences, pseudonodes) can't, so st_intersection() is only
+    ## run on the lines in candidate pairs.
     sf::st_agr(in_edges) <- "constant"
-    intersections <- st_intersection(in_edges, in_edges)
+
+    ## Lines whose interiors cross
+    cross_edges <- which(lengths(st_crosses(in_edges, in_edges)) > 0)
+
+    ## Line ends on, or within eps of, a line they aren't an end of.
+    ## st_intersection() snaps crossings within rounding error of a line
+    ## end onto that end, but the exact predicates miss them, so each end
+    ## is a small square. eps scales with the coordinates to stay well
+    ## above double-precision rounding; a larger eps only adds candidates.
+    eps <- max(1e-6, 1e-10 * max(abs(sf::st_bbox(in_edges))))
+    end_boxes <- st_buffer(all_nodes_as_single, eps, endCapStyle = "SQUARE")
+    end_on_line <- st_intersects(end_boxes, in_edges)
+    rm(end_boxes)
+    k <- rep(seq_len(2 * n_edges), lengths(end_on_line))
+    j <- unlist(end_on_line)
+    is_end_of_j <- (end.xy[k, 1] == end.xy[ind.from[j], 1] & end.xy[k, 2] == end.xy[ind.from[j], 2]) |
+    	(end.xy[k, 1] == end.xy[ind.to[j], 1] & end.xy[k, 2] == end.xy[ind.to[j], 2])
+    k_edge <- (k + 1) %/% 2
+    on_interior <- k_edge != j & !is_end_of_j
+    t_edges <- c(k_edge[on_interior], j[on_interior])
+    rm(end_on_line, k, j, is_end_of_j, k_edge, on_interior)
+
+    cand_edges <- sort(unique(c(cross_edges, t_edges)))
+    cand <- in_edges[cand_edges, ]
+    intersections <- st_intersection(cand, cand)
     points_only <- subset(intersections,
                           st_geometry_type(intersections) == "POINT")
 
@@ -523,7 +438,6 @@ lines_to_lsn <- function(streams,
     if (nrow(ill_int) > 0) {
       g.col <- attributes(ill_int)$sf_column
       ill_int <- ill_int[!duplicated(ill_int[, g.col]), ]
-      ## ill_int<- ill_int[!duplicated(ill_int$geometry),]
       ill_int$pointid <- NA
       ill_int$nodecat <- "Confluence"
       ill_int$error <- "Intersection Without Node"
@@ -532,7 +446,6 @@ lines_to_lsn <- function(streams,
     }
 
     ## Identify additional dangling nodes
-    ## This is where it identifies the removed dangle node
     ind.dangle <- which(node_checks == 1)
     dangle <- points_only[ind.dangle, ]
     if (nrow(dangle) > 0) {
@@ -545,13 +458,13 @@ lines_to_lsn <- function(streams,
       ind <- duplicated(dangle)
       dangle <- dangle[!ind, ]
 
-      ## Remove removed_nodes from dangle error list
-      if (nrow(removed_nodes) > 0) {
+      ## Remove ends that were snapped to a node from dangle error list
+      if (nrow(snapped_xy) > 0) {
         dangle_xy <- as.data.frame(st_coordinates(dangle))
         colnames(dangle_xy) <- c("xcoord", "ycoord")
         dangle_xy$ord <- seq(1, nrow(dangle_xy), by = 1)
-        removed_nodes$removed <- 1
-        tmp <- merge(dangle_xy, removed_nodes[, c("xcoord", "ycoord", "removed")],
+        snapped_xy$removed <- 1
+        tmp <- merge(dangle_xy, unique(snapped_xy),
           by = c("xcoord", "ycoord"), all.x = TRUE
         )
         tmp <- tmp[order(tmp$ord), ]
@@ -562,21 +475,11 @@ lines_to_lsn <- function(streams,
 
     ## Add to errors table
     suppressWarnings(errors <- rbind(errors, ill_int, dangle))
-    
-    ## Remove errors for flow unconnected end nodes w/in 
-    ## snap_tolerance that were previously snapped
-    ind <- (errors$pointid %in% removed_nodes$new.pointid) & 
-    	(errors$error == "Unsnapped Node")
-    errors <- errors[!ind,]
-    
+
     ## Writing node_errors
     if (overwrite == FALSE & file.exists(paste0(lsn_path, "/node_errors.gpkg"))) {
       stop(paste0(lsn_path, "/node_errors.gpkg"), " exists and overwrite == FALSE")
     } else {
-      ## if(nrow(errors) == 0) {
-      ##   message("No obvious topological errors detected and node_errors.gpkg was NOT created.")
-      ## }
-
       if (nrow(errors) > 0) {
         if (verbose == TRUE) message(paste0("Saving ", lsn_path, "/node_errors.gpkg"), "\n")
         st_write(errors, paste0(lsn_path, "/node_errors.gpkg"),
@@ -606,78 +509,21 @@ lines_to_lsn <- function(streams,
   ### Relationship tables
   if (verbose == TRUE) message("Building relationship tables....\n")
 
-  ### Create noderelationships table
-  first_indices <- seq(1, nrow(to_from_coords), 2)
-  last_indices <- seq(2, nrow(to_from_coords), 2)
-
-  ## From node pointid: should be no duplicates
-  ## When there are
-  ## duplicates in nodexy, left_join only keeps the first match,
-  ## but merge keeps both so that the result has more rows than
-  ## nrow(to_from_coords[last_indices,]
-  from_pointids <- as.data.frame(to_from_coords[first_indices, c("X", "Y")])
-  
-  # nodexy_mat1 <- nodexy_mat
-  # colnames(nodexy_mat1)[2:3]<- c("X", "Y")
-  # from_pointids1 <- merge(from_pointids, nodexy_mat1, by = c("X", "Y"), all = TRUE)
-  
-  from_pointids <- left_join(from_pointids, nodexy_mat, by = c("X" = "xcoord", "Y" = "ycoord"))
-  from_pointids <- from_pointids$pointid
-
-  ## To node pointid: There will be valid duplicates b/c of confluences
-  to_pointids <- as.data.frame(to_from_coords[last_indices, c("X", "Y")])
-  to_pointids <- left_join(to_pointids, nodexy_mat, by = c("X" = "xcoord", "Y" = "ycoord"))
-  to_pointids <- to_pointids$pointid
-
-  node_relate <- data.frame(
-    rid = in_edges$rid,
-    fromnode = from_pointids,
-    tonode = to_pointids
-  )
-
-  ## Replace removed nodes pointid with new node pointid value
-  if (nrow(removed_nodes) > 0) {
-    for (i in 1:nrow(removed_nodes)) {
-      old.pid <- removed_nodes$pointid[i]
-      ind <- node_relate$tonode == old.pid
-      node_relate$tonode[ind] <- removed_nodes$new.pointid[i]
-      ind <- node_relate$fromnode == old.pid
-      node_relate$fromnode[ind] <- removed_nodes$new.pointid[i]
-    }
-  }
-
   ## Write noderelationships to file
   if (overwrite == FALSE & file.exists(paste0(lsn_path, "/noderelationships.csv"))) {
     stop(paste0(lsn_path, "/noderelationships.csv"), " exists and overwrite == FALSE")
   } else {
-    ## Export noderelationshipsto a file.
     write.table(node_relate,
       file = paste(lsn_path, "noderelationships.csv", sep = "/"),
       sep = ",", col.names = TRUE, row.names = FALSE
     )
   }
 
-  ## Remove duplicated nodes in nodexy matrix
-  nodexy_mat <- nodexy_mat[!ind.dup, ]
   ## Write nodexy to file
   write.table(nodexy_mat,
     file = paste(lsn_path, "nodexy.csv", sep = "/"),
     sep = ",", col.names = TRUE, row.names = FALSE
   )
-
-  ## Create relationships table
-  to_rids <- rid_confl
-  n_repetitions <- unlist(lapply(to_rids, length))
-  n_repetitions[outlets] <- 1 ## these are outlets
-  from_rids_base <- as.integer(names(to_rids))
-  from_rids <- c()
-
-  from_rids <- rep.int(from_rids_base, n_repetitions)
-  to_rids[outlets] <- NA
-  to_rids <- unname(unlist(to_rids))
-  edge_relate <- data.frame(fromedge = from_rids, toedge = to_rids)
-  ## Remove outlet segment records with missing toedge values
-  edge_relate <- edge_relate[!is.na(edge_relate$toedge), ]
 
   ## Export relationships to file.
   write.table(edge_relate,
@@ -697,7 +543,7 @@ lines_to_lsn <- function(streams,
         ))
       } else {
       	message(paste0("\n", nrow(errors),
-      		" topology errors identified. node_errors.gpkg written to ", 
+      		" topology errors identified. node_errors.gpkg written to ",
       		lsn_path, "/node_errors.gpkg. Correct errors before re-running lines_to_lsn().\n\n",
       		n.outlets,
       		" outlets found. Visually check nodecat == Outlet locations in ",
@@ -707,6 +553,6 @@ lines_to_lsn <- function(streams,
     } else {
         message("LSN created. Topology not checked.")
     }
-  } 
+  }
   return(in_edges)
 }

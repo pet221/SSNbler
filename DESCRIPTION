@@ -36,15 +36,12 @@ Depends:
 Imports:
 	sf,
 	dplyr,
-	proxy,
 	stats,
 	utils,
 	igraph,
 	RSQLite,
 	withr,
-	SSN2,
-	doParallel,
-	foreach
+	SSN2
 Suggests:
     ggplot2,
     knitr,
