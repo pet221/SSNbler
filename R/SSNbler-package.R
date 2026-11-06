@@ -5,11 +5,10 @@
 #' st_crs st_crs<- st_drop_geometry st_equals st_geometry st_geometry<- st_geometry_type
 #' st_intersection st_intersects st_is_empty st_is_longlat st_join st_length
 #' st_linestring st_nearest_feature st_nearest_points st_read st_sfc st_write st_zm write_sf
-#' @importFrom stats filter
 #' @importFrom utils read.csv read.table write.table
-#' @importFrom dplyr distinct left_join pull
+#' @importFrom dplyr distinct left_join
 #' @importFrom igraph decompose graph_from_data_frame reverse_edges shortest_paths subcomponent vertex_attr
-#' @importFrom RSQLite dbConnect dbDisconnect dbExistsTable dbListTables dbReadTable dbRemoveTable dbWriteTable SQLite
+#' @importFrom RSQLite dbConnect dbDisconnect dbExistsTable dbListTables dbRemoveTable dbWriteTable SQLite
 #' @importFrom withr local_dir
 #' @importFrom SSN2 copy_lsn_to_temp create_netgeom ssn_get_netgeom ssn_import
 ## usethis namespace: start

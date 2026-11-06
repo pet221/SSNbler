@@ -36,7 +36,6 @@ Depends:
 Imports:
 	sf,
 	dplyr,
-	stats,
 	utils,
 	igraph,
 	RSQLite,
