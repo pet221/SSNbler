@@ -15,7 +15,8 @@
 #'   \code{node_errors.gpkg}. Defaults to \code{TRUE}.
 #' @param snap_tolerance Distance in map units >= 0. Two nodes separated by
 #'   a distance less than or equal to \code{snap_tolerance} are
-#'   assumed to be connected. Defaults to 0.
+#'   assumed to be connected. Defaults to 0, meaning no snapping: only
+#'   line end nodes with identical coordinates connect at a node.
 #' @param topo_tolerance Distance in map units >= 0. Only used if
 #'   \code{check_topology = TRUE}. Two nodes on the network separated
 #'   by a distance less than or equal to \code{topo_tolerance} are
@@ -151,9 +152,9 @@ lines_to_lsn <- function(streams,
   ## Get geometry type as text
   edge_geom <- st_as_text(st_geometry(in_edges)[[1]])
 
-  ## Check geometry type
-  if (grepl("LINESTRING", edge_geom) == FALSE | grepl("MULTILINESTRING", edge_geom) == TRUE) {
-    if (grepl("MULTILINESTRING", edge_geom) == TRUE) {
+  ## Check geometry type 
+  if (!inherits(st_geometry(in_edges), "sfc_LINESTRING")) {
+    if (any(st_geometry_type(in_edges) == "MULTILINESTRING")) {
       stop("Input streams must have LINESTRING geometry. Use sf::st_cast to convert from MULTILINESTRING to LINESTRING.")
     } else {
       stop("Input streams must have LINESTRING geometry.")
@@ -171,14 +172,24 @@ lines_to_lsn <- function(streams,
     in_edges <- st_zm(in_edges)
   }
 
-  ## if output directory doesn't exist, create it now
-  if (!file.exists(lsn_path)) {
-    dir.create(lsn_path)
+  ## Check that every line has at least two vertices. line.xy (one row
+  ## per vertex, L1 = line feature) is used again to get the line ends
+  line.xy <- st_coordinates(in_edges)
+  n.vert <- tabulate(line.xy[, "L1"], nrow(in_edges))
+  if (any(n.vert < 2)) {
+    stop("Each line feature in streams must have at least two vertices. ",
+      sum(n.vert < 2), " line feature(s) have fewer.", call. = FALSE)
   }
+  rm(n.vert)
 
-  ## Check for negative tolerances
-  if (snap_tolerance < 0 | topo_tolerance < 0) {
-    stop("snap_tolerance and topo_tolerance must be >= 0")
+  ## Check that tolerances are single, non-missing numbers >= 0
+  if (!is.numeric(snap_tolerance) || length(snap_tolerance) != 1 ||
+      is.na(snap_tolerance) || snap_tolerance < 0) {
+    stop("snap_tolerance must be a single number and must be >= 0", call. = FALSE)
+  }
+  if (!is.numeric(topo_tolerance) || length(topo_tolerance) != 1 ||
+      is.na(topo_tolerance) || topo_tolerance < 0) {
+    stop("topo_tolerance must be a single number and must be >= 0", call. = FALSE)
   }
 
   ## Check that topo_tolerance > snap_tolerance
@@ -194,8 +205,6 @@ lines_to_lsn <- function(streams,
   		stop("snap_tolerance must be < than the length of the smallest line feature in streams. Use sf::st_length() to obtain line feature lengths.")
   	}
   }
-
-  n_edges <- nrow(in_edges)
 
   # check column names
   if ("rid" %in% colnames(in_edges)) {
@@ -216,13 +225,19 @@ lines_to_lsn <- function(streams,
     }
   }
   check_names_case(names(in_edges), "fid", "streams")
+  
+  ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
+  ## Save edges ----
+  ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
 
   ## Add the field rid
+  n_edges <- nrow(in_edges)
   in_edges$rid <- seq.int(from = 1, to = n_edges) ## add and populate 1-based index rid column to edges
 
-  ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
-  ## Build nodes ----
-  ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
+  ## if output directory doesn't exist, create it now 
+  if (!file.exists(lsn_path)) {
+    dir.create(lsn_path)
+  }
 
   ## Write edges to GeoPackage
   if (overwrite == FALSE & file.exists(paste0(lsn_path, "/edges.gpkg"))) {
@@ -235,25 +250,23 @@ lines_to_lsn <- function(streams,
   }
 
   if (verbose == TRUE) message(paste0("\nSaved ", lsn_path, "/edges.gpkg", "\n"))
+  
+  ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
+  ## Build nodes and edge relationships ----
+  ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
 
-  ## Remove node_errors.gpkg from an earlier run, so it isn't mistaken
-  ## for errors in this LSN when this run finds none
+  ## Remove node_errors.gpkg if it exists
   if (overwrite == TRUE & file.exists(paste0(lsn_path, "/node_errors.gpkg"))) {
     unlink(paste0(lsn_path, "/node_errors.gpkg"))
   }
 
   if (verbose == TRUE) message("Building nodes and edge relationships ...\n")
 
-  ## Edge end coordinates (first and last vertex of each line), in the
-  ## order from1, to1, from2, to2, ... Taken straight from the vertices,
-  ## which is much faster than st_line_sample()
+  ## Create matrix of edge end node coords, 
+  ## ordered from1, to1, from2, to2
   ind.from <- seq(1, 2 * n_edges, by = 2)
   ind.to <- seq(2, 2 * n_edges, by = 2)
-  line.xy <- st_coordinates(in_edges)
   first.v <- which(!duplicated(line.xy[, "L1"]))
-  if (length(first.v) != n_edges) {
-  	stop("Could not extract exactly two end nodes for every line feature.")
-  }
   last.v <- c(first.v[-1] - 1, nrow(line.xy))
   end.xy <- matrix(NA_real_, nrow = 2 * n_edges, ncol = 2,
   									dimnames = list(NULL, c("X", "Y")))
@@ -264,16 +277,23 @@ lines_to_lsn <- function(streams,
   ## End nodes as POINTs, used to find intersections without nodes
   all_nodes_as_single <- st_geometry(st_as_sf(as.data.frame(end.xy),
   																									coords = c("X", "Y"), crs = lst_crs))
-
-  ## Pairs of ends <= snap_tolerance apart, grouped into nodes
+	
+  ## Find line end nodes <= snap_tolerance apart
   end.pairs <- grid_pairs(end.xy, snap_tolerance)
+  
+  ## Create a graph with one vertex per line end node
   g <- igraph::make_empty_graph(n = 2 * n_edges, directed = FALSE)
+  
+  ## Add graph edges/links between connected nodes
   g <- igraph::add_edges(g, as.vector(t(end.pairs)))
+  
+  ## Assign group number to snapped/shared nodes
   memb <- igraph::components(g)$membership
   rm(g)
 
-  ## Never put the from and to ends of a line in the same node
+  ## Prevent a line's from/to nodes being snapped
   split.res <- split_self_loops(end.pairs, end.xy, memb)
+  
   memb <- split.res$memb
   blocked.ends <- split.res$blocked
   rm(end.pairs, split.res)
