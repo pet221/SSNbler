@@ -12,7 +12,8 @@ sites_to_lsn(
   lsn_path = NULL,
   file_name = NULL,
   overwrite = FALSE,
-  verbose = TRUE
+  verbose = TRUE,
+  remove_ZM = FALSE
 )
 }
 \arguments{
@@ -44,6 +45,11 @@ exist. Defaults to \code{FALSE}.}
 
 \item{verbose}{Logical indicating whether progress messages should
 be printed to the console. Defaults to \code{TRUE}}
+
+\item{remove_ZM}{Logical. If \code{TRUE}, Z and M dimensions are
+removed from \code{sites} and \code{edges}, if they exist. If
+\code{FALSE} and either has Z or M dimensions, the function stops
+with an error. Default is \code{FALSE}.}
 }
 \value{
 An \code{sf} object with POINT geometry containing the

@@ -27,6 +27,10 @@
 #'   exist. Defaults to \code{FALSE}.
 #' @param verbose Logical indicating whether progress messages should
 #'   be printed to the console. Defaults to \code{TRUE}
+#' @param remove_ZM Logical. If \code{TRUE}, Z and M dimensions are
+#'   removed from \code{sites} and \code{edges}, if they exist. If
+#'   \code{FALSE} and either has Z or M dimensions, the function stops
+#'   with an error. Default is \code{FALSE}.
 #'
 #' @details The \code{sites_to_lsn} function is used to incorporate
 #'   observed and prediction sites into the LSN. The output is an
@@ -104,7 +108,7 @@
 #'
 sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
                          lsn_path = NULL, file_name = NULL, overwrite = FALSE,
-                         verbose = TRUE) {
+                         verbose = TRUE, remove_ZM = FALSE) {
   # check sf object
   if (!inherits(sites, "sf")) {
     stop("sites must be an sf object.", call. = FALSE)
@@ -240,6 +244,21 @@ sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
   }
   if (grepl("LINESTRING", edge_geom) == FALSE) {
     stop("Input edges must have LINESTRING geometry")
+  }
+
+  ## Z and M dimensions are not supported. Stop if remove_ZM == FALSE,
+  ## otherwise remove them
+  if (grepl("Z|M", site_geom) == TRUE) {
+    if (remove_ZM == FALSE) {
+      stop("sites has XYZ, XYM or XYZM geometry, which is not supported. Set remove_ZM = TRUE to drop Z and/or M dimensions from feature geometries.")
+    }
+    sites <- st_zm(sites)
+  }
+  if (grepl("Z|M", edge_geom) == TRUE) {
+    if (remove_ZM == FALSE) {
+      stop("edges has XYZ, XYM or XYZM geometry, which is not supported. Set remove_ZM = TRUE to drop Z and/or M dimensions from feature geometries.")
+    }
+    edges <- st_zm(edges)
   }
 
   ## Stop if the crs for edges and sites does not match
