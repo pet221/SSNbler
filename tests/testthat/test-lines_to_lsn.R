@@ -31,7 +31,7 @@ group_ends <- function(end.xy, tol) {
 }
 
 # Run lines_to_lsn() on a list of coordinate matrices and read the
-# outputs back. The temporary LSN folder lasts until the calling test ends
+# outputs back. 
 grid_lsn <- function(coords, snap, topo = 20) {
 	lines <- lapply(coords, sf::st_linestring)
 	streams <- sf::st_sf(id = seq_along(lines),
@@ -45,14 +45,12 @@ grid_lsn <- function(coords, snap, topo = 20) {
 	rel <- rel[order(rel$fromedge, rel$toedge), , drop = FALSE]
 	rownames(rel) <- NULL
 	err.file <- file.path(lsn.path, "node_errors.gpkg")
+	error.table <- if (file.exists(err.file)) sf::st_read(err.file, quiet = TRUE)
 	list(nodecat = sf::st_read(file.path(lsn.path, "nodes.gpkg"), quiet = TRUE)$nodecat,
 		noderel = utils::read.csv(file.path(lsn.path, "noderelationships.csv")),
 		rel = rel,
-		errors = if (file.exists(err.file)) {
-			sort(sf::st_read(err.file, quiet = TRUE)$error)
-		} else {
-			character(0)
-		})
+		errors = if (is.null(error.table)) character(0) else sort(error.table$error),
+		error.table = error.table)
 }
 
 x0 <- 1e6
@@ -118,27 +116,28 @@ test_that("split_self_loops() leaves groups without both ends of a line alone", 
 	expect_length(res$blocked, 0)
 })
 
-test_that("split_self_loops() splits a hairpin and reports both ends", {
+test_that("split_self_loops() splits a hairpin and does not report it", {
 	# Line 1's ends are 0.1 apart
 	end.xy <- rbind(c(0, 0), c(0.1, 0), c(50, 50), c(60, 60))
 	ge <- group_ends(end.xy, 0.3)
 	expect_equal(ge$memb[1], ge$memb[2])
 	res <- split_self_loops(ge$pairs, end.xy, ge$memb)
 	expect_false(res$memb[1] == res$memb[2])
-	expect_equal(sort(res$blocked), c(1, 2))
+	expect_length(res$blocked, 0)
 })
 
 test_that("split_self_loops() merges closest first and blocks the rest", {
 	# Line 1's ends are 0.2 apart. Line 2's to end is 0.05 from line 1's
 	# to end and 0.15 from its from end. The 0.05 merge is made; the others
-	# would put both ends of line 1 in one node
+	# would put both ends of line 1 in one node. Only the pair between
+	# lines (ends 1 and 4) is reported
 	end.xy <- rbind(c(0, 0), c(0.2, 0), c(0.15, 50), c(0.15, 0))
 	ge <- group_ends(end.xy, 0.3)
 	res <- split_self_loops(ge$pairs, end.xy, ge$memb)
 	expect_equal(res$memb[2], res$memb[4])
 	expect_false(res$memb[1] == res$memb[2])
 	expect_false(res$memb[3] %in% res$memb[c(1, 2, 4)])
-	expect_equal(sort(res$blocked), c(1, 2, 4))
+	expect_equal(sort(res$blocked), c(1, 4))
 })
 
 test_that("split_self_loops() leaves a line with identical ends as a self-loop", {
@@ -152,17 +151,6 @@ test_that("split_self_loops() leaves a line with identical ends as a self-loop",
 })
 
 ## lines_to_lsn() ----
-
-test_that("ends chained within tolerance form one node with no error", {
-	# A-B and B-C are 0.2 apart, A-C 0.4 (> snap 0.3)
-	lsn <- grid_lsn(list(
-		rbind(c(x0 - 100, y0 + 50), c(x0, y0)),
-		rbind(c(x0 + 100, y0 + 50), c(x0 + 0.2, y0)),
-		rbind(c(x0 + 0.4, y0), c(x0 + 0.4, y0 - 100))), snap = 0.3)
-	expect_equal(sort(lsn$nodecat), c("Confluence", "Outlet", "Source", "Source"))
-	expect_equal(lsn$rel, data.frame(fromedge = 1:2, toedge = c(3L, 3L)))
-	expect_length(lsn$errors, 0)
-})
 
 test_that("a gap of exactly snap_tolerance is snapped, just above is not", {
 	streams_gap <- function(gap) {
@@ -192,7 +180,7 @@ test_that("snap_tolerance = 0 connects exact matches only", {
 	expect_equal(lsn$errors, "Dangling Node")
 })
 
-test_that("a hairpin keeps two nodes and is flagged as Unsnapped Node", {
+test_that("a hairpin keeps two nodes and is not flagged as Unsnapped Node", {
 	# Line 1 starts 0.1 from where it ends (< snap 0.3); line 2 starts
 	# exactly where line 1 ends
 	lsn <- grid_lsn(list(
@@ -200,7 +188,20 @@ test_that("a hairpin keeps two nodes and is flagged as Unsnapped Node", {
 		rbind(c(x0 + 0.1, y0), c(x0 + 0.1, y0 - 100))), snap = 0.3)
 	expect_false(lsn$noderel$fromnode[1] == lsn$noderel$tonode[1])
 	expect_equal(lsn$rel, data.frame(fromedge = 1L, toedge = 2L))
-	expect_equal(lsn$errors, c("Unsnapped Node", "Unsnapped Node"))
+	expect_length(lsn$errors, 0)
+})
+
+test_that("a short line between two lines is not flagged as Unsnapped Node", {
+	# Line 2 is 0.03 long and shares its ends exactly with lines 1 and 3.
+	# All four inner ends are within snap 1, but the groups are unambiguous
+	a <- c(x0, y0)
+	b <- c(x0 + 0.03, y0)
+	expect_warning(lsn <- grid_lsn(list(rbind(a - c(10, 0), a), rbind(a, b),
+		rbind(b, b + c(10, 0))), snap = 1), "length <= snap_tolerance")
+	expect_equal(sort(lsn$nodecat),
+		c("Outlet", "Pseudonode", "Pseudonode", "Source"))
+	expect_equal(lsn$rel, data.frame(fromedge = 1:2, toedge = 2:3))
+	expect_length(lsn$errors, 0)
 })
 
 test_that("a short line longer than snap_tolerance is not collapsed", {
@@ -222,13 +223,6 @@ test_that("a line with identical ends is a Self-loop with no self-relationship",
 	expect_equal(length(lsn$nodecat), 1)
 	expect_equal(nrow(lsn$rel), 0)
 	expect_equal(lsn$errors, "Self-loop")
-})
-
-test_that("a single line gives a Source and an Outlet", {
-	lsn <- grid_lsn(list(rbind(c(x0, y0), c(x0 + 100, y0))), snap = 0.3)
-	expect_equal(sort(lsn$nodecat), c("Outlet", "Source"))
-	expect_equal(nrow(lsn$rel), 0)
-	expect_length(lsn$errors, 0)
 })
 
 test_that("MF LSN has one downstream edge per non-outlet edge and no errors", {
@@ -284,6 +278,28 @@ test_that("lines_to_lsn() input checks stop with informative errors", {
 		crs = 5070))
 	expect_error(run(pts), "must have LINESTRING geometry")
 
+	## Mixed geometry types are caught even when the first feature is a
+	## LINESTRING
+	mixed.multi <- sf::st_sf(id = 1:2, geometry = sf::st_sfc(
+		sf::st_linestring(two.lines[[1]]), sf::st_multilinestring(two.lines),
+		crs = 5070))
+	expect_error(run(mixed.multi), "sf::st_cast")
+
+	mixed.pts <- sf::st_sf(id = 1:2, geometry = sf::st_sfc(
+		sf::st_linestring(two.lines[[1]]), sf::st_point(c(x0, y0)),
+		crs = 5070))
+	expect_error(run(mixed.pts), "must have LINESTRING geometry")
+
+	not.folder <- withr::local_tempfile(fileext = ".gpkg")
+	file.create(not.folder)
+	expect_error(lines_to_lsn(make_streams(two.lines), lsn_path = not.folder,
+		snap_tolerance = 1, topo_tolerance = 20, verbose = FALSE),
+		"lsn_path must be a folder")
+
+	one.vertex <- make_streams(list(two.lines[[1]], matrix(c(x0, y0), nrow = 1)))
+	expect_error(run(one.vertex), "at least two vertices")
+	expect_false(file.exists(file.path(p, "edges.gpkg")))
+
 	for (d in c("XYZ", "XYM", "XYZM")) {
 		extra <- if (d == "XYZM") 2 else 1
 		zm <- make_streams(lapply(two.lines, function(m) {
@@ -296,10 +312,68 @@ test_that("lines_to_lsn() input checks stop with informative errors", {
 	streams <- make_streams(two.lines)
 	expect_error(run(streams, snap_tolerance = -1, topo_tolerance = 20),
 		"must be >= 0")
+	for (bad in list(NA, NA_real_, "1", c(1, 2), numeric(0))) {
+		expect_error(run(streams, snap_tolerance = bad, topo_tolerance = 20),
+			"snap_tolerance must be a single number")
+	}
+	for (bad in list(-1, NA, NA_real_, "20", c(20, 30), numeric(0))) {
+		expect_error(run(streams, snap_tolerance = 1, topo_tolerance = bad),
+			"topo_tolerance must be a single number")
+	}
 	expect_error(run(streams, snap_tolerance = 1, topo_tolerance = 1),
 		"topo_tolerance must be > snap_tolerance")
-	expect_error(run(streams, snap_tolerance = 150, topo_tolerance = 200),
-		"snap_tolerance must be < than the length")
+	expect_warning(run(streams, snap_tolerance = 150, topo_tolerance = 200),
+		"2 line feature\\(s\\) in streams have a length <= snap_tolerance")
+	expect_warning(run(streams, check_topology = FALSE, snap_tolerance = 150),
+		"2 line feature\\(s\\) in streams have a length <= snap_tolerance")
+})
+
+test_that("blocked snaps give a warning only when check_topology = FALSE", {
+	# Line 1 is 1.5 long. Line 2's to end is within snap 1 of both its ends
+	streams <- make_streams(list(rbind(c(x0, y0), c(x0 + 1.5, y0)),
+		rbind(c(x0 + 0.7, y0 + 100), c(x0 + 0.7, y0 + 0.2))))
+	p <- withr::local_tempdir()
+	expect_warning(lines_to_lsn(streams, lsn_path = p, check_topology = FALSE,
+		snap_tolerance = 1, overwrite = TRUE, verbose = FALSE),
+		"2 line end node\\(s\\)")
+	warnings.seen <- capture_warnings(lines_to_lsn(streams, lsn_path = p,
+		check_topology = TRUE, snap_tolerance = 1, topo_tolerance = 20,
+		overwrite = TRUE, verbose = FALSE))
+	expect_false(any(grepl("within snap_tolerance", warnings.seen)))
+	expect_true("Unsnapped Node" %in%
+		sf::st_read(file.path(p, "node_errors.gpkg"), quiet = TRUE)$error)
+})
+
+test_that("ends chained within tolerance form one Chained Node, or give a warning", {
+	# A-B and B-C are 0.2 apart, A-C 0.4 (> snap 0.3)
+	streams <- make_streams(list(
+		rbind(c(x0 - 100, y0 + 50), c(x0, y0)),
+		rbind(c(x0 + 100, y0 + 50), c(x0 + 0.2, y0)),
+		rbind(c(x0 + 0.4, y0), c(x0 + 0.4, y0 - 100))))
+	p <- withr::local_tempdir()
+	lines_to_lsn(streams, lsn_path = p, check_topology = TRUE,
+		snap_tolerance = 0.3, topo_tolerance = 20, overwrite = TRUE,
+		verbose = FALSE)
+	expect_equal(sort(sf::st_read(file.path(p, "nodes.gpkg"), quiet = TRUE)$nodecat),
+		c("Confluence", "Outlet", "Source", "Source"))
+	expect_equal(read_rel_df(p), data.frame(fromedge = 1:2, toedge = c(3L, 3L)))
+	err <- sf::st_read(file.path(p, "node_errors.gpkg"), quiet = TRUE)
+	expect_equal(err$error, "Chained Node")
+	expect_equal(err$node_width, 0.4)
+	expect_equal(err$up_rid, "1, 2")
+	expect_equal(err$down_rid, "3")
+
+	expect_warning(lines_to_lsn(streams, lsn_path = p, check_topology = FALSE,
+		snap_tolerance = 0.3, overwrite = TRUE, verbose = FALSE),
+		"1 node\\(s\\) contain line end nodes more than snap_tolerance apart")
+
+	# A-B and B-C are 0.1 apart, A-C 0.2 (<= snap 0.3): not chained
+	lsn <- grid_lsn(list(
+		rbind(c(x0 - 100, y0 + 50), c(x0, y0)),
+		rbind(c(x0 + 100, y0 + 50), c(x0 + 0.1, y0)),
+		rbind(c(x0 + 0.2, y0), c(x0 + 0.2, y0 - 100))), snap = 0.3)
+	expect_equal(lsn$rel, data.frame(fromedge = 1:2, toedge = c(3L, 3L)))
+	expect_length(lsn$errors, 0)
 })
 
 test_that("remove_ZM = TRUE drops Z, M and ZM dimensions", {
@@ -327,9 +401,12 @@ test_that("check_topology = FALSE writes the LSN without node_errors", {
 		snap_tolerance = 1, topo_tolerance = 0, overwrite = TRUE,
 		verbose = FALSE)
 	expect_true(all(file.exists(file.path(p, c("edges.gpkg", "nodes.gpkg",
-		"nodexy.csv", "noderelationships.csv", "relationships.csv")))))
+		"noderelationships.csv", "relationships.csv")))))
+	expect_false(file.exists(file.path(p, "nodexy.csv")))
 	expect_false(file.exists(file.path(p, "node_errors.gpkg")))
 	expect_equal(nrow(read_rel_df(p)), 0)
+	expect_equal(sort(sf::st_read(file.path(p, "nodes.gpkg"), quiet = TRUE)$nodecat),
+		c("Outlet", "Outlet", "Source", "Source"))
 })
 
 test_that("overwrite = FALSE stops when the LSN already exists", {
@@ -339,7 +416,15 @@ test_that("overwrite = FALSE stops when the LSN already exists", {
 		topo_tolerance = 20, overwrite = TRUE, verbose = FALSE)
 	expect_error(lines_to_lsn(streams, lsn_path = p, snap_tolerance = 1,
 		topo_tolerance = 20, overwrite = FALSE, verbose = FALSE),
-		"edges.gpkg exists")
+		"already exist.*edges.gpkg, nodes.gpkg, noderelationships.csv, relationships.csv")
+
+	# A partly filled folder stops before anything is written
+	p <- withr::local_tempdir()
+	file.create(file.path(p, "nodes.gpkg"))
+	expect_error(lines_to_lsn(streams, lsn_path = p, snap_tolerance = 1,
+		topo_tolerance = 20, overwrite = FALSE, verbose = FALSE),
+		"already exist.*: nodes.gpkg\\.")
+	expect_false(file.exists(file.path(p, "edges.gpkg")))
 })
 
 test_that("existing rid and fid columns follow overwrite", {
@@ -385,6 +470,60 @@ test_that("duplicate lines give Converging Node and Downstream Divergence", {
 		snap = 0.3)
 	expect_equal(lsn$rel, data.frame(fromedge = c(1L, 1L), toedge = 2:3))
 	expect_equal(lsn$errors, c("Converging Node", "Downstream Divergence"))
+
+	# up_rid/down_rid: no outflowing edges gives NA
+	err <- lsn$error.table
+	conv <- err[err$error == "Converging Node", ]
+	expect_equal(conv$up_rid, "2, 3")
+	expect_true(is.na(conv$down_rid))
+	div <- err[err$error == "Downstream Divergence", ]
+	expect_equal(div$up_rid, "1")
+	expect_equal(div$down_rid, "2, 3")
+})
+
+test_that("nodecat is Outlet with 0 outflow and Source with 0 inflow", {
+	# 3 lines flow into one node and none flow out: an Outlet that is
+	# also a Complex Confluence (and not a Dangling Node)
+	lsn <- grid_lsn(list(rbind(c(x0 - 100, y0 + 50), c(x0, y0)),
+		rbind(c(x0, y0 + 100), c(x0, y0)),
+		rbind(c(x0 + 100, y0 + 50), c(x0, y0))), snap = 0.3)
+	expect_equal(nrow(lsn$rel), 0)
+	expect_equal(sort(lsn$nodecat), c("Outlet", rep("Source", 3)))
+	expect_equal(lsn$errors, "Complex Confluence")
+	expect_equal(lsn$error.table$nodecat, "Outlet")
+
+	# 2 lines flow out of one node and none flow in: a Source that is
+	# also a Downstream Divergence
+	lsn <- grid_lsn(list(rbind(c(x0, y0), c(x0 - 100, y0 - 50)),
+		rbind(c(x0, y0), c(x0 + 100, y0 - 50))), snap = 0.3)
+	expect_equal(nrow(lsn$rel), 0)
+	expect_equal(sort(lsn$nodecat), c("Outlet", "Outlet", "Source"))
+	expect_equal(lsn$errors, "Downstream Divergence")
+	expect_equal(lsn$error.table$nodecat, "Source")
+})
+
+test_that("intersections without a node are flagged, with NA pointid and rids", {
+	# Two lines crossing in an X; arms 50 long, topo_tolerance 20
+	lsn <- grid_lsn(list(rbind(c(x0 - 50, y0), c(x0 + 50, y0)),
+		rbind(c(x0, y0 + 50), c(x0, y0 - 50))), snap = 0.3)
+	expect_equal(nrow(lsn$rel), 0)
+	expect_equal(lsn$errors, "Intersection Without Node")
+	err <- lsn$error.table
+	expect_true(is.na(err$pointid))
+	expect_true(is.na(err$up_rid))
+	expect_true(is.na(err$down_rid))
+	expect_equal(unname(sf::st_coordinates(err)[1, 1:2]), c(x0, y0))
+
+	# Line 2 starts on the interior of line 1, without a node (a T)
+	lsn <- grid_lsn(list(rbind(c(x0 - 50, y0), c(x0 + 50, y0)),
+		rbind(c(x0, y0), c(x0, y0 + 50))), snap = 0.3)
+	expect_equal(nrow(lsn$rel), 0)
+	expect_equal(lsn$errors, "Dangling Node")
+	err <- lsn$error.table
+	expect_true(is.na(err$pointid))
+	expect_true(is.na(err$up_rid))
+	expect_true(is.na(err$down_rid))
+	expect_equal(unname(sf::st_coordinates(err)[1, 1:2]), c(x0, y0))
 })
 
 test_that("separate networks each get their own outlet", {
@@ -395,17 +534,6 @@ test_that("separate networks each get their own outlet", {
 		rep(c("Outlet", "Pseudonode", "Source"), each = 2))
 	expect_equal(lsn$rel, data.frame(fromedge = c(1L, 3L), toedge = c(2L, 4L)))
 	expect_length(lsn$errors, 0)
-})
-
-test_that("tolerances are in map units (US feet)", {
-	# NAD83 / North Carolina (ftUS); a 0.5 ft gap with snap_tolerance = 1 ft
-	streams <- make_streams(list(rbind(c(2e6 - 100, 6e5), c(2e6, 6e5)),
-		rbind(c(2e6 + 0.5, 6e5), c(2e6 + 100, 6e5))), crs = 2264)
-	p <- withr::local_tempdir()
-	lines_to_lsn(streams, lsn_path = p, snap_tolerance = 1,
-		topo_tolerance = 20, overwrite = TRUE, verbose = FALSE)
-	expect_equal(read_rel_df(p), data.frame(fromedge = 1L, toedge = 2L))
-	expect_false(file.exists(file.path(p, "node_errors.gpkg")))
 })
 
 test_that("overwrite = TRUE removes node_errors.gpkg from an earlier run", {
@@ -420,4 +548,26 @@ test_that("overwrite = TRUE removes node_errors.gpkg from an earlier run", {
 	expect_true(file.exists(file.path(p, "node_errors.gpkg")))
 	run(0)  # fixed
 	expect_false(file.exists(file.path(p, "node_errors.gpkg")))
+})
+
+test_that("overwrite = TRUE stops before writing if an old file can't be deleted", {
+	# Windows locks a file that is open, so it can't be deleted (as with a
+	# GeoPackage open in GIS software). Other systems allow the delete
+	skip_on_os(c("mac", "linux", "solaris"))
+	p <- withr::local_tempdir()
+	writeLines("old", file.path(p, "nodes.gpkg"))
+	con <- file(file.path(p, "nodes.gpkg"), open = "r")
+	withr::defer(close(con))
+	expect_error(lines_to_lsn(make_streams(two.lines), lsn_path = p,
+		snap_tolerance = 1, topo_tolerance = 20, overwrite = TRUE,
+		verbose = FALSE), "could not be deleted: nodes.gpkg\\.")
+	expect_false(file.exists(file.path(p, "edges.gpkg")))
+})
+
+test_that("overwrite = TRUE removes nodexy.csv from an earlier version", {
+	p <- withr::local_tempdir()
+	file.create(file.path(p, "nodexy.csv"))
+	lines_to_lsn(make_streams(two.lines), lsn_path = p, snap_tolerance = 1,
+		topo_tolerance = 20, overwrite = TRUE, verbose = FALSE)
+	expect_false(file.exists(file.path(p, "nodexy.csv")))
 })

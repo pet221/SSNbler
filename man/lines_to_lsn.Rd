@@ -12,8 +12,6 @@ lines_to_lsn(
   topo_tolerance = 0,
   remove_ZM = FALSE,
   overwrite = FALSE,
-  use_parallel = FALSE,
-  no_cores = NULL,
   verbose = TRUE
 )
 }
@@ -32,32 +30,31 @@ flagged in an output file called
 
 \item{snap_tolerance}{Distance in map units >= 0. Two nodes separated by
 a distance less than or equal to \code{snap_tolerance} are
-assumed to be connected. Defaults to 0.}
+assumed to be connected. Defaults to 0, where only
+line end nodes with \emph{identical} coordinates connect at a node.}
 
 \item{topo_tolerance}{Distance in map units >= 0. Only used if
 \code{check_topology = TRUE}. Two nodes on the network separated
 by a distance less than or equal to \code{topo_tolerance} are
-flagged as potential topological errors in the network. Defaults
-to 0.}
+flagged as potential topological errors in the network. Must be
+greater than \code{snap_tolerance} when \code{check_topology =
+  TRUE} and \code{snap_tolerance} > 0. Defaults to 0.}
 
 \item{remove_ZM}{Logical. If \code{TRUE}, Z and M dimensions are
-removed from streams, if they exist. Default is \code{FALSE}.}
+removed from streams, if they exist. If \code{FALSE} and
+\code{streams} has Z and/or M dimensions, the function stops with
+an error. Default is \code{FALSE}.}
 
 \item{overwrite}{Logical. If \code{TRUE}, output files will
-overwrite existing files with the same names. If \code{FALSE} and
-files sharing the same names as the outputs exist in the
-\code{lsn_path}, the function will exit early with an error.}
-
-\item{use_parallel}{Logical. if \code{TRUE} parallel processing will be used. Default is \code{FALSE}.}
-
-\item{no_cores}{Integer representing the number of cores to use in parallel processing. Default is \code{NULL}. When \code{use_parallel = TRUE}, \code{no_cores} is required and must be > 0.}
+overwrite existing files with the same names, and a
+node_errors.gpkg file from an earlier run is deleted. Default is \code{FALSE}.}
 
 \item{verbose}{Logical. If \code{TRUE}, messages describing
 function progress will be printed to the console. Default is
 \code{TRUE}.}
 }
 \value{
-An \code{sf} object representing edges in the LSN. The LSN, including edges.gpkg, nodes.gpkg, nodexy.csv, noderelationships.csv, and relationships.csv files, are saved locally to a directory defined by \code{lsn_path}. If \code{check_topology = TRUE} and topological errors are identified, then node_errors.gpkg is also saved to \code{lsn_path}.
+An \code{sf} object representing edges in the LSN. The LSN, including edges.gpkg, nodes.gpkg, noderelationships.csv, and relationships.csv files, are saved locally to a directory defined by \code{lsn_path}. If \code{check_topology = TRUE} and topological errors are identified, then node_errors.gpkg is also saved to \code{lsn_path}.
 }
 \description{
 Convert an \code{sf} object containing features with
@@ -75,30 +72,59 @@ features, along with additional attribute information.
 \code{streams} must have LINESTRING geometry and a projected coordinate system, rather
 than geographic coordinate system (i.e. not Longitude and Latitude).
 
-The LSN is saved to a local directory defined by \code{lsn_path} and has 5 components:
+The LSN is saved to a local directory defined by \code{lsn_path} and has four components:
 \itemize{
-\item{ nodes.gpkg: A GeoPackage of features with POINT geometry representing topologic breaks in the stream network such as pseudonodes, confluences, stream sources, or stream outlets. A column containing a unique node identifier, pointid, is included. }
+\item{ nodes.gpkg: A GeoPackage of features with POINT geometry representing topologic breaks in the stream network. A column named nodecat specifies the type of node (e.g. pseudonodes, confluences, stream sources, or stream outlets). A column containing a unique node identifier, pointid, is also included. }
 \item{ edges.gpkg: A GeoPackage of features with LINESTRING geometry representing flow paths (i.e. line features) from node to node. A new column named rid is added that contains a unique identifier for each line feature. }
-\item{nodexy.csv: a table with three columns: the pointid (unique node identifier), and the x-, y-coordinates for each node. }
 \item{noderelationships.csv: a table describing the relationship between the nodes and their associated edges, as well as directionality in the LSN. The table contains three columns: the rid (for each edge), fromnode (pointid for the upstream node of each edge), and tonode (pointid for the downstream node of each edge). Directionality is defined based on the digitized direction of the line features. }
 \item{relationships.csv: a table representing the downstream flow path from edge to edge. The table contains two columns: fromedge (upstream edge) and toedge (downstream edge). }
 }
+
+Line end nodes separated by a Euclidean distance <=
+\code{snap_tolerance} are snapped together into a single node, and
+nodes, noderelationships.csv and relationships.csv are all built
+from this rule. Snapping is transitive: if end node A is within
+\code{snap_tolerance} of end node B, and B is within
+\code{snap_tolerance} of end node C, then A, B and C form one node
+even if A and C are further apart. The upstream and downstream end
+nodes of the same line feature are never snapped into one node. The
+node takes the coordinates of the first line end node assigned to it.
 
 Topological errors are common in spatial data and must be corrected
 to ensure that the LSN accurately represents direction and
 connectivity within the stream network. When \code{check_topology =
 TRUE}, the edges are checked for topological errors. Two nodes on
-the network separated by a distance less than or equal to
+the network separated by a distance > \code{snap_tolerance} and <=
 \code{topo_tolerance} are flagged as potential topological errors
-in the network saved in an output file called
+in the network and saved in an output file called
 \code{node_errors.gpkg}, which is also saved to \code{lsn_path}. In
 addition to the pointid, \code{node_errors.gpkg} contains a column
-containing the node class (nodecat), which can take on values of
+containing the node category (nodecat), which like \code{nodes.gpkg} can take on values of
 Pseudonode, Confluence, Source, or Outlet. A second column (error)
-defines the potential error type and can take on values of Complex
-Confluence, Converging Node, Dangling Node, Intersection Without
-Node, Downstream Divergence and Unsnapped Node. The nodecat column
-is also added to nodes.gpkg. A node_errors.gpkg file is not
+defines the potential error type and can take on values of:
+\itemize{
+\item{Complex Confluence: three or more edges flow into the node.}
+\item{Converging Node: two edges flow into the node and none flow out.}
+\item{Dangling Node: an outlet within \code{topo_tolerance} of another edge, or an edge end node that touches another edge without a node.}
+\item{Downstream Divergence: two or more edges flow out of the node.}
+\item{Intersection Without Node: two edges cross without a node.}
+\item{Self-loop: the upstream and downstream end nodes of a line feature have identical coordinates. The line feature is not included in relationships.csv.}
+\item{Chained Node: the node contains line end nodes more than \code{snap_tolerance} apart. Because snapping is transitive, this happens when end nodes are linked by a chain of end nodes, each within \code{snap_tolerance} of the next.}
+\item{Unsnapped Node: a line end node was <= \code{snap_tolerance} from another end node and was not snapped to it. This typically occurs when snapping would result in a line features to and from nodes being combined into one node (e.g. a line end node close to both end nodes of a short line). }
+}
+Two additional columns are added to \code{node_errors.gpkg} containing the rids of the edges flowing into (up_rid)
+and out of (down_rid) each node, in comma separated text format (e.g. "4, 7"). This allows the user to visually check flow relationships at each potential error more
+quickly. Note that up_rid is NA for a node without edges that flow in (e.g. a
+Source) and down_rid is NA for a node without edges flowing out
+(e.g. an Outlet). Both are NA for Intersection Without Node errors
+and for Dangling Nodes where an edge end node touches another edge
+without a node, because these do not coincide with topological breaks in the edges (pointid is
+NA). A numeric column (node_width) gives the largest distance, in
+map units, between two line end nodes in each Chained Node, so the
+widest can be checked first. Note that node_width is NA for all other error
+types.
+
+A node_errors.gpkg file is not
 produced if no obvious errors are identified. There is no guarantee
 that all topological errors will be identified and included in
 node_errors.gpkg. Therefore, potential errors \emph{and} node classes
@@ -109,12 +135,16 @@ iterative and must continue until the LSN is free of topological
 errors.
 
 The arguments \code{snap_tolerance} and \code{topo_tolerance} are
-both provided in map units and must be >= 0. It is generally a good
-idea to set the \code{snap_tolerance} to a relatively small value
-compared to the \code{topo_tolerance} argument. Nodes separated by
+both provided in map units and must be >= 0. When
+\code{check_topology = TRUE} and \code{snap_tolerance} > 0,
+\code{topo_tolerance} must be greater than \code{snap_tolerance}. It is generally a good
+idea to set the \code{snap_tolerance} to a distance shorter than the smallest line segment length. It should also be relatively small
+compared to the distance specified in the \code{topo_tolerance} argument. Nodes separated by
 a Euclidean distance <= \code{snap_tolerance} are assumed to be
-connected.  If this distance <= snap_tolerance, the nodes
-are automatically snapped when \code{check_topology = TRUE}. Similarly, when snap_tolerance < distance <= topo_tolerance, nodes are flagged as potential errors.
+connected and are snapped together. When snap_tolerance < distance <= topo_tolerance, nodes are flagged as potential errors. #' If \code{snap_tolerance} is too large, end nodes that should remain
+separate will be snapped together in error. If \code{topo_tolerance}
+is too large, more false errors will be flagged in
+\code{node_errors.gpkg}.
 
-WARNING: \code{snap_tolerance} must always be less than the length of the shortest line feature found in \code{streams}. Use the \code{\link[sf]{st_length}} to obtain and check the minimum length of the line features.
+WARNING: A warning is given if the length of any line feature in \code{streams} is <= \code{snap_tolerance}, because snapping near that line feature may not give the intended connections. Use \code{\link[sf]{st_length}} to obtain and check the minimum length of the line features prior to running \code{lines_to_lsn}. When \code{check_topology = FALSE}, a warning is also given if any line end nodes within \code{snap_tolerance} of another line end node were not snapped. This typically occurs when snapping would put both end nodes of a line feature into one node. If this warning is returned, re-run \code{lines_to_lsn} with \code{check_topology = TRUE} to locate these nodes. Similarly, when \code{check_topology = FALSE}, a warning is given if any snapped nodes include Chained Nodes that were more than \code{snap_tolerance} apart because of transitive snapping. Again, use \code{check_topology = TRUE} to locate and check these nodes.
 }
