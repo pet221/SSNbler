@@ -1,5 +1,6 @@
 test_that("Relevant files exist", {
-	expect_equal(length(list.files(path)), 13)
+	expect_equal(length(list.files(path)), 12)
+	expect_false(file.exists(file.path(path, "nodexy.csv")))
 })
 
 test_that("MF_streams", {
@@ -43,6 +44,8 @@ test_that("nodes", {
 	expect_equal(dim(nodes), c(165, 3))
 	expect_true(all(sf::st_geometry_type(nodes) == "POINT"))
 	expect_equal(nodes$pointid, 1:165)
+	expect_true(all(sf::st_coordinates(nodes)[, "X"] < -1450000))
+	expect_true(all(sf::st_coordinates(nodes)[, "Y"] > 2500000))
 	expect_true(all(nodes$nodecat %in% c("Pseudonode", "Confluence", "Source", "Outlet")))
 	expect_s3_class(nodes, "sf")
 })
@@ -69,15 +72,6 @@ test_that("noderelationships", {
 	expect_s3_class(noderelationships, "data.frame")
 })
 
-test_that("nodexy", {
-	expect_equal(dim(nodexy), c(165, 3))
-	expect_equal(names(nodexy), c("pointid", "xcoord", "ycoord"))
-	expect_equal(nodexy$pointid, 1:165)
-	expect_true(all(nodexy$xcoord < -1450000))
-	expect_true(all(nodexy$ycoord > 2500000))
-	expect_equal(noderelationships$tonode[1:2], c(2, 1))
-	expect_s3_class(noderelationships, "data.frame")
-})
 
 test_that("relationships", {
 	expect_equal(dim(relationships), c(161, 2))
