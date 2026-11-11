@@ -1,5 +1,5 @@
 ## Returns a two-column matrix (i, j), where i != j, of row indices of xy
-## for end nodes <= tol apart. Each node pair is returned once.
+## where end nodes <= tol apart. Each node pair is returned only once.
 ## End nodes are binned on a grid so each node is only compared with
 ## nodes in its own cell and neighbouring cells.
 
@@ -15,9 +15,9 @@ grid_pairs <- function(xy, tol) {
 		cell.width <- tol * 1.0001
 		node.col <- floor(xy[, 1] / cell.width) + 0 ## + 0 turns -0 to 0
 		node.row <- floor(xy[, 2] / cell.width) + 0
-		## Direction to move from source cell to one of its neighbours, 
+		## Direction to move from source cell (0,0) to one of its neighbours, 
 		## measured in cells (x, y directions). Limit directional
-		## comparisons to ensure pairs aren't counted twice
+		## comparisons to ensure pairs aren't counted twice.
 		offsets <- rbind(c(0, 0), c(1, -1), c(1, 0), c(1, 1), c(0, 1))
 		
 	## No snapping, a cell is an exact coordinate when tol == 0
@@ -27,7 +27,7 @@ grid_pairs <- function(xy, tol) {
 		offsets <- rbind(c(0, 0))
 	}
 	
-	## Group nodes by cell 
+	## Group nodes by cell ##
 	
 	## Sort nodes by cell (column, then row)
 	o <- order(node.col, node.row, method = "radix")
@@ -97,11 +97,11 @@ grid_pairs <- function(xy, tol) {
 			to.node.pos <- to.node.pos[keep]
 		}
 
-		## Convert node pairs' cell relative positions into row numbers in xy
-		## Get the sorted position of the first node in each from/to cell
-		## Expand from one value per cell pair to one value per node pair
-		## Add the from/to node's position within its cell to get its sorted position
-		## Use o to convert sorted positions to row numbers in xy
+		## Convert node pairs' cell relative positions into row numbers in xy ##
+		## Get the sorted position of the first node in each from/to cell.
+		## Expand from one value per cell pair to one value per node pair.
+		## Add the from/to node's position within its cell to get its sorted position.
+		## Use o to convert sorted positions to row numbers in xy.
 		pairs[[k]] <- cbind(i = o[cell.start[from.cell][cell.pair.id] + from.node.pos],
 												j = o[cell.start[to.cell][cell.pair.id] + to.node.pos])
 	}
