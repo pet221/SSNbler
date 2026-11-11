@@ -36,6 +36,7 @@ Depends:
 Imports:
 	sf,
 	dplyr,
+	grDevices,
 	utils,
 	igraph,
 	RSQLite,
