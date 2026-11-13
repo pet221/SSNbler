@@ -1,17 +1,17 @@
 ## Re-groups nodes so the from and to nodes of a line are never
-## assigned the same node. Only groups (memb) that contain both ends of a
-## line are re-grouped; all other groups are returned unchanged.
+## snapped. Only groups (memb) that contain both ends of a
+## line are re-grouped here; all other groups are returned unchanged.
 ## 
 ## Inputs:
 ## end.pairs: two-column matrix of end node indices <= snap_tolerance
-##   apart (from grid_pairs())
+##   apart (from grid_pairs)
 ## end.xy: line end node coordinates in the order from1, to1, from2, 
-##   to2, ...
-## memb: group id of each end node (from igraph::components())
+##   to2, ... 
+## memb: group id of each end node (from igraph::components)
 ##
 ## Returns a list of length 2 with memb (new group/node ids) and blocked
 ## (indices of end nodes in pairs that were within snap_tolerance but 
-## not merged). 
+## not snapped). 
 
 split_self_loops <- function(end.pairs, end.xy, memb) {
 
@@ -71,7 +71,7 @@ split_self_loops <- function(end.pairs, end.xy, memb) {
 	parent <- seq_along(local.ends)
 
 	## For each node, keep a list of lines that are associated with it. 
-	## The first step is to add the line the node belongs to.
+	## First, add the line the node belongs to.
 	edge.sets <- as.list(edge.id[local.ends])
 
 	## Self-loop lines are left out of edge.sets, so they don't block
@@ -82,31 +82,12 @@ split_self_loops <- function(end.pairs, end.xy, memb) {
 	## records whether a pair is not merged and needs to be reported
 	blocked <- logical(nrow(pairs))
 
-	## Find which node a line end node is currently associated with
-	find_node_label <- function(a) {
-		while (parent[a] != a) a <- parent[a]
-		a
-	}
-
-	## Check whether a blocked set of end nodes is a copy of a line's
-	## own two end nodes. If so, it has been correctly excluded and 
-	## the pair is not reported as unsnapped node
-	matches_line_ends <- function(end.a, end.b, edges) {
-		from.ends <- 2 * edges - 1
-		to.ends <- 2 * edges
-		same_xy <- function(end, ends) {
-			end.xy[ends, 1] == end.xy[end, 1] & end.xy[ends, 2] == end.xy[end, 2]
-		}
-		any((same_xy(end.a, from.ends) & same_xy(end.b, to.ends)) |
-				(same_xy(end.a, to.ends) & same_xy(end.b, from.ends)))
-	}
-
 	## Merge pairs in order, closest first
 	for (k in seq_len(nrow(pairs))) {
 
 		## Get group labels associated with two end nodes in pair k
-		node.label.i <- find_node_label(pair.i[k])
-		node.label.j <- find_node_label(pair.j[k])
+		node.label.i <- find_node_label(pair.i[k], parent)
+		node.label.j <- find_node_label(pair.j[k], parent)
 
 		## Already in the same group (merged through other pairs)
 		if (node.label.i == node.label.j) next
@@ -117,15 +98,15 @@ split_self_loops <- function(end.pairs, end.xy, memb) {
 
 		## Merging would put both ends of a line in one group: skip the
 		## merge. Report the pair unless it is equivalent to that line's
-		## own two end nodes
+		## own two end nodes 
 		if (length(blocking.edges) > 0) {
-			blocked[k] <- !matches_line_ends(pairs[k, 1], pairs[k, 2], 
-																			 blocking.edges)
+			blocked[k] <- !matches_line_ends(pairs[k, 1], pairs[k, 2],
+																			 blocking.edges, end.xy)
 			next
 		}
 
 		## Merge group node.label.j into group node.label.i, and combine
-		## their lines
+		## their edge.sets
 		parent[node.label.j] <- node.label.i
 		edge.sets[[node.label.i]] <- c(edge.sets[[node.label.i]],
 			edge.sets[[node.label.j]])
@@ -133,13 +114,16 @@ split_self_loops <- function(end.pairs, end.xy, memb) {
 	}
 
 	## Create final group/node label for affected end nodes
-	node.labels <- vapply(seq_along(local.ends), find_node_label, integer(1))
+	node.labels <- vapply(seq_along(local.ends), 
+												find_node_label, 
+												integer(1),
+												parent = parent)
 
 	## Add max(memb) to node label to ensure node labels are unique
 	memb[local.ends] <- max(memb) + match(node.labels, unique(node.labels))
 
-	## Return new node labels and the end nodes for reported blocked pairs.
-  ## To be reported as Unsnapped Node errors
+	## Return new node labels and end nodes for reported blocked pairs.
+  ## To be reported as unsnapped node errors
 	return(list(memb = memb,
 							blocked = unique(c(pairs[blocked, 1], pairs[blocked, 2]))))
 }

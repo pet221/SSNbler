@@ -8,8 +8,8 @@ lines_to_lsn(
   streams,
   lsn_path,
   check_topology = TRUE,
-  snap_tolerance = 0,
-  topo_tolerance = 0,
+  snap_tolerance,
+  topo_tolerance,
   remove_ZM = FALSE,
   overwrite = FALSE,
   verbose = TRUE
@@ -28,17 +28,18 @@ checked for topological errors and potential node errors will be
 flagged in an output file called
 \code{node_errors.gpkg}. Defaults to \code{TRUE}.}
 
-\item{snap_tolerance}{Distance in map units >= 0. Two nodes separated by
-a distance less than or equal to \code{snap_tolerance} are
-assumed to be connected. Defaults to 0, where only
-line end nodes with \emph{identical} coordinates connect at a node.}
+\item{snap_tolerance}{Distance in map units >= 0. Required; there is
+no default. Two nodes separated by a distance less than or equal to
+\code{snap_tolerance} are assumed to be connected. Use 0 to connect
+only line end nodes with \emph{identical} coordinates.}
 
-\item{topo_tolerance}{Distance in map units >= 0. Only used if
-\code{check_topology = TRUE}. Two nodes on the network separated
-by a distance less than or equal to \code{topo_tolerance} are
-flagged as potential topological errors in the network. Must be
-greater than \code{snap_tolerance} when \code{check_topology =
-  TRUE} and \code{snap_tolerance} > 0. Defaults to 0.}
+\item{topo_tolerance}{Distance in map units. Required when
+\code{check_topology = TRUE}, and ignored otherwise.
+Two nodes on the network separated by a distance less
+than or equal to \code{topo_tolerance} are flagged as potential
+topological errors in the network. Must be greater than
+\code{snap_tolerance} (and therefore > 0) when
+\code{check_topology = TRUE}.}
 
 \item{remove_ZM}{Logical. If \code{TRUE}, Z and M dimensions are
 removed from streams, if they exist. If \code{FALSE} and
@@ -85,63 +86,61 @@ Line end nodes separated by a Euclidean distance <=
 nodes, noderelationships.csv and relationships.csv are all built
 from this rule. Snapping is transitive: if end node A is within
 \code{snap_tolerance} of end node B, and B is within
-\code{snap_tolerance} of end node C, then A, B and C form one node
+\code{snap_tolerance} of end node C, then A, B and C are snapped
 even if A and C are further apart. The upstream and downstream end
 nodes of the same line feature are never snapped into one node. The
 node takes the coordinates of the first line end node assigned to it.
 
 Topological errors are common in spatial data and must be corrected
-to ensure that the LSN accurately represents direction and
+to ensure the LSN accurately represents direction and
 connectivity within the stream network. When \code{check_topology =
-TRUE}, the edges are checked for topological errors. Two nodes on
-the network separated by a distance > \code{snap_tolerance} and <=
-\code{topo_tolerance} are flagged as potential topological errors
-in the network and saved in an output file called
-\code{node_errors.gpkg}, which is also saved to \code{lsn_path}. In
+TRUE}, the edges are checked for topological errors and potential errors are saved to \code{lsn_path} in an output file called
+\code{node_errors.gpkg}. In
 addition to the pointid, \code{node_errors.gpkg} contains a column
 containing the node category (nodecat), which like \code{nodes.gpkg} can take on values of
-Pseudonode, Confluence, Source, or Outlet. A second column (error)
+Pseudonode, Confluence, Source, or Outlet. Another column (error)
 defines the potential error type and can take on values of:
 \itemize{
 \item{Complex Confluence: three or more edges flow into the node.}
 \item{Converging Node: two edges flow into the node and none flow out.}
-\item{Dangling Node: an outlet within \code{topo_tolerance} of another edge, or an edge end node that touches another edge without a node.}
+\item{Dangling Node: an outlet within \code{topo_tolerance} of an edge in a different network. }
 \item{Downstream Divergence: two or more edges flow out of the node.}
-\item{Intersection Without Node: two edges cross without a node.}
+\item{Intersection Without Node: two edges cross without a node. A crossing within \code{snap_tolerance} of a node that both edges flow into or out of is not reported.}
+\item{Confluence Without Node: an edge end node touches another edge somewhere other than the end node (e.g. forms a T junction where the other edge is not split).}
+\item{Network Without Outlet: the node is part of a loop of edges with no outlet (e.g. edges digitised in a circle, with or without edges flowing into it). Every node on the loop is reported. }
 \item{Self-loop: the upstream and downstream end nodes of a line feature have identical coordinates. The line feature is not included in relationships.csv.}
 \item{Chained Node: the node contains line end nodes more than \code{snap_tolerance} apart. Because snapping is transitive, this happens when end nodes are linked by a chain of end nodes, each within \code{snap_tolerance} of the next.}
-\item{Unsnapped Node: a line end node was <= \code{snap_tolerance} from another end node and was not snapped to it. This typically occurs when snapping would result in a line features to and from nodes being combined into one node (e.g. a line end node close to both end nodes of a short line). }
+\item{Unsnapped Node: a line end node was <= \code{snap_tolerance} from another end node and was not snapped to it. This typically occurs when snapping would result in a line feature's to and from nodes being combined into one node (e.g. a line end node close to both end nodes of a short line). }
 }
 Two additional columns are added to \code{node_errors.gpkg} containing the rids of the edges flowing into (up_rid)
 and out of (down_rid) each node, in comma separated text format (e.g. "4, 7"). This allows the user to visually check flow relationships at each potential error more
 quickly. Note that up_rid is NA for a node without edges that flow in (e.g. a
 Source) and down_rid is NA for a node without edges flowing out
-(e.g. an Outlet). Both are NA for Intersection Without Node errors
-and for Dangling Nodes where an edge end node touches another edge
-without a node, because these do not coincide with topological breaks in the edges (pointid is
-NA). A numeric column (node_width) gives the largest distance, in
+(e.g. an Outlet). Both are NA for Intersection Without Node errors, along with pointid and nodecat,
+because these do not coincide with topological breaks in the edges. A numeric column (node_width) gives the largest distance, in
 map units, between two line end nodes in each Chained Node, so the
 widest can be checked first. Note that node_width is NA for all other error
 types.
 
-A node_errors.gpkg file is not
-produced if no obvious errors are identified. There is no guarantee
+There is no guarantee
 that all topological errors will be identified and included in
 node_errors.gpkg. Therefore, potential errors \emph{and} node classes
-found in node_errors.gpkg and nodes.gpkg must be checked in a GIS
+found in node_errors.gpkg and nodes.gpkg must be checked
 and topological errors in \code{streams} corrected before
 rebuilding the LSN using \code{lines_to_lsn()}. This process is
 iterative and must continue until the LSN is free of topological
-errors.
+errors. A node_errors.gpkg file is not
+produced if no obvious errors are identified.
 
 The arguments \code{snap_tolerance} and \code{topo_tolerance} are
-both provided in map units and must be >= 0. When
-\code{check_topology = TRUE} and \code{snap_tolerance} > 0,
-\code{topo_tolerance} must be greater than \code{snap_tolerance}. It is generally a good
+both provided in map units and neither has a default.
+\code{snap_tolerance} must always be provided and must be >= 0. When
+\code{check_topology = TRUE}, \code{topo_tolerance} must also be
+provided and must be greater than \code{snap_tolerance}. It is generally a good
 idea to set the \code{snap_tolerance} to a distance shorter than the smallest line segment length. It should also be relatively small
 compared to the distance specified in the \code{topo_tolerance} argument. Nodes separated by
 a Euclidean distance <= \code{snap_tolerance} are assumed to be
-connected and are snapped together. When snap_tolerance < distance <= topo_tolerance, nodes are flagged as potential errors. #' If \code{snap_tolerance} is too large, end nodes that should remain
+connected and are snapped together. When snap_tolerance < distance <= topo_tolerance, nodes are flagged as potential errors. If \code{snap_tolerance} is too large, end nodes that should remain
 separate will be snapped together in error. If \code{topo_tolerance}
 is too large, more false errors will be flagged in
 \code{node_errors.gpkg}.

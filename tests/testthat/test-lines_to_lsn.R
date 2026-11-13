@@ -180,6 +180,65 @@ test_that("snap_tolerance = 0 connects exact matches only", {
 	expect_equal(lsn$errors, "Dangling Node")
 })
 
+test_that("Dangling Node ignores the outlet's own network", {
+	# Two tributaries join 5 m above the outlet; both are within
+	# topo_tolerance of the outlet, but they are upstream of it
+	lsn <- grid_lsn(list(rbind(c(x0 - 100, y0 + 50), c(x0, y0)),
+		rbind(c(x0 - 100, y0 - 50), c(x0, y0)),
+		rbind(c(x0, y0), c(x0 + 5, y0))), snap = 0.3)
+	expect_equal(lsn$rel, data.frame(fromedge = c(1L, 2L), toedge = c(3L, 3L)))
+	expect_length(lsn$errors, 0)
+
+	# A 5 m line on its own, 10 m from a line in another network, lies
+	# wholly within topo_tolerance of its outlet
+	lsn <- grid_lsn(list(rbind(c(x0 - 100, y0 + 10), c(x0 + 100, y0 + 10)),
+		rbind(c(x0, y0), c(x0 + 5, y0))), snap = 0.3)
+	expect_equal(nrow(lsn$rel), 0)
+	expect_equal(lsn$errors, "Dangling Node")
+	expect_equal(lsn$error.table$up_rid, "2")
+})
+
+test_that("a short line leaving a Downstream Divergence is not a Dangling Node", {
+	# Line 3 is a 2 m stub leaving the node between lines 1 and 2. Its
+	# outlet is within topo_tolerance of lines 1 and 2, but they are in
+	# its own network. Reported once, by the Downstream Divergence, which
+	# lists the stub in down_rid
+	lsn <- grid_lsn(list(rbind(c(x0 - 100, y0), c(x0, y0)),
+		rbind(c(x0, y0), c(x0 + 100, y0)),
+		rbind(c(x0, y0), c(x0 + 2, y0 + 2))), snap = 0.3)
+	expect_equal(lsn$rel, data.frame(fromedge = c(1L, 1L), toedge = c(2L, 3L)))
+	expect_equal(lsn$errors, "Downstream Divergence")
+	expect_equal(lsn$error.table$up_rid, "1")
+	expect_equal(lsn$error.table$down_rid, "2, 3")
+})
+
+test_that("a loop of lines with no outlet is a Network Without Outlet", {
+	# Three lines in a triangle: every node has one line in and one out,
+	# so the network has no Outlet. Every node on the loop is reported
+	triangle <- list(rbind(c(x0, y0), c(x0 + 100, y0)),
+		rbind(c(x0 + 100, y0), c(x0 + 50, y0 + 80)),
+		rbind(c(x0 + 50, y0 + 80), c(x0, y0)))
+	lsn <- grid_lsn(triangle, snap = 0.3)
+	expect_equal(lsn$nodecat, rep("Pseudonode", 3))
+	expect_equal(lsn$rel, data.frame(fromedge = 1:3, toedge = c(2L, 3L, 1L)))
+	expect_equal(lsn$errors, rep("Network Without Outlet", 3))
+
+	# A line flowing into the loop: still no Outlet. Only the loop's
+	# nodes are reported, not the tributary's Source
+	lsn <- grid_lsn(c(triangle, list(rbind(c(x0 - 100, y0), c(x0, y0)))),
+		snap = 0.3)
+	expect_equal(lsn$errors, rep("Network Without Outlet", 3))
+	expect_false("Source" %in% lsn$error.table$nodecat)
+	expect_equal(sort(lsn$error.table$nodecat),
+		c("Confluence", "Pseudonode", "Pseudonode"))
+
+	# A line flowing out of the loop: the network has an Outlet, and the
+	# loop is reported as a Downstream Divergence instead
+	lsn <- grid_lsn(c(triangle, list(rbind(c(x0, y0), c(x0 - 100, y0)))),
+		snap = 0.3)
+	expect_equal(lsn$errors, "Downstream Divergence")
+})
+
 test_that("a hairpin keeps two nodes and is not flagged as Unsnapped Node", {
 	# Line 1 starts 0.1 from where it ends (< snap 0.3); line 2 starts
 	# exactly where line 1 ends
@@ -262,6 +321,7 @@ test_that("lines_to_lsn() input checks stop with informative errors", {
 			verbose = FALSE, ...)
 	}
 	expect_error(run(data.frame(a = 1)), "must be an sf object")
+	expect_error(run(make_streams(two.lines)[0, ]), "zero rows")
 
 	empty <- sf::st_sf(id = 1:2, geometry = sf::st_sfc(
 		sf::st_linestring(two.lines[[1]]), sf::st_linestring(), crs = 5070))
@@ -269,6 +329,8 @@ test_that("lines_to_lsn() input checks stop with informative errors", {
 
 	expect_error(run(make_streams(list(rbind(c(-120, 45), c(-119.9, 45))),
 		crs = 4326)), "geographic coordinates")
+	expect_error(run(make_streams(two.lines, crs = sf::NA_crs_)),
+		"no coordinate reference system")
 
 	multi <- sf::st_sf(id = 1, geometry = sf::st_sfc(
 		sf::st_multilinestring(two.lines), crs = 5070))
@@ -310,17 +372,29 @@ test_that("lines_to_lsn() input checks stop with informative errors", {
 	}
 
 	streams <- make_streams(two.lines)
+	## Tolerances have no defaults; topo_tolerance is only needed when
+	## topology is checked, and must then be > 0
+	expect_error(run(streams, topo_tolerance = 20),
+		"snap_tolerance must be provided")
+	expect_error(run(streams, snap_tolerance = 1),
+		"topo_tolerance must be provided")
+	expect_error(run(streams, snap_tolerance = 0, topo_tolerance = 0),
+		"topo_tolerance must be > snap_tolerance")
+	expect_s3_class(run(streams, check_topology = FALSE, snap_tolerance = 1),
+		"sf")
 	expect_error(run(streams, snap_tolerance = -1, topo_tolerance = 20),
 		"must be >= 0")
-	for (bad in list(NA, NA_real_, "1", c(1, 2), numeric(0))) {
+	for (bad in list(NA, NA_real_, NaN, Inf, "1", c(1, 2), numeric(0))) {
 		expect_error(run(streams, snap_tolerance = bad, topo_tolerance = 20),
 			"snap_tolerance must be a single number")
 	}
-	for (bad in list(-1, NA, NA_real_, "20", c(20, 30), numeric(0))) {
+	for (bad in list(-1, NA, NA_real_, NaN, Inf, "20", c(20, 30), numeric(0))) {
 		expect_error(run(streams, snap_tolerance = 1, topo_tolerance = bad),
 			"topo_tolerance must be a single number")
 	}
 	expect_error(run(streams, snap_tolerance = 1, topo_tolerance = 1),
+		"topo_tolerance must be > snap_tolerance")
+	expect_error(run(streams, snap_tolerance = 1, topo_tolerance = 0.5),
 		"topo_tolerance must be > snap_tolerance")
 	expect_warning(run(streams, snap_tolerance = 150, topo_tolerance = 200),
 		"2 line feature\\(s\\) in streams have a length <= snap_tolerance")
@@ -510,6 +584,7 @@ test_that("intersections without a node are flagged, with NA pointid and rids", 
 	expect_equal(lsn$errors, "Intersection Without Node")
 	err <- lsn$error.table
 	expect_true(is.na(err$pointid))
+	expect_true(is.na(err$nodecat))
 	expect_true(is.na(err$up_rid))
 	expect_true(is.na(err$down_rid))
 	expect_equal(unname(sf::st_coordinates(err)[1, 1:2]), c(x0, y0))
@@ -518,12 +593,76 @@ test_that("intersections without a node are flagged, with NA pointid and rids", 
 	lsn <- grid_lsn(list(rbind(c(x0 - 50, y0), c(x0 + 50, y0)),
 		rbind(c(x0, y0), c(x0, y0 + 50))), snap = 0.3)
 	expect_equal(nrow(lsn$rel), 0)
-	expect_equal(lsn$errors, "Dangling Node")
+	expect_equal(lsn$errors, "Confluence Without Node")
 	err <- lsn$error.table
-	expect_true(is.na(err$pointid))
+	# Reported at line 2's upstream node (a Source)
+	expect_false(is.na(err$pointid))
+	expect_equal(err$nodecat, "Source")
 	expect_true(is.na(err$up_rid))
-	expect_true(is.na(err$down_rid))
+	expect_equal(err$down_rid, "2")
 	expect_equal(unname(sf::st_coordinates(err)[1, 1:2]), c(x0, y0))
+
+	# Line 2 ends on the interior of line 1 (a tributary without a node)
+	lsn <- grid_lsn(list(rbind(c(x0 - 50, y0), c(x0 + 50, y0)),
+		rbind(c(x0, y0 + 50), c(x0, y0))), snap = 0.3)
+	# Also within topo_tolerance of line 1, but not reported as a
+	# Dangling Node as well
+	expect_equal(lsn$errors, "Confluence Without Node")
+	err <- lsn$error.table
+	expect_equal(err$nodecat, "Outlet")
+	expect_equal(err$up_rid, "2")
+	expect_true(is.na(err$down_rid))
+})
+
+test_that("lines crossing more than once give one error per crossing", {
+	# Line 2 zigzags across line 1 twice. st_intersection() returns both
+	# crossings together as a MULTIPOINT
+	lsn <- grid_lsn(list(rbind(c(x0 - 50, y0), c(x0 + 50, y0)),
+		rbind(c(x0 - 20, y0 + 30), c(x0 - 10, y0 - 30), c(x0 + 10, y0 - 30),
+			c(x0 + 20, y0 + 30))), snap = 0.3)
+	expect_equal(lsn$errors, rep("Intersection Without Node", 2))
+	xy <- sf::st_coordinates(lsn$error.table)
+	expect_equal(sort(xy[, 1]), c(x0 - 15, x0 + 15))
+	expect_equal(unname(xy[, 2]), c(y0, y0))
+})
+
+test_that("a node with 2+ end nodes on another line's interior is flagged", {
+	# Lines 2 and 3 meet at a Pseudonode on the interior of line 1, with
+	# no node on line 1. This was missed when Confluence Without Node was
+	# found from intersections matching exactly one end node
+	lsn <- grid_lsn(list(rbind(c(x0 - 50, y0), c(x0 + 50, y0)),
+		rbind(c(x0, y0 + 50), c(x0, y0)),
+		rbind(c(x0, y0), c(x0, y0 - 50))), snap = 0.3)
+	expect_equal(lsn$rel, data.frame(fromedge = 2L, toedge = 3L))
+	expect_equal(lsn$errors, "Confluence Without Node")
+	err <- lsn$error.table
+	expect_equal(err$nodecat, "Pseudonode")
+	expect_equal(err$up_rid, "2")
+	expect_equal(err$down_rid, "3")
+	expect_equal(unname(sf::st_coordinates(err)[1, 1:2]), c(x0, y0))
+})
+
+test_that("crossings at a node are not reported as Intersection Without Node", {
+	# Line 2 ends a nanometre past line 1, so the lines technically cross
+	# within rounding error of line 2's end node. Reported once, as a
+	# Confluence Without Node
+	lsn <- grid_lsn(list(rbind(c(x0 - 50, y0), c(x0 + 50, y0)),
+		rbind(c(x0, y0 + 50), c(x0, y0 - 1e-9))), snap = 0.3)
+	expect_equal(lsn$errors, "Confluence Without Node")
+
+	# Line 1's to node and line 2's from node are snapped into one node
+	# (0.11 apart), and the two lines cross 0.1 and 0.05 from those end
+	# nodes. They are connected there, so it is not an error
+	lsn <- grid_lsn(list(rbind(c(x0 - 100, y0), c(x0 + 0.1, y0)),
+		rbind(c(x0, y0 + 0.05), c(x0, y0 - 100))), snap = 0.5)
+	expect_equal(lsn$rel, data.frame(fromedge = 1L, toedge = 2L))
+	expect_length(lsn$errors, 0)
+
+	# Line 2 overshoots line 1 by 0.1 (< snap_tolerance) without being
+	# connected to it: still an Intersection Without Node
+	lsn <- grid_lsn(list(rbind(c(x0 - 50, y0), c(x0 + 50, y0)),
+		rbind(c(x0, y0 + 50), c(x0, y0 - 0.1))), snap = 0.3)
+	expect_equal(lsn$errors, c("Dangling Node", "Intersection Without Node"))
 })
 
 test_that("separate networks each get their own outlet", {
