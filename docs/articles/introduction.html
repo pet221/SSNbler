@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SSNbler</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.2.9000</span>
       </span>
     </div>
 
@@ -111,9 +111,9 @@ can be fit using the ‘SSN2’ <strong>R</strong> package <span class="citation
 topological, and attribute data in a specific format called an
 <code>SSN</code> object. The ‘SSNbler’ <strong>R</strong> package, which
 we introduce here, is an adaptation of the STARS ArcGIS toolset <span class="citation">(Peterson &amp; Ver Hoef, 2014)</span> for the
-<strong>R</strong> programming language. ‘SSNbler’ generates formats,
-assembles, and validates <code>SSN</code> objects that can be used for
-statistical modeling in ‘SSN2’.</p>
+<strong>R</strong> programming language. ‘SSNbler’ formats, assembles,
+and validates <code>SSN</code> objects that can be used for statistical
+modeling in ‘SSN2’.</p>
 <p>In this vignette, we use ‘SSNbler’ to create the <code>SSN</code>
 object <code>MiddleFork04.ssn</code> used by ‘SSN2’. First, we load
 ‘SSNbler’ into our current <strong>R</strong> session.</p>
@@ -174,15 +174,15 @@ SpatiaLite, PostGIS).</p>
 <span><span class="va">MF_obs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">path</span>, <span class="st">"/MF_obs.gpkg"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">MF_pred1km</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">path</span>, <span class="st">"/MF_pred1km.gpkg"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">MF_CapeHorn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">path</span>, <span class="st">"/MF_CapeHorn.gpkg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Notice that the line (<code>MF_Streams</code>) and point features
+<p>Notice that the line (<code>MF_streams</code>) and point features
 (<code>MF_obs</code>, <code>MF_pred1km</code>, and
 <code>MF_CapeHorn</code>) have <code>LINESTRING</code> and
 <code>POINT</code> geometry types, which are required in ‘SSNbler’. If
 these datasets had <code>MULTILINESTRING</code> or
 <code>MULTIPOINT</code> geometry types, the ‘sf’ function
 <code>st_cast</code> could be used to convert to the required geometry
-types. All of the input data have an Albers Equal Area Conic projection
-(EPSG 102003) and distances are measured in meters. It is important that
+types. All of the input data have an Albers NAD83/Conus projection
+(EPSG:5070) and distances are measured in meters. It is important that
 all input datasets have the same map projection, which must be a
 projected coordinate system and not a geographic coordinate system
 measured in Latitude and Longitude. The ‘sf’ function
@@ -214,7 +214,7 @@ network, observed sites, and prediction sites using the
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">coord_sf</a></span><span class="op">(</span>datum <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">MF_streams</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="introduction_files/figure-html/Plot_MF-1.png" class="r-plt" alt="The Middle Fork Stream Network." width="75%" style="display: block; margin: auto;"></p>
 <p>In the figure above, there are two subnetworks from
-<code>MF_Streams</code> (black lines). Point features from
+<code>MF_streams</code> (black lines). Point features from
 <code>MF_obs</code> (blue dots) and <code>MF_pred1km</code> (purple
 dots) are found on both networks, while <code>MF_CapeHorn</code> point
 features (yellow dots) are only found on one of the two networks.</p>
@@ -248,9 +248,7 @@ dataset may contain multiple subnetworks with associated outlets.</li>
 a single node.</li>
 <li>
 <strong>Pseudonode</strong>: One edge flows in and one edge flows
-out of a single node. While these nodes are not topologically
-problematic, an excessive number of pseudonodes can slow down
-geoprocessing operations for large datasets.</li>
+out of a single node.</li>
 </ul>
 <div class="figure" style="text-align: center">
 <img src="valid_nodes.png" class="r-plt" alt="Valid Nodes" width="50%"><p class="caption">
@@ -298,13 +296,15 @@ topological errors in <code>streams</code>.</li>
 <code>snap_tolerance</code>: Two nodes separated by a Euclidean
 distance
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≤</mo><annotation encoding="application/x-tex">\le</annotation></semantics></math><code>snap_tolerance</code> will be assumed connected. Distance is
-measured in map units (i.e., projection units for <code>streams</code>).
-Must be &lt; minimum line feature length in <code>streams</code>.</li>
+measured in map units (i.e., projection units for <code>streams</code>)
+and must be
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≥</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\ge 0</annotation></semantics></math>;
+typically smaller than the shortest line feature length in
+<code>streams</code>.</li>
 <li>
-<code>topo_tolerance</code>: Two nodes separated by a Euclidean
-distance
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≤</mo><annotation encoding="application/x-tex">\le</annotation></semantics></math><code>topo_tolerance</code> are flagged as potential topological errors
-in the network.</li>
+<code>topo_tolerance</code>: Distance in map units used to flag
+potential topological errors, such as an outlet near a line in another
+network. Must be greater than <code>snap_tolerance</code>.</li>
 </ul>
 <p>We create a LSN associated with <code>MF_streams</code> by
 running</p>
@@ -320,11 +320,11 @@ running</p>
 <span>  streams <span class="op">=</span> <span class="va">MF_streams</span>,</span>
 <span>  lsn_path <span class="op">=</span> <span class="va">lsn.path</span>,</span>
 <span>  check_topology <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  snap_tolerance <span class="op">=</span> <span class="fl">0.05</span>, <span class="co"># must be &lt; min line length</span></span>
+<span>  snap_tolerance <span class="op">=</span> <span class="fl">0.05</span>, </span>
 <span>  topo_tolerance <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>The <code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code> function writes a minimum of five
+<p>The <code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code> function writes a minimum of four
 files to <code>lsn_path</code>:</p>
 <ul>
 <li>
@@ -339,9 +339,6 @@ geometry features representing LSN edges, which contains all of the
 columns in <code>streams</code> and a unique edge (i.e., reach)
 identifier column named <code>rid</code>.</li>
 <li>
-<code>nodexy.csv</code>: A comma-separated value (csv) file with the
-<code>pointid</code> and x and y coordinates for each node.</li>
-<li>
 <code>noderelationships.csv</code>: A csv file with three columns
 used to describe the directional relationship between nodes and edges.
 The column <code>rid</code> is the edge identifier, while the
@@ -354,18 +351,30 @@ directional relationship between edges using two columns named
 <code>fromedge</code> and <code>toedge</code>, which contain the edge
 <code>rid</code> values.</li>
 </ul>
-<p>Together these five files describe the geographic and topological
+<p>Together these four files describe the geographic and topological
 relationships between edges in the network, while preserving flow
 direction.</p>
 <p>When <code>check_topology = TRUE</code>, <code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code>
 also checks the topology of the network. When potential topological
 errors are identified, they are saved at the location specified by
 <code>lsn_path</code> as a GeoPackage named
-<code>node_errors.gpkg</code> with <code>POINT</code> geometry.</p>
+<code>node_errors.gpkg</code> with <code>POINT</code> geometry. Each
+point has an <code>error</code> column describing the potential error
+(e.g., Dangling Node or Downstream Divergence), along with the
+<code>pointid</code> and <code>nodecat</code> of the node. The
+<code>up_rid</code> and <code>down_rid</code> columns list the
+<code>rid</code> values of the edges flowing into and out of the node
+error, to allow users to quickly check flow direction and connectivity
+at each location. The same information is available for every node in
+the network in <code>noderelationships.csv</code> (via the
+<code>fromnode</code> and <code>tonode</code> columns). A node may be
+listed more than once if it has more than one potential error. See
+<code><a href="../reference/lines_to_lsn.html">help(lines_to_lsn)</a></code> for a description of each error
+type.</p>
 <p>It is important to pay attention to the output messages from
 <code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code> that are printed to the <strong>R</strong>
 console. In this example, the message is
-<code>No obvious topological errors detected and node_errors.gpkg was NOT created.</code>
+<code>0 topology errors identified. node_errors.gpkg not written to file.</code>
 This suggests that the LSN edges are error-free, but it is still a good
 idea in practice to visually assess maps of the node
 <code>nodecat</code> values to look for obvious errors, as described in
@@ -374,12 +383,15 @@ the topology editing tutorials mentioned previously. If
 errors were identified, which must be checked and corrected before
 moving on to the next spatial processing steps.</p>
 <p>Also notice that we checked the minimum line length in
-<code>MF_streams</code> before running <code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code>. It
-is important that the <code>snap_tolerance</code> distance provided is
-smaller than the shortest line feature’s length; otherwise, the end
-nodes of a line feature will be snapped to each other, forming a loop
-and introducing new topological errors that are difficult to
-identify.</p>
+<code>MF_streams</code> before running <code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code>. It’s
+typically good-practice to set the <code>snap_tolerance</code> distance
+smaller than the shortest line feature’s length.
+<code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code> gives a warning if it is not, because
+snapping near a line feature that is not longer than
+<code>snap_tolerance</code> may not give the intended connections. The
+two end nodes of a line feature are never snapped to each other. If they
+are within <code>snap_tolerance</code> of each other, they are kept as
+separate nodes.</p>
 </div>
 <div class="section level3">
 <h3 id="incorporating-sites-into-the-landscape-network">Incorporating Sites Into the Landscape Network<a class="anchor" aria-label="anchor" href="#incorporating-sites-into-the-landscape-network"></a>
@@ -464,7 +476,7 @@ predictions from a spatial stream-network model may be desired. They are
 optional, but must also be incorporated into the LSN using
 <code><a href="../reference/sites_to_lsn.html">sites_to_lsn()</a></code> before predictions can be made using a
 fitted model. We add the <code>MF_pred1km</code> and
-<code>MF_capehorn</code> prediction datasets to the LSN by running</p>
+<code>MF_CapeHorn</code> prediction datasets to the LSN by running</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">preds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sites_to_lsn.html">sites_to_lsn</a></span><span class="op">(</span></span>
 <span>  sites <span class="op">=</span> <span class="va">MF_pred1km</span>,</span>
@@ -506,17 +518,19 @@ models.</p>
 <p>The LSN created using <code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code> and
 <code><a href="../reference/sites_to_lsn.html">sites_to_lsn()</a></code> is stored in memory and also in a local
 folder defined using <code>lsn_path</code>. The LSN contains at least
-six components. The edges, nodes, and observed sites contain the spatial
-features and attribute data <em>within</em> each dataset, while the
-three tables (nodexy, noderelationships, and relationships) describe the
-relationships <em>between</em> edges and sites. These tables are not
-stored in memory but are accessed by subsequent ‘SSNbler’ functions.
-Prediction datasets may also be included in the LSN if desired. By
-default, all ‘SSNbler’ functions will update the files stored locally in
-<code>lsn_path</code> <em>and</em> return an updated <code>sf</code>
-object. However, the <code>save_local</code> argument can be set to
-FALSE in most functions if the user would prefer not to save results
-locally.</p>
+five components. The edges, nodes, and observed sites contain the
+spatial features and attribute data for each dataset. The topological
+relationships are stored in three places: noderelationships links each
+edge to its upstream and downstream nodes, relationships links each edge
+to the edge it flows into, and the rid and ratio columns in each site
+dataset give the edge each site resides on and its position along that
+edge. These tables are not stored in memory but are accessed by
+subsequent ‘SSNbler’ functions. Prediction site datasets may also be
+included in the LSN if desired. By default, all ‘SSNbler’ functions will
+update the files stored locally in <code>lsn_path</code> <em>and</em>
+return an updated <code>sf</code> object. However, the
+<code>save_local</code> argument can be set to FALSE in most functions
+if the user would prefer not to save results locally.</p>
 <table class="table">
 <caption>LSN components are stored in memory as <code>sf</code> objects
 and also in a local LSN directory as GeoPackages and comma separated
@@ -554,16 +568,11 @@ functions.</caption>
 <td align="left">GeoPackage</td>
 </tr>
 <tr class="odd">
-<td align="left">nodexy table</td>
-<td align="left"></td>
-<td align="left">csv file</td>
-</tr>
-<tr class="even">
 <td align="left">noderelationships table</td>
 <td align="left"></td>
 <td align="left">csv file</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">relationships table</td>
 <td align="left"></td>
 <td align="left">csv file</td>
@@ -590,7 +599,7 @@ is:</p>
 upDist_j = \sum_{k \in D_j}{L_k},
 </annotation></semantics></math></p>
 <p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>L</mi><mi>j</mi></msub><annotation encoding="application/x-tex">L_j</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>L</mi><mi>k</mi></msub><annotation encoding="application/x-tex">L_k</annotation></semantics></math>
 is the length of each edge and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>D</mi><mi>j</mi></msub><annotation encoding="application/x-tex">D_j</annotation></semantics></math>
 is the set of edges found in the path between the network outlet and the
@@ -667,8 +676,8 @@ arguments:</p>
 objects with <code>POINT</code> geometry, which have been incorporated
 into the LSN using <code><a href="../reference/sites_to_lsn.html">sites_to_lsn()</a></code>.</li>
 <li>
-<code>edges:</code> An <code>sf</code> object representing edges
-that have been processed using <code>lines_to_ssn()</code> and
+<code>edges</code>: An <code>sf</code> object representing edges
+that have been processed using <code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code> and
 <code><a href="../reference/updist_edges.html">updist_edges()</a></code>.</li>
 <li>
 <code>length_col</code>: The name of the column in
@@ -858,7 +867,7 @@ into the LSN using <code><a href="../reference/sites_to_lsn.html">sites_to_lsn()
 <li>
 <code>edges</code>: An <code>sf</code> object representing edges,
 which contains <code>afv_col</code> created using
-<code>edges_afv()</code>.</li>
+<code><a href="../reference/afv_edges.html">afv_edges()</a></code>.</li>
 <li>
 <code>afv_col</code>: The name of the column containing the AFVs in
 <code>edges</code>. A new column with this name will be added to
@@ -888,10 +897,10 @@ via <code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code> is 
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">$</span><span class="va">pred1km</span><span class="op">$</span><span class="va">afvArea</span><span class="op">)</span> <span class="co">## Summarize AFVs in pred1km and look for zeros</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
 <span><span class="co">#&gt; 0.009894 0.031219 0.047470 0.104969 0.112882 1.000000</span></span></code></pre>
-<p>Each <code>sf</code> dataset in <code>sites.list</code> now has an
-AFV column, <code>afvArea</code>, which was generated based on
-cumulative watershed area. All AFVs should meet the requirement that
-they are between zero and one.</p>
+<p>Each <code>sf</code> dataset in <code>site.list</code> now has an AFV
+column, <code>afvArea</code>, which was generated based on cumulative
+watershed area. All AFVs should meet the requirement that they are
+between zero and one.</p>
 </div>
 <div class="section level2">
 <h2 id="assembling-the-ssn-object">Assembling the SSN Object<a class="anchor" aria-label="anchor" href="#assembling-the-ssn-object"></a>
@@ -911,7 +920,7 @@ and all observation and prediction site datasets reside.</li>
 <code>obs_sites:</code> Optional. A single <code>sf</code> object
 representing observed sites, which has been processed using
 <code><a href="../reference/sites_to_lsn.html">sites_to_lsn()</a></code>, <code><a href="../reference/updist_sites.html">updist_sites()</a></code>, and
-<code><a href="../reference/afv_sites.html">afv_sites()</a></code>. Default is is NULL.</li>
+<code><a href="../reference/afv_sites.html">afv_sites()</a></code>. Default is NULL.</li>
 <li>
 <code>preds_list</code>: Optional. A named list of one or more
 <code>sf</code> objects representing prediction site datasets that have
@@ -1250,7 +1259,7 @@ package, visit the package website at <a href="https://usepa.github.io/SSN2/" cl
 <span>  streams <span class="op">=</span> <span class="va">MF_streams</span>,</span>
 <span>  lsn_path <span class="op">=</span> <span class="va">lsn.path</span>,</span>
 <span>  check_topology <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  snap_tolerance <span class="op">=</span> <span class="fl">0.05</span>, <span class="co"># must be &lt; min line length</span></span>
+<span>  snap_tolerance <span class="op">=</span> <span class="fl">0.05</span>, </span>
 <span>  topo_tolerance <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>

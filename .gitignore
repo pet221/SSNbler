@@ -5,3 +5,4 @@
 .DS_Store
 .quarto
 inst/doc
+inst/test_data/

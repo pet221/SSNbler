@@ -23,7 +23,7 @@ topological location relative to other features in the LSN."><!-- mathjax --><sc
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SSNbler</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.2.9000</span>
       </span>
     </div>
 
@@ -83,7 +83,8 @@ topological location relative to other features in the LSN.</p>
 <span>  lsn_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  file_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  remove_ZM <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -134,6 +135,13 @@ exist. Defaults to <code>FALSE</code>.</p></dd>
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>Logical indicating whether progress messages should
 be printed to the console. Defaults to <code>TRUE</code></p></dd>
+
+
+<dt id="arg-remove-zm">remove_ZM<a class="anchor" aria-label="anchor" href="#arg-remove-zm"></a></dt>
+<dd><p>Logical. If <code>TRUE</code>, Z and M dimensions are
+removed from <code>sites</code> and <code>edges</code>, if they exist. If
+<code>FALSE</code> and either has Z or M dimensions, the function stops
+with an error. Default is <code>FALSE</code>.</p></dd>
 
 </dl></div>
     <div id="value">
