@@ -34,6 +34,10 @@
 #' @param verbose Logical. If \code{TRUE}, messages describing
 #'   function progress will be printed to the console. Default is
 #'   \code{TRUE}.
+#' @param use_parallel Deprecated and ignored. Parallel processing is
+#'   no longer needed. Supplying it gives a warning.
+#' @param no_cores Deprecated and ignored. Parallel processing is no
+#'   longer needed. Supplying it gives a warning.
 #'
 #' @details \code{lines_to_lsn} converts an `sf` object
 #'   representing streams to a landscape network
@@ -128,11 +132,20 @@ lines_to_lsn <- function(streams,
                          topo_tolerance,
                          remove_ZM = FALSE,
                          overwrite = FALSE,
-                         verbose = TRUE) {
+                         verbose = TRUE,
+                         use_parallel = NULL,
+                         no_cores = NULL) {
 
 	##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
 	# Check Inputs ----
 	##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
+
+  ## use_parallel and no_cores are deprecated: warn and ignore
+  if (is.null(use_parallel) == FALSE || is.null(no_cores) == FALSE) {
+    warning("use_parallel and no_cores are deprecated and are ignored. ",
+            "lines_to_lsn() no longer needs parallel processing. ",
+            "Remove these arguments from your code.", call. = FALSE)
+  }
 
 	# check sf object
   if (inherits(streams, "sf") == FALSE) {
