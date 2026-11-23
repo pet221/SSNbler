@@ -37,9 +37,10 @@ only line end nodes with \emph{identical} coordinates.}
 
 \item{topo_tolerance}{Distance in map units. Required when
 \code{check_topology = TRUE}, and ignored otherwise.
-Two nodes on the network separated by a distance less
-than or equal to \code{topo_tolerance} are flagged as potential
-topological errors in the network. Must be greater than
+Used only for the Dangling Node check: an outlet within
+\code{topo_tolerance} of an edge in a different network is flagged
+as a Dangling Node. Upstream end nodes, and outlets near an edge in
+their own network, are not checked. Must be greater than
 \code{snap_tolerance} (and therefore > 0) when
 \code{check_topology = TRUE}.}
 
@@ -150,7 +151,7 @@ provided and must be greater than \code{snap_tolerance}. It is generally a good
 idea to set the \code{snap_tolerance} to a distance shorter than the smallest line segment length. It should also be relatively small
 compared to the distance specified in the \code{topo_tolerance} argument. Nodes separated by
 a Euclidean distance <= \code{snap_tolerance} are assumed to be
-connected and are snapped together. When snap_tolerance < distance <= topo_tolerance, nodes are flagged as potential errors. If \code{snap_tolerance} is too large, end nodes that should remain
+connected and are snapped together. An outlet within \code{topo_tolerance} of an edge in a different network is flagged as a Dangling Node. If \code{snap_tolerance} is too large, end nodes that should remain
 separate will be snapped together in error. If \code{topo_tolerance}
 is too large, more false errors will be flagged in
 \code{node_errors.gpkg}.
