@@ -276,12 +276,32 @@ test_that("a short line longer than snap_tolerance is not collapsed", {
 	expect_length(lsn$errors, 0)
 })
 
-test_that("a line with identical ends is a Self-loop with no self-relationship", {
+test_that("a line with identical ends is a Self-loop that flows into itself", {
 	lsn <- grid_lsn(list(rbind(c(x0, y0), c(x0 + 50, y0), c(x0 + 50, y0 + 50),
 		c(x0, y0))), snap = 0.3)
 	expect_equal(length(lsn$nodecat), 1)
-	expect_equal(nrow(lsn$rel), 0)
+	expect_equal(lsn$rel, data.frame(fromedge = 1L, toedge = 1L))
 	expect_equal(lsn$errors, "Self-loop")
+})
+
+test_that("a Self-loop gives a warning only when check_topology = FALSE", {
+	# Line 2 starts and ends at the node where line 1 ends and line 3 starts.
+	# It stays in relationships.csv, including its link to itself
+	lines <- lapply(list(rbind(c(x0 - 100, y0), c(x0, y0)),
+		rbind(c(x0, y0), c(x0 + 50, y0 + 50), c(x0 + 50, y0 - 50), c(x0, y0)),
+		rbind(c(x0, y0), c(x0, y0 - 100))), sf::st_linestring)
+	streams <- sf::st_sf(id = 1:3, geometry = sf::st_sfc(lines, crs = 5070))
+	p <- withr::local_tempdir()
+	expect_warning(lines_to_lsn(streams, lsn_path = p, check_topology = FALSE,
+		snap_tolerance = 0.3, overwrite = TRUE, verbose = FALSE),
+		"1 line feature\\(s\\) start and end at the same node \\(Self-loop, rid 2\\)")
+	rel <- utils::read.csv(file.path(p, "relationships.csv"))
+	expect_equal(paste(rel$fromedge, rel$toedge, sep = ">"), c("1>2", "1>3", "2>2", "2>3"))
+
+	warns <- capture_warnings(lines_to_lsn(streams, lsn_path = p,
+		check_topology = TRUE, snap_tolerance = 0.3, topo_tolerance = 20,
+		overwrite = TRUE, verbose = FALSE))
+	expect_false(any(grepl("start and end at the same node", warns)))
 })
 
 test_that("MF LSN has one downstream edge per non-outlet edge and no errors", {

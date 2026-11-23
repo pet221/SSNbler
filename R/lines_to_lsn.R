@@ -82,7 +82,7 @@
 #'   \item{Intersection Without Node: two edges cross without a node. A crossing within \code{snap_tolerance} of a node that both edges flow into or out of is not reported.}
 #'   \item{Confluence Without Node: an edge end node touches another edge somewhere other than the end node (e.g. forms a T junction where the other edge is not split).}
 #'   \item{Network Without Outlet: the node is part of a loop of edges with no outlet (e.g. edges digitised in a circle, with or without edges flowing into it). Every node on the loop is reported. }
-#'   \item{Self-loop: the upstream and downstream end nodes of a line feature have identical coordinates. The line feature is not included in relationships.csv.}
+#'   \item{Self-loop: the upstream and downstream end nodes of a line feature have identical coordinates. The line feature is kept in noderelationships.csv and relationships.csv, where it flows into itself and stays connected to the line features upstream and downstream. updist_edges(), afv_edges() and accum_edges() stop with an error while a Self-loop is present.}
 #'    \item{Chained Node: the node contains line end nodes more than \code{snap_tolerance} apart. Because snapping is transitive, this happens when end nodes are linked by a chain of end nodes, each within \code{snap_tolerance} of the next.}
 #'   \item{Unsnapped Node: a line end node was <= \code{snap_tolerance} from another end node and was not snapped to it. This typically occurs when snapping would result in a line feature's to and from nodes being combined into one node (e.g. a line end node close to both end nodes of a short line). }
 #' }
@@ -119,7 +119,7 @@
 #' is too large, more false errors will be flagged in
 #' \code{node_errors.gpkg}.
 #'
-#' WARNING: A warning is given if the length of any line feature in \code{streams} is <= \code{snap_tolerance}, because snapping near that line feature may not give the intended connections. Use \code{\link[sf]{st_length}} to obtain and check the minimum length of the line features prior to running \code{lines_to_lsn}. When \code{check_topology = FALSE}, a warning is also given if any line end nodes within \code{snap_tolerance} of another line end node were not snapped. This typically occurs when snapping would put both end nodes of a line feature into one node. If this warning is returned, re-run \code{lines_to_lsn} with \code{check_topology = TRUE} to locate these nodes. Similarly, when \code{check_topology = FALSE}, a warning is given if any snapped nodes include Chained Nodes that were more than \code{snap_tolerance} apart because of transitive snapping. Again, use \code{check_topology = TRUE} to locate and check these nodes.
+#' WARNING: A warning is given if the length of any line feature in \code{streams} is <= \code{snap_tolerance}, because snapping near that line feature may not give the intended connections. Use \code{\link[sf]{st_length}} to obtain and check the minimum length of the line features prior to running \code{lines_to_lsn}. When \code{check_topology = FALSE}, a warning is also given if any line end nodes within \code{snap_tolerance} of another line end node were not snapped. This typically occurs when snapping would put both end nodes of a line feature into one node. If this warning is returned, re-run \code{lines_to_lsn} with \code{check_topology = TRUE} to locate these nodes. Similarly, when \code{check_topology = FALSE}, a warning is given if any snapped nodes include Chained Nodes that were more than \code{snap_tolerance} apart because of transitive snapping. Again, use \code{check_topology = TRUE} to locate and check these nodes. When \code{check_topology = FALSE}, a warning is also given if any line feature is a Self-loop, and it lists their rids.
 #'
 #' @return An `sf` object representing edges in the LSN. The LSN, including edges.gpkg, nodes.gpkg, noderelationships.csv, and relationships.csv files, are saved locally to a directory defined by \code{lsn_path}. If \code{check_topology = TRUE} and topological errors are identified, then node_errors.gpkg is also saved to \code{lsn_path}.
 #'
@@ -425,15 +425,19 @@ lines_to_lsn <- function(streams,
   ## Edges whose from and to end nodes are the same node
   self.loop.rids <- 
   	node.relate$rid[node.relate$fromnode == node.relate$tonode]
+  if (check_topology == FALSE && length(self.loop.rids) > 0) {
+    warning(length(self.loop.rids), " line feature(s) start and end at the same node (Self-loop, rid ",
+      format_rids(self.loop.rids), "). These line features remain connected to the edges upstream and downstream, so upDist, AFV and other values calculated downstream may be incorrect. Use check_topology = TRUE to locate and check Self-loop errors.", call. = FALSE)
+  }
 
-  ## Create (edge) relationships table. Exclude self-loops
+  ## Create (edge) relationships table. Self-loops are kept, including
+  ## their link to themselves (fromedge == toedge)
   edge.relate <- merge(data.frame(fromedge = node.relate$rid, 
   																node = node.relate$tonode),
   										 data.frame(toedge = node.relate$rid, 
   										 					 node = node.relate$fromnode),
   										 by = "node", sort = FALSE)
-  edge.relate <- edge.relate[edge.relate$fromedge != edge.relate$toedge,
-  													 c("fromedge", "toedge")]
+  edge.relate <- edge.relate[, c("fromedge", "toedge")]
   edge.relate <- edge.relate[order(edge.relate$fromedge, 
   																 edge.relate$toedge), ]
 

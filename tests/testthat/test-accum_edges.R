@@ -12,3 +12,16 @@ test_that("accum_edges", {
 	expect_equal(edges_accum$WArea_km2, edges_accum$h2oAreaKm2)
 	expect_true(all(edges_accum$WArea_km2 >= edges_accum$rcaAreaKm2))
 })
+
+test_that("accum_edges stops when a Self-loop is present", {
+	# Inside a network (also a downstream divergence) and at the outlet
+	# (otherwise silently wrong results)
+	e <- self_loop_lsn("inside")
+	expect_error(accum_edges(e, attr(e, "lsn_path"), sum_col = "area",
+			acc_col = "areaAcc", save_local = FALSE, verbose = FALSE),
+		"1 Self-loop edge\\(s\\) \\(rid 2\\)")
+	e <- self_loop_lsn("outlet")
+	expect_error(accum_edges(e, attr(e, "lsn_path"), sum_col = "area",
+			acc_col = "areaAcc", save_local = FALSE, verbose = FALSE),
+		"1 Self-loop edge\\(s\\) \\(rid 4\\)")
+})

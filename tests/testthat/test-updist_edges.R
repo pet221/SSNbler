@@ -9,3 +9,16 @@ test_that("updist_edges", {
 	expect_true(all(edges_updist$upDist >= edges_updist$Length))
 	expect_s3_class(edges_updist, "sf")
 })
+
+test_that("updist_edges stops when a Self-loop is present", {
+	# Inside a network (also a downstream divergence) and at the outlet
+	# (otherwise silently wrong results)
+	e <- self_loop_lsn("inside")
+	expect_error(updist_edges(e, attr(e, "lsn_path"), calc_length = TRUE,
+			save_local = FALSE, verbose = FALSE),
+		"1 Self-loop edge\\(s\\) \\(rid 2\\)")
+	e <- self_loop_lsn("outlet")
+	expect_error(updist_edges(e, attr(e, "lsn_path"), calc_length = TRUE,
+			save_local = FALSE, verbose = FALSE),
+		"1 Self-loop edge\\(s\\) \\(rid 4\\)")
+})

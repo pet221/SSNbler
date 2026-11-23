@@ -14,7 +14,7 @@ This update focuses on improving the computational efficiency of `lines_to_lsn()
   * **Chained Node**: a snapped node containing multiple line end nodes, with some more than `snap_tolerance` apart. Snapping is transitive, so this happens when end nodes are linked by a chain of end nodes, each within `snap_tolerance` of the next. A new `node_width` column gives the largest distance between two line end nodes associated with each Chained Node (`NA` for other error types). When `check_topology = FALSE`, a warning gives the number of Chained Nodes instead.
   * **Confluence Without Node**: a line end node on the interior of another line feature it is not connected to (e.g. a T junction where a line feature is not split). These were previously reported as Dangling Node, or not at all when two or more line end nodes met at that location. Dangling Node now refers only to an outlet within `topo_tolerance` of a line feature in a different network.
   * **Network Without Outlet**: a network with no outlet (e.g. a loop of line features digitised in a circle), with or without line features flowing into it. Every node on the loop is reported as an error. These networks were previously not reported and would cause features to be silently dropped in downstream functions.
-  * **Self-loop**: a line feature whose upstream and downstream end nodes have identical coordinates. These line features are not included in `relationships.csv`.
+  * **Self-loop**: a line feature whose upstream and downstream end nodes have identical coordinates. These line features stay in `relationships.csv`, where they flow into themselves and stay connected to the line features upstream and downstream. When `check_topology = FALSE`, a warning gives their rids.
 
 
 ## Minor updates
@@ -35,6 +35,8 @@ This update focuses on improving the computational efficiency of `lines_to_lsn()
 
 * `sites_to_lsn()` now checks the geometry type of every feature in `sites` and `edges`, and stops with an error if any site is not a POINT or any edge is not a LINESTRING. Previously only the first feature was checked, and MULTIPOINT sites and MULTILINESTRING edges were accepted. Use `sf::st_cast()` to convert them.
 
+* `updist_edges()`, `afv_edges()` and `accum_edges()` now stop with an error if an edge starts and ends at the same node (a Self-loop), and list its rid. Previously, a Self-loop at an outlet gave incorrect upDist, AFV and accumulated values without an error.
+
 
 ## Bug fixes
 
@@ -49,7 +51,7 @@ This update focuses on improving the computational efficiency of `lines_to_lsn()
 
 	Nodes and edge relationships are now built using the same method: line end nodes `<= snap_tolerance` apart are merged into one node, and the two end nodes of a line feature are never merged. AFVs calculated from LSNs built with earlier versions should be checked, especially if `snap_tolerance = 0` was used or the streams contain very short line features (#8).
 
-* When the two end nodes of a line feature were `<= snap_tolerance` apart (e.g. a very short line feature, a line that nearly forms a loop, or a short line feature whose end nodes were read as 0 m apart because of the `pdist::pdist()` precision problem described above), `lines_to_lsn()` recorded the line as flowing into itself (`fromedge == toedge`) in `relationships.csv`, even when `noderelationships.csv` was correct. This could give false Downstream Divergence, Complex Confluence and Unsnapped Node errors at nearby nodes, and `updist_edges()`, `afv_edges()` and `accum_edges()` stopped with a downstream divergence error (from version 1.1.0; earlier versions did not check for this). The two end nodes of a line feature are now kept as separate nodes, so a line feature can no longer flow into itself (#8).
+* When the two end nodes of a line feature were `<= snap_tolerance` apart (e.g. a very short line feature, a line that nearly forms a loop, or a short line feature whose end nodes were read as 0 m apart because of the `pdist::pdist()` precision problem described above), `lines_to_lsn()` recorded the line as flowing into itself (`fromedge == toedge`) in `relationships.csv`, even when `noderelationships.csv` was correct. This could give false Downstream Divergence, Complex Confluence and Unsnapped Node errors at nearby nodes, and `updist_edges()`, `afv_edges()` and `accum_edges()` stopped with a downstream divergence error (from version 1.1.0; earlier versions did not check for this). The two end nodes of a line feature are now kept as separate nodes, so a line feature can no longer flow into itself unless its end nodes have identical coordinates (a Self-loop, which is reported as an error) (#8).
 
 * When `use_parallel = TRUE`, `lines_to_lsn()` split the nodes into chunks and returned the Unsnapped Node flags found where a line end node was 0 m from more than one node as row numbers within each chunk, but applied them to the full node table. These Unsnapped Node errors were therefore reported at the wrong nodes instead of at the nodes where they occurred. The parallel code has been removed (#8).
 

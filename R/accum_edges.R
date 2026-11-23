@@ -133,6 +133,10 @@ accum_edges <- function(edges, lsn_path, sum_col, acc_col,
   relate_table <- paste0(lsn_path, "/relationships.csv")
   rel <- read.csv(relate_table)
   
+  ## Check for Self-loops (before divergences: a Self-loop inside a
+  ## network also gives a downstream divergence)
+  check_self_loops(lsn_path)
+
   ## Check for downstream divergences
   if(sum(duplicated(rel$fromedge)) > 0) {
   	stop("At least one downstream divergence is present in edges. Fix topology errors and re-create error free edges using lines_to_lsn().")

@@ -186,6 +186,10 @@ afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
   ## Read in relationsips table
   relate_table <- read.csv(paste0(lsn_path, "/relationships.csv"))
   
+  ## Check for Self-loops (before divergences: a Self-loop inside a
+  ## network also gives a downstream divergence)
+  check_self_loops(lsn_path)
+
   ## Check for downstream divergences
   if(sum(duplicated(relate_table$fromedge)) > 0) {
   	stop("At least one downstream divergence is present in edges. Fix topology errors and re-create error free edges using lines_to_lsn().")
