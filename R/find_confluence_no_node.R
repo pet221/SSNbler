@@ -1,6 +1,4 @@
-## Finds Confluence Without Node errors (e.g. T junction): nodes with
-## a line end node on, or within eps of, a line that the node is not
-## connected to. Used by lines_to_lsn().
+## Finds Confluence Without Node errors (e.g. T junction)
 ##
 ## Inputs:
 ## end.points: sfc POINT geometry of every line end node, in the order
@@ -28,5 +26,14 @@ find_confluence_no_node <- function(end.points, in.edges, node.of.end, eps) {
 	not.connected <- k.node != node.of.end[2 * j - 1] &
 		k.node != node.of.end[2 * j]
 
-	sort(unique(k.node[not.connected]))
+	## Leave out touches within eps of line j's end nodes (same square as
+	## end.boxes), so only touches away from line j's end nodes are counted
+	end.xy <- st_coordinates(end.points)
+	near.from <- abs(end.xy[k, 1] - end.xy[2 * j - 1, 1]) <= eps &
+		abs(end.xy[k, 2] - end.xy[2 * j - 1, 2]) <= eps
+	near.to <- abs(end.xy[k, 1] - end.xy[2 * j, 1]) <= eps &
+		abs(end.xy[k, 2] - end.xy[2 * j, 2]) <= eps
+	away.from.ends <- near.from == FALSE & near.to == FALSE
+
+	sort(unique(k.node[not.connected & away.from.ends]))
 }

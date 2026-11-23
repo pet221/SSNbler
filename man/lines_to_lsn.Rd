@@ -117,7 +117,7 @@ defines the potential error type and can take on values of:
 \item{Dangling Node: an outlet within \code{topo_tolerance} of an edge in a different network. }
 \item{Downstream Divergence: two or more edges flow out of the node.}
 \item{Intersection Without Node: two edges cross without a node. A crossing within \code{snap_tolerance} of a node that both edges flow into or out of is not reported.}
-\item{Confluence Without Node: an edge end node touches another edge somewhere other than the end node (e.g. forms a T junction where the other edge is not split).}
+\item{Confluence Without Node: an edge end node touches another edge somewhere other than its end nodes, or is within a tiny rounding distance of it, and is not connected to it (e.g. forms a T junction where the other edge is not split).}
 \item{Network Without Outlet: the node is part of a loop of edges with no outlet (e.g. edges digitised in a circle, with or without edges flowing into it). Every node on the loop is reported. }
 \item{Self-loop: the upstream and downstream end nodes of a line feature have identical coordinates. The line feature is kept in noderelationships.csv and relationships.csv, where it flows into itself and stays connected to the line features upstream and downstream. updist_edges(), afv_edges() and accum_edges() stop with an error while a Self-loop is present.}
 \item{Chained Node: the node contains line end nodes more than \code{snap_tolerance} apart. Because snapping is transitive, this happens when end nodes are linked by a chain of end nodes, each within \code{snap_tolerance} of the next.}

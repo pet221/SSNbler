@@ -649,6 +649,19 @@ test_that("intersections without a node are flagged, with NA pointid and rids", 
 	expect_true(is.na(err$down_rid))
 })
 
+test_that("an end node near another line's end node is not a Confluence Without Node", {
+	# Line 2 starts 1e-7 m after line 1 ends, so at snap 0 they are not
+	# snapped. Line 1's outlet stops just short of a different network,
+	# so it is a Dangling Node. Line 2's Source is not flagged
+	lsn <- grid_lsn(list(rbind(c(x0 - 100, y0), c(x0, y0)),
+		rbind(c(x0 + 1e-7, y0), c(x0 + 100, y0))), snap = 0)
+	expect_equal(nrow(lsn$rel), 0)
+	expect_equal(lsn$errors, "Dangling Node")
+	err <- lsn$error.table
+	expect_equal(err$nodecat, "Outlet")
+	expect_equal(err$up_rid, "1")
+})
+
 test_that("lines crossing more than once give one error per crossing", {
 	# Line 2 zigzags across line 1 twice. st_intersection() returns both
 	# crossings together as a MULTIPOINT
