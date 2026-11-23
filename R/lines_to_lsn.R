@@ -190,9 +190,6 @@ lines_to_lsn <- function(streams,
     stop("Streams data have geographic coordinates. Re-project streams to a cartesian coordinate system.", call. = FALSE)
   }
 
-  ## Get geometry type as text
-  edge.geom <- st_as_text(st_geometry(in.edges)[[1]])
-
   ## Check geometry type 
   if (inherits(st_geometry(in.edges), "sfc_LINESTRING") == FALSE) {
     if (any(st_geometry_type(in.edges) == "MULTILINESTRING") == TRUE) {
@@ -204,12 +201,16 @@ lines_to_lsn <- function(streams,
 
   edge.geom.name <- attributes(in.edges)$sf_column
 
-  if (grepl("Z|M", edge.geom) == TRUE && remove_ZM == FALSE) {
+  ## Z and M dimensions are not supported. Test the Z and M ranges of
+  ## all features, not the geometry text of the first one
+  edge.zm <- !is.null(st_z_range(in.edges)) || !is.null(st_m_range(in.edges))
+
+  if (edge.zm == TRUE && remove_ZM == FALSE) {
     stop("XYZ, XYM or XYZM geometries are not supported. Set remove_ZM = TRUE to drop Z and/or M dimensions from feature geometries.", call. = FALSE)
   }
 
   ## Remove Z and/or M dimensions if they exist
-  if (grepl("Z|M", edge.geom) == TRUE && remove_ZM == TRUE) {
+  if (edge.zm == TRUE && remove_ZM == TRUE) {
     in.edges <- st_zm(in.edges)
   }
 

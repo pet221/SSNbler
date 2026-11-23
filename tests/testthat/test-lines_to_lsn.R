@@ -370,6 +370,12 @@ test_that("lines_to_lsn() input checks stop with informative errors", {
 		expect_error(run(zm, snap_tolerance = 1, topo_tolerance = 20),
 			"XYZ, XYM or XYZM geometries are not supported")
 	}
+	## Z in a later feature only is still caught
+	z.later <- sf::st_sf(id = 1:2, geometry = sf::st_sfc(
+		sf::st_linestring(two.lines[[1]]),
+		sf::st_linestring(cbind(two.lines[[2]], 0)), crs = 5070))
+	expect_error(run(z.later, snap_tolerance = 1, topo_tolerance = 20),
+		"XYZ, XYM or XYZM geometries are not supported")
 
 	streams <- make_streams(two.lines)
 	## Tolerances have no defaults; topo_tolerance is only needed when

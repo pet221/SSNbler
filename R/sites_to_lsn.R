@@ -233,28 +233,36 @@ sites_to_lsn <- function(sites, edges, snap_tolerance, save_local = TRUE,
     )
   }
 
-  ## Stop if sites and edges do not have the correct geometry types
-  ## Get geometry type as text
-  site_geom <- st_as_text(st_geometry(sites)[[1]])
-  edge_geom <- st_as_text(st_geometry(edges)[[1]])
-
-  ## Check geometry type
-  if (grepl("POINT", site_geom) == FALSE) {
-    stop("Input sites must have POINT geometry")
+  ## Stop if sites and edges do not have the correct geometry types.
+  ## Every site must be a POINT (not MULTIPOINT) and every edge a
+  ## LINESTRING (not MULTILINESTRING), as in lines_to_lsn()
+  if (inherits(st_geometry(sites), "sfc_POINT") == FALSE) {
+    if (any(st_geometry_type(sites) == "MULTIPOINT") == TRUE) {
+      stop("Input sites must have POINT geometry. Use sf::st_cast to convert from MULTIPOINT to POINT.", call. = FALSE)
+    } else {
+      stop("Input sites must have POINT geometry.", call. = FALSE)
+    }
   }
-  if (grepl("LINESTRING", edge_geom) == FALSE) {
-    stop("Input edges must have LINESTRING geometry")
+  if (inherits(st_geometry(edges), "sfc_LINESTRING") == FALSE) {
+    if (any(st_geometry_type(edges) == "MULTILINESTRING") == TRUE) {
+      stop("Input edges must have LINESTRING geometry. Use sf::st_cast to convert from MULTILINESTRING to LINESTRING.", call. = FALSE)
+    } else {
+      stop("Input edges must have LINESTRING geometry.", call. = FALSE)
+    }
   }
 
   ## Z and M dimensions are not supported. Stop if remove_ZM == FALSE,
-  ## otherwise remove them
-  if (grepl("Z|M", site_geom) == TRUE) {
+  ## otherwise remove them. Test the Z and M ranges of all features,
+  ## not the geometry text of the first one
+  site.zm <- !is.null(st_z_range(sites)) || !is.null(st_m_range(sites))
+  edge.zm <- !is.null(st_z_range(edges)) || !is.null(st_m_range(edges))
+  if (site.zm == TRUE) {
     if (remove_ZM == FALSE) {
       stop("sites has XYZ, XYM or XYZM geometry, which is not supported. Set remove_ZM = TRUE to drop Z and/or M dimensions from feature geometries.")
     }
     sites <- st_zm(sites)
   }
-  if (grepl("Z|M", edge_geom) == TRUE) {
+  if (edge.zm == TRUE) {
     if (remove_ZM == FALSE) {
       stop("edges has XYZ, XYM or XYZM geometry, which is not supported. Set remove_ZM = TRUE to drop Z and/or M dimensions from feature geometries.")
     }

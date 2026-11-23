@@ -1,10 +1,11 @@
 #' @keywords internal
 "_PACKAGE"
 #'
-#' @importFrom sf st_agr st_agr<- st_as_sf st_as_text st_bbox st_buffer st_cast st_collection_extract st_coordinates st_crosses
-#' st_crs st_crs<- st_drop_geometry st_equals st_geometry st_geometry<- st_geometry_type
-#' st_intersection st_intersects st_is_empty st_is_longlat st_join st_length
-#' st_linestring st_nearest_feature st_nearest_points st_read st_sfc st_write st_zm write_sf
+#' @importFrom sf st_agr st_agr<- st_as_sf st_as_text st_bbox st_buffer st_cast st_collection_extract
+#' @importFrom sf st_coordinates st_crosses st_crs st_crs<- st_drop_geometry st_equals st_geometry st_geometry<-
+#' @importFrom sf st_geometry_type st_intersection st_intersects st_is_empty st_is_longlat st_join st_length st_linestring
+#' @importFrom sf st_m_range st_nearest_feature st_nearest_points st_read st_sfc st_write st_z_range st_zm
+#' @importFrom sf write_sf
 #' @importFrom utils read.csv read.table write.table
 #' @importFrom dplyr distinct left_join
 #' @importFrom grDevices chull

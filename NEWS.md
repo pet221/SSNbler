@@ -33,6 +33,8 @@ This update focuses on improving the computational efficiency of `lines_to_lsn()
 
 * `lines_to_lsn()` now checks the geometry type of every feature in `streams`, and stops with an error if any feature is not a LINESTRING. Previously only the first feature was checked.
 
+* `sites_to_lsn()` now checks the geometry type of every feature in `sites` and `edges`, and stops with an error if any site is not a POINT or any edge is not a LINESTRING. Previously only the first feature was checked, and MULTIPOINT sites and MULTILINESTRING edges were accepted. Use `sf::st_cast()` to convert them.
+
 
 ## Bug fixes
 

@@ -64,3 +64,40 @@ test_that("sites_to_lsn checks for Z and M dimensions", {
 		expect_equal(out$snapdist, obs_lsn$snapdist)
 	}
 })
+
+test_that("sites_to_lsn rejects MULTIPOINT sites and MULTILINESTRING edges", {
+	# Checked for every feature, and not mistaken for XYM geometry
+	# ("MULTI" contains an M)
+	x0 <- 878000
+	y0 <- 1261000
+	streams <- sf::st_sf(id = 1:2, geometry = sf::st_sfc(
+		sf::st_linestring(rbind(c(x0 - 100, y0), c(x0, y0))),
+		sf::st_linestring(rbind(c(x0, y0), c(x0 + 100, y0))), crs = 3005))
+	edges <- lines_to_lsn(streams, tempfile(), snap_tolerance = 0.3,
+		topo_tolerance = 20, overwrite = TRUE, verbose = FALSE)
+	site.pt <- sf::st_sf(id = 1, geometry = sf::st_sfc(
+		sf::st_point(c(x0 - 50, y0 + 1)), crs = 3005))
+	site.multi <- sf::st_sf(id = 1, geometry = sf::st_sfc(
+		sf::st_multipoint(matrix(c(x0 - 50, y0 + 1), 1)), crs = 3005))
+	edges.multi <- edges
+	sf::st_geometry(edges.multi) <- sf::st_cast(sf::st_geometry(edges), "MULTILINESTRING")
+	snap <- function(sites, edges) {
+		sites_to_lsn(sites = sites, edges = edges, snap_tolerance = 10,
+			save_local = FALSE, verbose = FALSE)
+	}
+
+	# Every site must be a POINT and every edge a LINESTRING, even when
+	# the first feature is
+	site.mixed <- sf::st_sf(id = 1:2, geometry = sf::st_sfc(
+		sf::st_point(c(x0 - 50, y0 + 1)),
+		sf::st_multipoint(matrix(c(x0 + 50, y0 + 1), 1)), crs = 3005))
+	expect_error(snap(site.multi, edges), "must have POINT geometry. Use sf::st_cast")
+	expect_error(snap(site.mixed, edges), "must have POINT geometry. Use sf::st_cast")
+
+	edges.mixed <- edges
+	sf::st_geometry(edges.mixed) <- sf::st_sfc(sf::st_geometry(edges)[[1]],
+		sf::st_multilinestring(list(unclass(sf::st_geometry(edges)[[2]]))), crs = 3005)
+	expect_error(snap(site.pt, edges.multi), "must have LINESTRING geometry. Use sf::st_cast")
+	expect_error(snap(site.pt, edges.mixed), "must have LINESTRING geometry. Use sf::st_cast")
+	expect_no_error(snap(site.pt, edges))
+})
