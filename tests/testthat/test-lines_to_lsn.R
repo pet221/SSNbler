@@ -334,6 +334,14 @@ read_rel_df <- function(p) {
 	rel
 }
 
+test_that("lines_to_lsn() arguments are in the same order as in version 1.1.2", {
+	# So calls that pass arguments by position keep their meaning
+	expect_equal(names(formals(lines_to_lsn)),
+		c("streams", "lsn_path", "check_topology", "snap_tolerance",
+			"topo_tolerance", "remove_ZM", "overwrite", "use_parallel",
+			"no_cores", "verbose"))
+})
+
 test_that("lines_to_lsn() input checks stop with informative errors", {
 	p <- withr::local_tempdir()
 	run <- function(streams, ...) {

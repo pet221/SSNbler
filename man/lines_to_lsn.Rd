@@ -12,9 +12,9 @@ lines_to_lsn(
   topo_tolerance,
   remove_ZM = FALSE,
   overwrite = FALSE,
-  verbose = TRUE,
   use_parallel = NULL,
-  no_cores = NULL
+  no_cores = NULL,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -55,15 +55,15 @@ node_errors.gpkg file from an earlier run is deleted. If \code{FALSE},
 \code{lines_to_lsn()} stops if any output file, including
 node_errors.gpkg, already exists in \code{lsn_path}. Default is \code{FALSE}.}
 
-\item{verbose}{Logical. If \code{TRUE}, messages describing
-function progress will be printed to the console. Default is
-\code{TRUE}.}
-
 \item{use_parallel}{Deprecated and ignored. Parallel processing is
 no longer needed. Supplying it gives a warning.}
 
 \item{no_cores}{Deprecated and ignored. Parallel processing is no
 longer needed. Supplying it gives a warning.}
+
+\item{verbose}{Logical. If \code{TRUE}, messages describing
+function progress will be printed to the console. Default is
+\code{TRUE}.}
 }
 \value{
 An \code{sf} object representing edges in the LSN. The LSN, including edges.gpkg, nodes.gpkg, noderelationships.csv, and relationships.csv files, are saved locally to a directory defined by \code{lsn_path}. If \code{check_topology = TRUE} and topological errors are identified, then node_errors.gpkg is also saved to \code{lsn_path}.

@@ -135,9 +135,9 @@ lines_to_lsn <- function(streams,
                          topo_tolerance,
                          remove_ZM = FALSE,
                          overwrite = FALSE,
-                         verbose = TRUE,
                          use_parallel = NULL,
-                         no_cores = NULL) {
+                         no_cores = NULL,
+                         verbose = TRUE) {
 
 	##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
 	# Check Inputs ----
