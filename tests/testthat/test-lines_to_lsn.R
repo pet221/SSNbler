@@ -525,6 +525,15 @@ test_that("overwrite = FALSE stops when the LSN already exists", {
 		topo_tolerance = 20, overwrite = FALSE, verbose = FALSE),
 		"already exist.*: nodes.gpkg\\.")
 	expect_false(file.exists(file.path(p, "edges.gpkg")))
+
+	# An old node_errors.gpkg also stops it when check_topology = FALSE,
+	# so it can't be left beside a new LSN
+	p <- withr::local_tempdir()
+	file.create(file.path(p, "node_errors.gpkg"))
+	expect_error(lines_to_lsn(streams, lsn_path = p, check_topology = FALSE,
+		snap_tolerance = 1, overwrite = FALSE, verbose = FALSE),
+		"already exist.*: node_errors.gpkg\\.")
+	expect_false(file.exists(file.path(p, "edges.gpkg")))
 })
 
 test_that("existing rid and fid columns follow overwrite", {

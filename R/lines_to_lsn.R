@@ -30,7 +30,9 @@
 #'   an error. Default is \code{FALSE}.
 #' @param overwrite Logical. If \code{TRUE}, output files will
 #'   overwrite existing files with the same names, and a
-#'   node_errors.gpkg file from an earlier run is deleted. Default is \code{FALSE}.
+#'   node_errors.gpkg file from an earlier run is deleted. If \code{FALSE},
+#'   \code{lines_to_lsn()} stops if any output file, including
+#'   node_errors.gpkg, already exists in \code{lsn_path}. Default is \code{FALSE}.
 #' @param verbose Logical. If \code{TRUE}, messages describing
 #'   function progress will be printed to the console. Default is
 #'   \code{TRUE}.
@@ -286,12 +288,12 @@ lines_to_lsn <- function(streams,
       call. = FALSE)
   }
 
-  ## Stop if output files exist and overwrite = FALSE 
+  ## Stop if output files exist and overwrite = FALSE. node_errors.gpkg
+  ## is checked even when check_topology = FALSE, so an old one is never
+  ## left beside a new LSN
   if (overwrite == FALSE) {
     out.files <- c("edges.gpkg", "nodes.gpkg", "noderelationships.csv",
-                   "relationships.csv")
-    
-    if (check_topology == TRUE) out.files <- c(out.files, "node_errors.gpkg")
+                   "relationships.csv", "node_errors.gpkg")
     
     existing.files <- out.files[file.exists(file.path(lsn_path, out.files))]
     

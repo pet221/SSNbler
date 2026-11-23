@@ -50,7 +50,9 @@ an error. Default is \code{FALSE}.}
 
 \item{overwrite}{Logical. If \code{TRUE}, output files will
 overwrite existing files with the same names, and a
-node_errors.gpkg file from an earlier run is deleted. Default is \code{FALSE}.}
+node_errors.gpkg file from an earlier run is deleted. If \code{FALSE},
+\code{lines_to_lsn()} stops if any output file, including
+node_errors.gpkg, already exists in \code{lsn_path}. Default is \code{FALSE}.}
 
 \item{verbose}{Logical. If \code{TRUE}, messages describing
 function progress will be printed to the console. Default is

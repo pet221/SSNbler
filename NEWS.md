@@ -61,7 +61,7 @@ This update focuses on improving the computational efficiency of `lines_to_lsn()
 
 * `lines_to_lsn()` now stops with an error for XYZ geometries unless `remove_ZM = TRUE`, as it already did for XYM and XYZM geometries. Previously, Z coordinates were kept.
 
-* `lines_to_lsn()` with `overwrite = TRUE` left `node_errors.gpkg` from an earlier run in `lsn_path` when the new run found no errors. It is now deleted.
+* `lines_to_lsn()` with `overwrite = TRUE` left `node_errors.gpkg` from an earlier run in `lsn_path` when the new run found no errors. It is now deleted. With `overwrite = FALSE`, an existing `node_errors.gpkg` now stops `lines_to_lsn()`, even when `check_topology = FALSE`.
 
 
 ## Behaviour changes
