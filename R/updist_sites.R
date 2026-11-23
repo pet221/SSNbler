@@ -234,6 +234,17 @@ updist_sites <- function(sites, edges, length_col, lsn_path, save_local = TRUE,
 
     ## Get the Length and upDist fields from the edges
     sites_i_sf <- merge(sites_i_sf, edges, by = "rid", all.x = TRUE)
+
+    ## Stop if any site is on an edge with no upDist (or an edge that
+    ## isn't in edges), rather than giving it upDist = NA
+    no.updist <- is.na(sites_i_sf$uDist) | is.na(sites_i_sf[[length_col]])
+    if (any(no.updist) == TRUE) {
+      stop(sum(no.updist), " site(s) in ", sites_i_name,
+        " are on edges with no upDist (rid ",
+        format_rids(sites_i_sf$rid[no.updist]),
+        "). Run updist_edges() on edges with no topology errors first.",
+        call. = FALSE)
+    }
     
     ## Compute the new upDist for sites based on the ratio, updist and length of edge
     sites_i_sf$upDist <- sites_i_sf[, "uDist", drop = TRUE] -

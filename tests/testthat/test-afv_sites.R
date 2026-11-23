@@ -14,3 +14,15 @@ test_that("afv_sites", {
 	expect_true(all(site.list_afv$pred1km$afvArea >= 0))
 	expect_s3_class(site.list_afv$pred1km, "sf")
 })
+
+test_that("afv_sites stops when a site is on an edge with no AFV", {
+	e <- no_outlet_lsn()
+	sites <- no_outlet_sites(e)
+	# Edges in the loop are missing, as in updist_edges() output before
+	# the network outlet check was added
+	e.valid <- e[e$rid %in% 5:6, ]
+	e.valid$afvArea <- 1
+	expect_error(afv_sites(list(obs = sites), e.valid, afv_col = "afvArea",
+		save_local = FALSE),
+		"1 site\\(s\\) in obs are on edges with no afvArea \\(rid 1\\)")
+})

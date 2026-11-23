@@ -247,6 +247,18 @@ afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
     }
     check_names_case(names(sites_i), "fid", names(sites)[i])
 
+    ## Stop if any site is on an edge with no AFV (or an edge that isn't
+    ## in edges), rather than dropping it
+    afv.rids <- edges_df$rid[is.na(edges_df[[afv_col]]) == FALSE]
+    no.afv <- (sites_i$rid %in% afv.rids) == FALSE
+    if (any(no.afv) == TRUE) {
+      stop(sum(no.afv), " site(s) in ", names(sites)[i],
+        " are on edges with no ", afv_col, " (rid ",
+        format_rids(sites_i$rid[no.afv]),
+        "). Run afv_edges() on edges with no topology errors first.",
+        call. = FALSE)
+    }
+
     sites_i <- merge(sites_i, edges_df, by = "rid", sort = FALSE)
 
     ind.neg <- st_drop_geometry(sites_i[, afv_col]) < 0

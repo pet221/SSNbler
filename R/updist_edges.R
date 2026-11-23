@@ -190,6 +190,9 @@ updist_edges <- function(edges, lsn_path = NULL, calc_length = FALSE, length_col
   ## network also gives a downstream divergence)
   check_self_loops(lsn_path)
 
+  ## Check that every edge is in a network with an outlet
+  check_network_outlets(lsn_path)
+
   ## Check for downstream divergences
   if(sum(duplicated(rel$fromedge)) > 0) {
   	stop("At least one downstream divergence is present in edges. Fix topology errors and re-create error free edges using lines_to_lsn().")
@@ -281,6 +284,8 @@ updist_edges <- function(edges, lsn_path = NULL, calc_length = FALSE, length_col
   all_results_df <- do.call(rbind, results_list)
   ## Join result to existing sf object
   results_sf <- merge(edges, all_results_df[, c("rid", "upDist")], "rid", sort = FALSE)
+  ## Stop before saving if any edge would be dropped
+  check_edges_kept(edges$rid, results_sf$rid, "upDist")
 
   ## Write out the in_sites if save_local == TRUE
   if (save_local == TRUE) {

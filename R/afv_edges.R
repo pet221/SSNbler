@@ -190,6 +190,9 @@ afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
   ## network also gives a downstream divergence)
   check_self_loops(lsn_path)
 
+  ## Check that every edge is in a network with an outlet
+  check_network_outlets(lsn_path)
+
   ## Check for downstream divergences
   if(sum(duplicated(relate_table$fromedge)) > 0) {
   	stop("At least one downstream divergence is present in edges. Fix topology errors and re-create error free edges using lines_to_lsn().")
@@ -291,6 +294,8 @@ afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
     "rid",
     sort = FALSE
   )
+  ## Stop before saving if any edge would be dropped
+  check_edges_kept(edges$rid, results_sf$rid, afv_col)
 
   ## Write out results
   if (save_local) {

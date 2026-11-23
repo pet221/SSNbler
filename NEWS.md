@@ -63,6 +63,8 @@ This update focuses on improving the computational efficiency of `lines_to_lsn()
 
 * `lines_to_lsn()` with `overwrite = TRUE` left `node_errors.gpkg` from an earlier run in `lsn_path` when the new run found no errors. It is now deleted. With `overwrite = FALSE`, an existing `node_errors.gpkg` now stops `lines_to_lsn()`, even when `check_topology = FALSE`.
 
+* `updist_edges()`, `afv_edges()` and `accum_edges()` now stop with an error, listing the rids, if any edge is in a network without an outlet (e.g. a loop of edges). Previously these edges were silently dropped from the results and from `edges.gpkg`. `updist_sites()` and `afv_sites()` now stop if a site is on an edge with no upDist or AFV value, rather than giving it `NA` (`updist_sites()`) or dropping it (`afv_sites()`).
+
 
 ## Behaviour changes
 

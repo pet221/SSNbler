@@ -16,3 +16,13 @@ test_that("updist_sites", {
 })
 
 
+
+test_that("updist_sites stops when a site is on an edge with no upDist", {
+	e <- no_outlet_lsn()
+	sites <- no_outlet_sites(e)
+	e$Length <- as.numeric(sf::st_length(e))
+	e$upDist <- ifelse(e$rid %in% 5:6, 100, NA)
+	expect_error(updist_sites(list(obs = sites), e, length_col = "Length",
+		lsn_path = attr(e, "lsn_path"), save_local = FALSE),
+		"1 site\\(s\\) in obs are on edges with no upDist \\(rid 1\\)")
+})
