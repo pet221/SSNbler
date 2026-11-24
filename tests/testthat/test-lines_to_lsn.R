@@ -619,6 +619,42 @@ test_that("nodecat is Outlet with 0 outflow and Source with 0 inflow", {
 	expect_equal(lsn$error.table$nodecat, "Source")
 })
 
+test_that("Self-loop lines are not counted as flowing into or out of their node", {
+	# Ring (line 4) at the outlet of a river: the node is still an Outlet
+	lsn <- grid_lsn(list(rbind(c(x0, y0 + 300), c(x0, y0 + 100)),
+		rbind(c(x0 - 100, y0 + 200), c(x0, y0 + 100)),
+		rbind(c(x0, y0 + 100), c(x0, y0)),
+		rbind(c(x0, y0), c(x0 + 50, y0 - 50), c(x0 - 50, y0 - 50), c(x0, y0))),
+		snap = 0.3)
+	expect_equal(sort(lsn$nodecat), c("Confluence", "Outlet", "Source", "Source"))
+	expect_equal(lsn$errors, "Self-loop")
+	expect_equal(lsn$error.table$nodecat, "Outlet")
+
+	# Zero-length line (line 3) at the end of a tributary that stops 5 m short
+	# of the mainstem: an Outlet, so the Dangling Node is reported
+	expect_warning(lsn <- grid_lsn(list(rbind(c(x0 - 100, y0), c(x0 + 100, y0)),
+		rbind(c(x0, y0 + 100), c(x0, y0 + 5)),
+		rbind(c(x0, y0 + 5), c(x0, y0 + 5))), snap = 0.3),
+		"length <= snap_tolerance")
+	expect_equal(lsn$errors, c("Dangling Node", "Self-loop"))
+	expect_equal(lsn$error.table$nodecat, c("Outlet", "Outlet"))
+
+	# Ring (line 2) partway down a river: a Pseudonode, not a Downstream
+	# Divergence
+	lsn <- grid_lsn(list(rbind(c(x0 - 100, y0), c(x0, y0)),
+		rbind(c(x0, y0), c(x0 + 50, y0 + 50), c(x0 + 50, y0 - 50), c(x0, y0)),
+		rbind(c(x0, y0), c(x0, y0 - 100))), snap = 0.3)
+	expect_equal(sort(lsn$nodecat), c("Outlet", "Pseudonode", "Source"))
+	expect_equal(lsn$errors, "Self-loop")
+	expect_equal(lsn$error.table$nodecat, "Pseudonode")
+
+	# Isolated ring: no flow in or out, so a Source
+	lsn <- grid_lsn(list(rbind(c(x0, y0), c(x0 + 50, y0), c(x0 + 50, y0 + 50),
+		c(x0, y0))), snap = 0.3)
+	expect_equal(lsn$nodecat, "Source")
+	expect_equal(lsn$errors, "Self-loop")
+})
+
 test_that("intersections without a node are flagged, with NA pointid and rids", {
 	# Two lines crossing in an X; arms 50 long, topo_tolerance 20
 	lsn <- grid_lsn(list(rbind(c(x0 - 50, y0), c(x0 + 50, y0)),

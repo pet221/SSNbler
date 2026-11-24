@@ -448,9 +448,12 @@ lines_to_lsn <- function(streams,
   # Create node categories ----
   ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
 
-  ## Number of edges flowing in/out of each node
-  n.inflow <- tabulate(node.relate$tonode, n.nodes)
-  n.outflow <- tabulate(node.relate$fromnode, n.nodes)
+  ## Number of edges flowing in/out of each node. Self-loop lines are
+  ## left out, so they don't turn an Outlet into a Confluence or add a
+  ## Downstream Divergence (they are reported as Self-loop errors)
+  not.self.loop.ind <- node.relate$fromnode != node.relate$tonode
+  n.inflow <- tabulate(node.relate$tonode[not.self.loop.ind], n.nodes)
+  n.outflow <- tabulate(node.relate$fromnode[not.self.loop.ind], n.nodes)
 
   ## Categorise nodes based on the number of inflow/outflow edges
   headwaters <- n.inflow == 0
