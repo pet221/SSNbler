@@ -1,5 +1,7 @@
 ## Returns a two-column matrix (i, j), where i != j, of row indices of xy
 ## where end nodes <= tol apart. Each node pair is returned only once.
+## When tol > 0, a tiny margin allows for rounding in the coordinates, so
+## end nodes exactly tol apart are always paired.
 ## End nodes are binned on a grid so each node is only compared with
 ## nodes in its own cell and neighbouring cells.
 
@@ -8,11 +10,18 @@ grid_pairs <- function(xy, tol) {
 	## Get total number of node coordinates
 	n.xy <- nrow(xy)
 	
+	## Rounding margin: a few times the largest rounding error in the
+	## coordinates and tol (0 when tol == 0, so only exact matches)
+	margin <- 0
+	if (tol > 0) {
+		margin <- 4 * .Machine$double.eps * (max(abs(xy)) + tol)
+	}
+
 	## Set up grid cells to search when tol > 0
 	if (tol > 0) {
 		## Set cell size slightly wider than tol to ensure two nodes
 		## within tol aren't more than one cell apart.
-		cell.width <- tol * 1.0001
+		cell.width <- (tol + margin) * 1.0001
 		node.col <- floor(xy[, 1] / cell.width) + 0 ## + 0 turns -0 to 0
 		node.row <- floor(xy[, 2] / cell.width) + 0
 		## Direction to move from source cell (0,0) to one of its neighbours, 
@@ -112,5 +121,5 @@ grid_pairs <- function(xy, tol) {
 	d <- sqrt((xy[pairs[, 1], 1] - xy[pairs[, 2], 1])^2 +
 							(xy[pairs[, 1], 2] - xy[pairs[, 2], 2])^2)
 
-	return(pairs[d <= tol, , drop = FALSE])
+	return(pairs[d <= tol + margin, , drop = FALSE])
 }

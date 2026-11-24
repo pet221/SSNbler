@@ -88,6 +88,22 @@ test_that("grid_pairs() includes points exactly tol apart, across cell boundarie
 	expect_equal(norm_pairs(grid_pairs(xy, 0.25)), matrix(c(1L, 2L), 1))
 })
 
+test_that("end nodes exactly a decimal snap_tolerance apart are snapped", {
+	# At x0 = 1e6, (x0 + 0.3) - x0 is 0.30000000004656613 in double
+	# precision, just over 0.3
+	for (tol in c(0.3, 0.01, 0.1)) {
+		xy <- rbind(c(x0, y0), c(x0 + tol, y0), c(x0, y0 + tol))
+		expect_equal(nrow(grid_pairs(xy, tol)), 2)
+	}
+	# Still exact matches only when tol = 0
+	expect_equal(nrow(grid_pairs(rbind(c(x0, y0), c(x0 + 1e-9, y0)), 0)), 0)
+
+	# Through lines_to_lsn(): a 0.3 gap at snap_tolerance = 0.3
+	lsn <- grid_lsn(list(rbind(c(x0 - 100, y0), c(x0, y0)),
+		rbind(c(x0 + 0.3, y0), c(x0 + 100, y0))), snap = 0.3)
+	expect_equal(lsn$rel, data.frame(fromedge = 1L, toedge = 2L))
+})
+
 test_that("grid_pairs() pairs a point at -0 with its neighbour cell", {
 	# floor(-0 / h) is -0; the cell key must still match "0"
 	xy <- rbind(c(-0.05, 0), c(-0, -0))
