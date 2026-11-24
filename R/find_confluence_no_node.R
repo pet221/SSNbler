@@ -12,10 +12,24 @@
 
 find_confluence_no_node <- function(end.points, in.edges, node.of.end, eps) {
 
+	## Only test shared end node locations once. position.id is the
+	## position of each end node; position.end is one end node at each
+	## position
+	end.xy <- st_coordinates(end.points)
+	xy.order <- order(end.xy[, 1], end.xy[, 2])
+	new.position.ind <- c(TRUE,
+		diff(end.xy[xy.order, 1]) != 0 | diff(end.xy[xy.order, 2]) != 0)
+	position.id <- integer(nrow(end.xy))
+	position.id[xy.order] <- cumsum(new.position.ind)
+	position.end <- xy.order[new.position.ind]
+
 	## Exact predicates miss end nodes due to rounding errors.
-	## Make end node a small square using eps
-	end.boxes <- st_buffer(end.points, eps, endCapStyle = "SQUARE")
-	end.on.line <- st_intersects(end.boxes, in.edges)
+	## Make each position a small square using eps, find the lines it
+	## touches, then copy the result to every end node at that position
+	position.boxes <- st_buffer(end.points[position.end], eps,
+		endCapStyle = "SQUARE")
+	position.on.line <- st_intersects(position.boxes, in.edges)
+	end.on.line <- position.on.line[position.id]
 
 	## One row per end node (k) and line it touches (j). The end node's
 	## node is connected to line j if it contains one of j's end nodes
@@ -27,8 +41,8 @@ find_confluence_no_node <- function(end.points, in.edges, node.of.end, eps) {
 		k.node != node.of.end[2 * j]
 
 	## Leave out touches within eps of line j's end nodes (same square as
-	## end.boxes), so only touches away from line j's end nodes are counted
-	end.xy <- st_coordinates(end.points)
+	## position.boxes), so only touches away from line j's end nodes are
+	## counted
 	near.from <- abs(end.xy[k, 1] - end.xy[2 * j - 1, 1]) <= eps &
 		abs(end.xy[k, 2] - end.xy[2 * j - 1, 2]) <= eps
 	near.to <- abs(end.xy[k, 1] - end.xy[2 * j, 1]) <= eps &
