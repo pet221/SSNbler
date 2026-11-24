@@ -86,6 +86,10 @@ This update focuses on improving the computational efficiency of `lines_to_lsn()
 
 * In `nodes.gpkg`, `nodecat` is now Source for every node with no inflowing edges, and Outlet for every node with inflowing edges but no outflowing edges. Previously, a node with no inflowing edges and two or more outflowing edges (a Downstream Divergence) and a node with three or more inflowing edges and no outflowing edges (a Complex Confluence) were both categorised as Confluence. These nodes are still reported as errors in `node_errors.gpkg`. 
 
+* Snapping and node coordinates in `lines_to_lsn()` no longer depend on the order of the line features in `streams`:
+  * When two snaps are the same distance apart, the end node coordinates decide which is made first, not the row order.
+  * A snapped node takes the coordinates of its end node with the smallest x (then y) coordinate. Previously it took the coordinates of the first end node.
+
 # SSNbler 1.1.2
 
 ## Minor updates

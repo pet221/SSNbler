@@ -96,8 +96,11 @@ from this rule. Snapping is transitive: if end node A is within
 \code{snap_tolerance} of end node C, then A, B and C are snapped
 even if A and C are further apart. The upstream and downstream end
 nodes of the same line feature, or the two ends of a chain of line
-features, are never snapped into one node. The
-node takes the coordinates of the first line end node assigned to it.
+features, are never snapped into one node. The node takes the
+coordinates of the line end node with the smallest x coordinate (or
+the smallest y coordinate, if x coordinates are equal). Snapping and
+node coordinates in \code{lines_to_lsn} no longer depend on the order
+of the line features in \code{streams}.
 
 Topological errors are common in spatial data and must be corrected
 to ensure the LSN accurately represents direction and

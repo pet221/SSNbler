@@ -62,8 +62,11 @@
 #' \code{snap_tolerance} of end node C, then A, B and C are snapped
 #' even if A and C are further apart. The upstream and downstream end
 #' nodes of the same line feature, or the two ends of a chain of line
-#' features, are never snapped into one node. The
-#' node takes the coordinates of the first line end node assigned to it.
+#' features, are never snapped into one node. The node takes the
+#' coordinates of the line end node with the smallest x coordinate (or
+#' the smallest y coordinate, if x coordinates are equal). Snapping and
+#' node coordinates in \code{lines_to_lsn} no longer depend on the order
+#' of the line features in \code{streams}.
 #'
 #' Topological errors are common in spatial data and must be corrected
 #' to ensure the LSN accurately represents direction and
@@ -420,13 +423,18 @@ lines_to_lsn <- function(streams,
     warning(length(blocked.ends), " line end node(s) within snap_tolerance were not snapped, because this would form a loop. Connections at these locations may be incorrect. Use check_topology = TRUE to locate and check Unsnapped Node errors.", call. = FALSE)
   }
 
-  ## pointid numbered in order of first appearance; each node takes the
-  ## coordinates of its first associated end node
+  ## pointid numbered in order of first appearance
   first <- !duplicated(memb)
   node.of.end <- match(memb, memb[first])
+
+  ## Each node takes the coordinates of the end node with the smallest
+  ## x (then y)
+  coord.order <- order(node.of.end, end.xy[, 1], end.xy[, 2])
+  node.xy.end <- coord.order[!duplicated(node.of.end[coord.order])]
   nodexy.mat <- data.frame(pointid = seq_len(sum(first)),
-  												 xcoord = end.xy[first, 1],
-  												 ycoord = end.xy[first, 2])
+  												 xcoord = end.xy[node.xy.end, 1],
+  												 ycoord = end.xy[node.xy.end, 2])
+  rm(coord.order, node.xy.end)
   n.nodes <- nrow(nodexy.mat)
 
   ## Chained Nodes: nodes whose end nodes are not all within

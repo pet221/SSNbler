@@ -361,6 +361,53 @@ test_that("lines all shorter than snap_tolerance keep the right connections", {
 	expect_true(all(lsn$errors == "Unsnapped Node"))
 })
 
+test_that("snapping does not depend on the order of the line features", {
+	# Line T ends 0.5 above the middle of the 1 m line S, so it is exactly
+	# the same distance from both of S's end nodes. Relationships are
+	# compared by line name, because rids follow row order
+	lines <- list(U = rbind(c(x0 - 100, y0), c(x0, y0)),
+		S = rbind(c(x0, y0), c(x0 + 1, y0)),
+		T = rbind(c(x0 + 0.5, y0 + 100), c(x0 + 0.5, y0 + 0.5)),
+		D = rbind(c(x0 + 1, y0), c(x0 + 100, y0)))
+	rel.by.name <- function(perm) {
+		lsn <- suppressWarnings(grid_lsn(lines[perm], snap = 1))
+		line.names <- names(lines)[perm]
+		sort(paste(line.names[lsn$rel$fromedge], line.names[lsn$rel$toedge],
+			sep = ">"))
+	}
+	first.rel <- rel.by.name(1:4)
+	for (perm in list(c(3, 1, 2, 4), c(4, 3, 2, 1), c(2, 4, 1, 3))) {
+		expect_equal(rel.by.name(perm), first.rel)
+	}
+})
+
+test_that("snapped node coordinates do not depend on the order of the line features", {
+	# Two confluences 0.5 apart, and a line ending midway between them,
+	# snapped into one node at snap 0.3
+	lines <- list(rbind(c(x0 - 100, y0 + 50), c(x0, y0)),
+		rbind(c(x0 - 100, y0 - 50), c(x0, y0)),
+		rbind(c(x0, y0), c(x0 - 50, y0 - 100)),
+		rbind(c(x0 + 100, y0 + 50), c(x0 + 0.5, y0)),
+		rbind(c(x0 + 100, y0 - 50), c(x0 + 0.5, y0)),
+		rbind(c(x0 + 0.5, y0), c(x0 + 50, y0 - 100)),
+		rbind(c(x0 + 0.25, y0 + 100), c(x0 + 0.25, y0)))
+	node.xy <- function(perm) {
+		lsn.path <- withr::local_tempdir()
+		streams <- sf::st_sf(id = seq_along(perm),
+			geometry = sf::st_sfc(lapply(lines[perm], sf::st_linestring),
+				crs = 5070))
+		suppressWarnings(lines_to_lsn(streams, lsn_path = lsn.path,
+			check_topology = TRUE, snap_tolerance = 0.3, topo_tolerance = 20,
+			overwrite = TRUE, verbose = FALSE))
+		xy <- sf::st_coordinates(sf::st_read(file.path(lsn.path, "nodes.gpkg"),
+			quiet = TRUE))
+		xy[order(xy[, 1], xy[, 2]), ]
+	}
+	first.xy <- node.xy(1:7)
+	expect_equal(node.xy(c(7, 1:6)), first.xy)
+	expect_equal(node.xy(7:1), first.xy)
+})
+
 test_that("a line with identical ends is a Self-loop that flows into itself", {
 	lsn <- grid_lsn(list(rbind(c(x0, y0), c(x0 + 50, y0), c(x0 + 50, y0 + 50),
 		c(x0, y0))), snap = 0.3)

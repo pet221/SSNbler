@@ -52,8 +52,17 @@ prevent_snapped_loops <- function(end.pairs, end.xy, memb) {
 							(end.xy[pairs[, 1], 2] - end.xy[pairs[, 2], 2])^2)
 
 	## Sort node pairs by distance, so closest end nodes are merged first.
-	## Ties are broken by pairs$i and then pairs$j. 
-	pair.order <- order(d, pairs[, 1], pairs[, 2])
+	## Ties are broken by the coordinates of the pair's end nodes 
+	## (smaller x, then y, first)
+	end.a <- pairs[, 1]
+	end.b <- pairs[, 2]
+	a.first.ind <- end.xy[end.a, 1] < end.xy[end.b, 1] |
+		(end.xy[end.a, 1] == end.xy[end.b, 1] &
+			end.xy[end.a, 2] <= end.xy[end.b, 2])
+	low.end <- ifelse(a.first.ind == TRUE, end.a, end.b)
+	high.end <- ifelse(a.first.ind == TRUE, end.b, end.a)
+	pair.order <- order(d, end.xy[low.end, 1], end.xy[low.end, 2],
+		end.xy[high.end, 1], end.xy[high.end, 2])
 	pairs <- pairs[pair.order, , drop = FALSE]
 	d <- d[pair.order]
 
