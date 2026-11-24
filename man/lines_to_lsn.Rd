@@ -35,14 +35,10 @@ no default. Two nodes separated by a distance less than or equal to
 \code{snap_tolerance} are assumed to be connected. Use 0 to connect
 only line end nodes with \emph{identical} coordinates.}
 
-\item{topo_tolerance}{Distance in map units. Required when
-\code{check_topology = TRUE}, and ignored otherwise.
-Used only for the Dangling Node check: an outlet within
-\code{topo_tolerance} of an edge in a different network is flagged
-as a Dangling Node. Upstream end nodes, and outlets near an edge in
-their own network, are not checked. Must be greater than
-\code{snap_tolerance} (and therefore > 0) when
-\code{check_topology = TRUE}.}
+\item{topo_tolerance}{Distance in map units, used to check for
+Dangling Nodes (see Details). Required when
+\code{check_topology = TRUE}, and ignored otherwise. Must be greater
+than \code{snap_tolerance} when \code{check_topology = TRUE}.}
 
 \item{remove_ZM}{Logical. If \code{TRUE}, Z and M dimensions are
 removed from streams, if they exist. If \code{FALSE} and
@@ -86,10 +82,10 @@ than geographic coordinate system (i.e. not Longitude and Latitude).
 
 The LSN is saved to a local directory defined by \code{lsn_path} and has four components:
 \itemize{
-\item{ nodes.gpkg: A GeoPackage of features with POINT geometry representing topologic breaks in the stream network. A column named nodecat specifies the type of node (e.g. pseudonodes, confluences, stream sources, or stream outlets). A column containing a unique node identifier, pointid, is also included. }
-\item{ edges.gpkg: A GeoPackage of features with LINESTRING geometry representing flow paths (i.e. line features) from node to node. A new column named rid is added that contains a unique identifier for each line feature. }
-\item{noderelationships.csv: a table describing the relationship between the nodes and their associated edges, as well as directionality in the LSN. The table contains three columns: the rid (for each edge), fromnode (pointid for the upstream node of each edge), and tonode (pointid for the downstream node of each edge). Directionality is defined based on the digitized direction of the line features. }
-\item{relationships.csv: a table representing the downstream flow path from edge to edge. The table contains two columns: fromedge (upstream edge) and toedge (downstream edge). }
+\item nodes.gpkg: A GeoPackage of features with POINT geometry representing topologic breaks in the stream network. A column named nodecat specifies the type of node (e.g. pseudonode, confluence, stream source, or stream outlet). A column containing a unique node identifier, pointid, is also included.
+\item edges.gpkg: A GeoPackage of features with LINESTRING geometry representing flow paths (i.e. line features) from node to node. A new column named rid is added that contains a unique identifier for each line feature.
+\item noderelationships.csv: a table describing the relationship between the nodes and their associated edges, as well as directionality in the LSN. The table contains three columns: the rid (for each edge), fromnode (pointid for the upstream node of each edge), and tonode (pointid for the downstream node of each edge). Directionality is defined based on the digitized direction of the line features.
+\item relationships.csv: a table representing the downstream flow path from edge to edge. The table contains two columns: fromedge (upstream edge) and toedge (downstream edge).
 }
 
 Line end nodes separated by a Euclidean distance <=
@@ -113,16 +109,16 @@ containing the node category (nodecat), which like \code{nodes.gpkg} can take on
 Pseudonode, Confluence, Source, or Outlet. Another column (error)
 defines the potential error type and can take on values of:
 \itemize{
-\item{Complex Confluence: three or more edges flow into the node.}
-\item{Converging Node: two edges flow into the node and none flow out.}
-\item{Dangling Node: an outlet within \code{topo_tolerance} of an edge in a different network. }
-\item{Downstream Divergence: two or more edges flow out of the node.}
-\item{Intersection Without Node: two edges cross without a node. A crossing within \code{snap_tolerance} of a node that both edges flow into or out of is not reported.}
-\item{Confluence Without Node: an edge end node touches another edge somewhere other than its end nodes, or is within a tiny rounding distance of it, and is not connected to it (e.g. forms a T junction where the other edge is not split).}
-\item{Network Without Outlet: the node is part of a loop of edges with no outlet (e.g. edges digitised in a circle, with or without edges flowing into it). Every node on the loop is reported. }
-\item{Self-loop: the upstream and downstream end nodes of a line feature have identical coordinates. }
-\item{Chained Node: the node contains line end nodes more than \code{snap_tolerance} apart. Because snapping is transitive, this happens when end nodes are linked by a chain of end nodes, each within \code{snap_tolerance} of the next.}
-\item{Unsnapped Node: a line end node was <= \code{snap_tolerance} from another end node and was not snapped to it. This typically occurs when snapping would make a line feature, or a chain of short line features, form a loop. }
+\item Complex Confluence: three or more edges flow into the node.
+\item Converging Node: two edges flow into the node and none flow out.
+\item Dangling Node: an outlet within \code{topo_tolerance} of an edge in a different network, unless the closest part of that edge is its outlet.
+\item Downstream Divergence: two or more edges flow out of the node.
+\item Intersection Without Node: two edges cross without a node. A crossing within \code{snap_tolerance} of a node that both edges flow into or out of is not reported.
+\item Confluence Without Node: an edge end node touches another edge somewhere other than its end nodes, or is within a tiny rounding distance of it, and is not connected to it (e.g. forms a T junction where the other edge is not split).
+\item Network Without Outlet: the node is part of a loop of edges with no outlet (e.g. edges digitised in a circle, with or without edges flowing into it). Every node on the loop is reported.
+\item Self-loop: the upstream and downstream end nodes of a line feature have identical coordinates.
+\item Chained Node: the node contains line end nodes more than \code{snap_tolerance} apart. Because snapping is transitive, this happens when end nodes are linked by a chain of end nodes, each within \code{snap_tolerance} of the next.
+\item Unsnapped Node: a line end node was <= \code{snap_tolerance} from another end node and was not snapped to it. This typically occurs when snapping would make a line feature, or a chain of short line features, form a loop.
 }
 Two additional columns are added to \code{node_errors.gpkg} containing the rids of the edges flowing into (up_rid)
 and out of (down_rid) each node, in comma separated text format (e.g. "4, 7"). This allows the user to visually check flow relationships at each potential error more
@@ -148,14 +144,22 @@ The arguments \code{snap_tolerance} and \code{topo_tolerance} are
 both provided in map units and neither has a default.
 \code{snap_tolerance} must always be provided and must be >= 0. When
 \code{check_topology = TRUE}, \code{topo_tolerance} must also be
-provided and must be greater than \code{snap_tolerance}. It is generally a good
+provided and must be greater than \code{snap_tolerance} (and therefore > 0). It is generally a good
 idea to set the \code{snap_tolerance} to a distance shorter than the smallest line segment length. It should also be relatively small
 compared to the distance specified in the \code{topo_tolerance} argument. Nodes separated by
 a Euclidean distance <= \code{snap_tolerance} are assumed to be
-connected and are snapped together. An outlet within \code{topo_tolerance} of an edge in a different network is flagged as a Dangling Node. If \code{snap_tolerance} is too large, end nodes that should remain
+connected and are snapped together. An outlet within \code{topo_tolerance} of an edge in a different network is flagged as a Dangling Node, unless the closest part of the neighbouring edge is its outlet. Upstream end nodes, and outlets near an edge in their own network, are not checked. If \code{snap_tolerance} is too large, end nodes that should remain
 separate will be snapped together in error. If \code{topo_tolerance}
 is too large, more false errors will be flagged in
 \code{node_errors.gpkg}.
 
-WARNING: A warning is given if the length of any line feature in \code{streams} is <= \code{snap_tolerance}, because snapping near that line feature may result in unintended connections. Use \code{\link[sf]{st_length}} to obtain and check the minimum length of the line features prior to running \code{lines_to_lsn}. When \code{check_topology = FALSE}, a warning is also given if any line end nodes within \code{snap_tolerance} of another line end node were not snapped. This typically occurs when snapping would put both end nodes of a line feature into one node. If this warning is returned, re-run \code{lines_to_lsn} with \code{check_topology = TRUE} to locate these nodes. Similarly, when \code{check_topology = FALSE}, a warning is given if any snapped nodes include Chained Nodes that were more than \code{snap_tolerance} apart due to transitive snapping. Again, use \code{check_topology = TRUE} to locate and check these nodes. When \code{check_topology = FALSE}, a warning is also given if any line feature is a Self-loop, and it lists their rids.
+WARNING: When \code{snap_tolerance > 0}, a warning is given if the length of any line feature in \code{streams} is <= \code{snap_tolerance}, because snapping near that line feature may result in unintended connections. Use \code{\link[sf]{st_length}} to obtain and check the minimum length of the line features prior to running \code{lines_to_lsn}.
+
+When \code{check_topology = FALSE}, a warning is also given if:
+\itemize{
+\item any line end nodes within \code{snap_tolerance} of another line end node were not snapped, because snapping would make a line feature, or a chain of line features, form a loop.
+\item any nodes are Chained Nodes.
+\item any line feature is a Self-loop. The warning lists their rids.
+}
+If any of these warnings are given, re-run \code{lines_to_lsn} with \code{check_topology = TRUE} to locate and check these nodes.
 }

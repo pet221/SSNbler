@@ -198,6 +198,29 @@ test_that("Dangling Node ignores the outlet's own network", {
 	expect_equal(lsn$error.table$up_rid, "2")
 })
 
+test_that("an outlet near another network's outlet is not a Dangling Node", {
+	# Two rivers whose outlets are 15 m apart (e.g. both end in a lake)
+	lsn <- grid_lsn(list(rbind(c(x0, y0 + 500), c(x0, y0)),
+		rbind(c(x0 + 15, y0 + 500), c(x0 + 15, y0))), snap = 0.3)
+	expect_equal(nrow(lsn$rel), 0)
+	expect_length(lsn$errors, 0)
+
+	# An outlet 10 m from another network's upstream end node is still
+	# a Dangling Node
+	lsn <- grid_lsn(list(rbind(c(x0, y0 + 500), c(x0, y0)),
+		rbind(c(x0 - 200, y0 + 700), c(x0 - 10, y0 + 500))), snap = 0.3)
+	expect_equal(lsn$errors, "Dangling Node")
+	expect_equal(lsn$error.table$up_rid, "2")
+
+	# An outlet 10 m from the node where two lines of another network
+	# meet is still a Dangling Node
+	lsn <- grid_lsn(list(rbind(c(x0, y0 + 500), c(x0, y0 + 200)),
+		rbind(c(x0, y0 + 200), c(x0, y0)),
+		rbind(c(x0 - 200, y0 + 300), c(x0 - 10, y0 + 200))), snap = 0.3)
+	expect_equal(lsn$errors, "Dangling Node")
+	expect_equal(lsn$error.table$up_rid, "3")
+})
+
 test_that("a short line leaving a Downstream Divergence is not a Dangling Node", {
 	# Line 3 is a 2 m stub leaving the node between lines 1 and 2. Its
 	# outlet is within topo_tolerance of lines 1 and 2, but they are in

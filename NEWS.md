@@ -80,7 +80,7 @@ This update focuses on improving the computational efficiency of `lines_to_lsn()
 
 * In `node_errors.gpkg`, `nodecat` is now `NA` for Intersection Without Node errors, which are not nodes. Previously it was Confluence.
 
-* In `lines_to_lsn()`, a Dangling Node is now an outlet within `topo_tolerance` of a line feature in a different network. Previously, it was an outlet whose `topo_tolerance` buffer was crossed by more than one line feature. An outlet that touches another line feature somewhere other than its end nodes is now reported only as a Confluence Without Node, not also as a Dangling Node. 
+* In `lines_to_lsn()`, a Dangling Node is now an outlet within `topo_tolerance` of a line feature in a different network. Previously, it was an outlet whose `topo_tolerance` buffer was crossed by more than one line feature. An outlet that touches another line feature somewhere other than its end nodes is now reported only as a Confluence Without Node, not also as a Dangling Node. Outlets close to another network's outlet (e.g. two streams ending in a lake) are not reported. 
 
 * In `nodes.gpkg`, `nodecat` is now Source for every node with no inflowing edges, and Outlet for every node with inflowing edges but no outflowing edges. Previously, a node with no inflowing edges and two or more outflowing edges (a Downstream Divergence) and a node with three or more inflowing edges and no outflowing edges (a Complex Confluence) were both categorised as Confluence. These nodes are still reported as errors in `node_errors.gpkg`. 
 
