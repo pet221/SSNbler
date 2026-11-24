@@ -65,7 +65,8 @@
 #' \code{snap_tolerance} of end node B, and B is within
 #' \code{snap_tolerance} of end node C, then A, B and C are snapped
 #' even if A and C are further apart. The upstream and downstream end
-#' nodes of the same line feature are never snapped into one node. The
+#' nodes of the same line feature, or the two ends of a chain of line
+#' features, are never snapped into one node. The
 #' node takes the coordinates of the first line end node assigned to it.
 #'
 #' Topological errors are common in spatial data and must be corrected
@@ -85,9 +86,9 @@
 #'   \item{Intersection Without Node: two edges cross without a node. A crossing within \code{snap_tolerance} of a node that both edges flow into or out of is not reported.}
 #'   \item{Confluence Without Node: an edge end node touches another edge somewhere other than its end nodes, or is within a tiny rounding distance of it, and is not connected to it (e.g. forms a T junction where the other edge is not split).}
 #'   \item{Network Without Outlet: the node is part of a loop of edges with no outlet (e.g. edges digitised in a circle, with or without edges flowing into it). Every node on the loop is reported. }
-#'   \item{Self-loop: the upstream and downstream end nodes of a line feature have identical coordinates. The line feature is kept in noderelationships.csv and relationships.csv, where it flows into itself and stays connected to the line features upstream and downstream. updist_edges(), afv_edges() and accum_edges() stop with an error while a Self-loop is present.}
+#'   \item{Self-loop: the upstream and downstream end nodes of a line feature have identical coordinates. }
 #'    \item{Chained Node: the node contains line end nodes more than \code{snap_tolerance} apart. Because snapping is transitive, this happens when end nodes are linked by a chain of end nodes, each within \code{snap_tolerance} of the next.}
-#'   \item{Unsnapped Node: a line end node was <= \code{snap_tolerance} from another end node and was not snapped to it. This typically occurs when snapping would result in a line feature's to and from nodes being combined into one node (e.g. a line end node close to both end nodes of a short line). }
+#'   \item{Unsnapped Node: a line end node was <= \code{snap_tolerance} from another end node and was not snapped to it. This typically occurs when snapping would make a line feature, or a chain of short line features, form a loop. }
 #' }
 #' Two additional columns are added to \code{node_errors.gpkg} containing the rids of the edges flowing into (up_rid)
 #' and out of (down_rid) each node, in comma separated text format (e.g. "4, 7"). This allows the user to visually check flow relationships at each potential error more
@@ -122,7 +123,7 @@
 #' is too large, more false errors will be flagged in
 #' \code{node_errors.gpkg}.
 #'
-#' WARNING: A warning is given if the length of any line feature in \code{streams} is <= \code{snap_tolerance}, because snapping near that line feature may not give the intended connections. Use \code{\link[sf]{st_length}} to obtain and check the minimum length of the line features prior to running \code{lines_to_lsn}. When \code{check_topology = FALSE}, a warning is also given if any line end nodes within \code{snap_tolerance} of another line end node were not snapped. This typically occurs when snapping would put both end nodes of a line feature into one node. If this warning is returned, re-run \code{lines_to_lsn} with \code{check_topology = TRUE} to locate these nodes. Similarly, when \code{check_topology = FALSE}, a warning is given if any snapped nodes include Chained Nodes that were more than \code{snap_tolerance} apart because of transitive snapping. Again, use \code{check_topology = TRUE} to locate and check these nodes. When \code{check_topology = FALSE}, a warning is also given if any line feature is a Self-loop, and it lists their rids.
+#' WARNING: A warning is given if the length of any line feature in \code{streams} is <= \code{snap_tolerance}, because snapping near that line feature may result in unintended connections. Use \code{\link[sf]{st_length}} to obtain and check the minimum length of the line features prior to running \code{lines_to_lsn}. When \code{check_topology = FALSE}, a warning is also given if any line end nodes within \code{snap_tolerance} of another line end node were not snapped. This typically occurs when snapping would put both end nodes of a line feature into one node. If this warning is returned, re-run \code{lines_to_lsn} with \code{check_topology = TRUE} to locate these nodes. Similarly, when \code{check_topology = FALSE}, a warning is given if any snapped nodes include Chained Nodes that were more than \code{snap_tolerance} apart due to transitive snapping. Again, use \code{check_topology = TRUE} to locate and check these nodes. When \code{check_topology = FALSE}, a warning is also given if any line feature is a Self-loop, and it lists their rids. 
 #'
 #' @return An `sf` object representing edges in the LSN. The LSN, including edges.gpkg, nodes.gpkg, noderelationships.csv, and relationships.csv files, are saved locally to a directory defined by \code{lsn_path}. If \code{check_topology = TRUE} and topological errors are identified, then node_errors.gpkg is also saved to \code{lsn_path}.
 #'
@@ -380,16 +381,16 @@ lines_to_lsn <- function(streams,
   memb <- igraph::components(g)$membership
   rm(g)
 
-  ## Prevent a line's from/to nodes being snapped together
-  split.res <- split_self_loops(end.pairs, end.xy, memb)
+  ## Prevent snapping making a line, or a chain of lines, flow into itself
+  snap.res <- prevent_snapped_loops(end.pairs, end.xy, memb)
 
-  memb <- split.res$memb
-  blocked.ends <- split.res$blocked
-  rm(split.res)
+  memb <- snap.res$memb
+  blocked.ends <- snap.res$blocked
+  rm(snap.res)
 
   ## Produce warning if not checking topology
   if (check_topology == FALSE && length(blocked.ends) > 0) {
-    warning(length(blocked.ends), " line end node(s) (may be shared nodes) within snap_tolerance were not snapped, because this would force end nodes of a single line feature into one node. Connections at these locations may be incorrect. Use check_topology = TRUE to locate and check Unsnapped Node errors.", call. = FALSE)
+    warning(length(blocked.ends), " line end node(s) (may be shared nodes) within snap_tolerance were not snapped, because this would make a line feature, or a chain of line features, flow into itself. Connections at these locations may be incorrect. Use check_topology = TRUE to locate and check Unsnapped Node errors.", call. = FALSE)
   }
 
   ## pointid numbered in order of first appearance; each node takes the
@@ -496,7 +497,7 @@ lines_to_lsn <- function(streams,
     self.loop <- nodexy.sf[unique(node.relate$fromnode[self.loop.rids]), ]
     if (nrow(self.loop) > 0) self.loop$error <- "Self-loop"
     
-    ## Unsnapped nodes: from split_self_loops ----
+    ## Unsnapped nodes: from prevent_snapped_loops ----
     unsnapped <- nodexy.sf[unique(node.of.end[blocked.ends]), ]
     if (nrow(unsnapped) > 0) unsnapped$error <- "Unsnapped Node"
     

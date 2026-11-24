@@ -1,5 +1,6 @@
-## Re-groups nodes so the from and to nodes of a line are never
-## snapped. Only groups (memb) that contain both ends of a
+## Re-groups nodes so snapping never makes lines flow in a loop: the
+## from and to nodes of a line, or the two ends of a chain of short lines,
+## are never snapped. Only groups (memb) that contain both ends of a
 ## line are re-grouped here; all other groups are returned unchanged.
 ## 
 ## Inputs:
@@ -13,7 +14,7 @@
 ## (indices of end nodes in pairs that were within snap_tolerance but 
 ## not snapped). 
 
-split_self_loops <- function(end.pairs, end.xy, memb) {
+prevent_snapped_loops <- function(end.pairs, end.xy, memb) {
 
 	## Get total number of node coordinates
 	n.xy <- nrow(end.xy)
@@ -22,9 +23,6 @@ split_self_loops <- function(end.pairs, end.xy, memb) {
 	## end nodes
 	ind.from <- seq(1, n.xy, by = 2)
 	ind.to <- seq(2, n.xy, by = 2)
-
-	## Create vector of edge ids based on row
-	edge.id <- (seq_len(n.xy) + 1) %/% 2
 
 	## Create indicator of edges with identical from/to node coords
 	same.xy <- end.xy[ind.from, 1] == end.xy[ind.to, 1] &
@@ -55,28 +53,41 @@ split_self_loops <- function(end.pairs, end.xy, memb) {
 
 	## Sort node pairs by distance, so closest end nodes are merged first.
 	## Ties are broken by pairs$i and then pairs$j. 
-	pairs <- pairs[order(d, pairs[, 1], pairs[, 2]), , drop = FALSE]
+	pair.order <- order(d, pairs[, 1], pairs[, 2])
+	pairs <- pairs[pair.order, , drop = FALSE]
+	d <- d[pair.order]
 
-	## Union-find operation over nodes associated with loop.groups. 
-	## edge.sets holds the lines with a node in each group; lines with
-	## identical ends are omitted so they never block a merge. --- ##
-  
 	## Renumber the line end nodes in each pair so they match 
-  ## numbering used inside merge loop below.
+	## numbering used inside merge loop below
 	pair.i <- match(pairs[, 1], local.ends)
 	pair.j <- match(pairs[, 2], local.ends)
 
 	## Put each line end node in its own node group to start,
 	## before merging takes place
-	parent <- seq_along(local.ends)
+	snapped <- seq_along(local.ends)
 
-	## For each node, keep a list of lines that are associated with it. 
-	## First, add the line the node belongs to.
-	edge.sets <- as.list(edge.id[local.ends])
+	## Lines with both end nodes in these groups, renumbered to match
+	## local.ends. Self-loop lines are left out, so they never block a
+	## merge
+	local.from <- match(ind.from, local.ends)
+	local.to <- match(ind.to, local.ends)
+	local.edges <- which(is.na(local.from) == FALSE &
+		is.na(local.to) == FALSE & same.xy == FALSE)
 
-	## Self-loop lines are left out of edge.sets, so they don't block
-	## a merge
-	edge.sets[same.xy[edge.id[local.ends]]] <- list(integer(0))
+	## Group end nodes that are connected through lines. 
+	## Initially, each group = two end nodes of a line. 
+	## Groups will be combined below each time a snap is made. 
+	linked <- seq_along(local.ends)
+	for (e in local.edges) {
+		linked <- join_node_labels(local.from[e], local.to[e], linked)
+	}
+
+	## Group end nodes with identical coordinates (prior to snapping). 
+	## Include both end nodes for the two associated lines in the group. 
+	exact <- linked
+	for (k in which(d == 0)) {
+		exact <- join_node_labels(pair.i[k], pair.j[k], exact)
+	}
 
 	## Create a vector of logical values (all initially FALSE) that 
 	## records whether a pair is not merged and needs to be reported
@@ -86,38 +97,34 @@ split_self_loops <- function(end.pairs, end.xy, memb) {
 	for (k in seq_len(nrow(pairs))) {
 
 		## Get group labels associated with two end nodes in pair k
-		node.label.i <- find_node_label(pair.i[k], parent)
-		node.label.j <- find_node_label(pair.j[k], parent)
+		node.label.i <- find_node_label(pair.i[k], snapped)
+		node.label.j <- find_node_label(pair.j[k], snapped)
 
 		## Already in the same group (merged through other pairs)
 		if (node.label.i == node.label.j) next
 
-		## Does the line have an end node in each node label group?
-		blocking.edges <- edge.sets[[node.label.i]][edge.sets[[node.label.i]] %in%
-			edge.sets[[node.label.j]]]
-
-		## Merging would put both ends of a line in one group: skip the
-		## merge. Report the pair unless it is equivalent to that line's
-		## own two end nodes 
-		if (length(blocking.edges) > 0) {
-			blocked[k] <- !matches_line_ends(pairs[k, 1], pairs[k, 2],
-																			 blocking.edges, end.xy)
+		## Snapping end nodes that are already linked would make lines flow
+		## in a loop: skip the merge. End nodes with identical coordinates
+		## (d == 0) are always joined. Report the pair unless the end nodes
+		## are already exact
+		linked.ind <- find_node_label(pair.i[k], linked) ==
+			find_node_label(pair.j[k], linked)
+		if (d[k] > 0 && linked.ind == TRUE) {
+			blocked[k] <- find_node_label(pair.i[k], exact) !=
+				find_node_label(pair.j[k], exact)
 			next
 		}
 
-		## Merge group node.label.j into group node.label.i, and combine
-		## their edge.sets
-		parent[node.label.j] <- node.label.i
-		edge.sets[[node.label.i]] <- c(edge.sets[[node.label.i]],
-			edge.sets[[node.label.j]])
-		edge.sets[node.label.j] <- list(NULL)
+		## Merge group node.label.j into group node.label.i
+		snapped[node.label.j] <- node.label.i
+		linked <- join_node_labels(pair.i[k], pair.j[k], linked)
 	}
 
 	## Create final group/node label for affected end nodes
 	node.labels <- vapply(seq_along(local.ends), 
 												find_node_label, 
 												integer(1),
-												parent = parent)
+												joined.to = snapped)
 
 	## Add max(memb) to node label to ensure node labels are unique
 	memb[local.ends] <- max(memb) + match(node.labels, unique(node.labels))

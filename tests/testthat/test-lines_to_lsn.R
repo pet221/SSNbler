@@ -6,7 +6,7 @@ test_that("lines_to_lsn", {
 	expect_s3_class(edges_lsn, "sf")
 })
 
-# Synthetic cases for lines_to_lsn(), grid_pairs() and split_self_loops()
+# Synthetic cases for lines_to_lsn(), grid_pairs() and prevent_snapped_loops()
 
 ## Helpers ----
 
@@ -105,46 +105,46 @@ test_that("grid_pairs() returns a 0-row matrix when nothing is paired", {
 	expect_equal(dim(grid_pairs(matrix(c(0, 0), nrow = 1), 1)), c(0L, 2L))
 })
 
-## split_self_loops() ----
+## prevent_snapped_loops() ----
 
-test_that("split_self_loops() leaves groups without both ends of a line alone", {
+test_that("prevent_snapped_loops() leaves groups without both ends of a line alone", {
 	# Line 1 ends 0.1 from the start of line 2
 	end.xy <- rbind(c(0, 0), c(10, 0), c(10.1, 0), c(20, 0))
 	ge <- group_ends(end.xy, 0.3)
-	res <- split_self_loops(ge$pairs, end.xy, ge$memb)
+	res <- prevent_snapped_loops(ge$pairs, end.xy, ge$memb)
 	expect_identical(res$memb, ge$memb)
 	expect_length(res$blocked, 0)
 })
 
-test_that("split_self_loops() splits a hairpin and does not report it", {
+test_that("prevent_snapped_loops() keeps a hairpin's end nodes apart and does not report it", {
 	# Line 1's ends are 0.1 apart
 	end.xy <- rbind(c(0, 0), c(0.1, 0), c(50, 50), c(60, 60))
 	ge <- group_ends(end.xy, 0.3)
 	expect_equal(ge$memb[1], ge$memb[2])
-	res <- split_self_loops(ge$pairs, end.xy, ge$memb)
+	res <- prevent_snapped_loops(ge$pairs, end.xy, ge$memb)
 	expect_false(res$memb[1] == res$memb[2])
 	expect_length(res$blocked, 0)
 })
 
-test_that("split_self_loops() merges closest first and blocks the rest", {
+test_that("prevent_snapped_loops() merges closest first and blocks the rest", {
 	# Line 1's ends are 0.2 apart. Line 2's to end is 0.05 from line 1's
 	# to end and 0.15 from its from end. The 0.05 merge is made; the others
 	# would put both ends of line 1 in one node. Only the pair between
 	# lines (ends 1 and 4) is reported
 	end.xy <- rbind(c(0, 0), c(0.2, 0), c(0.15, 50), c(0.15, 0))
 	ge <- group_ends(end.xy, 0.3)
-	res <- split_self_loops(ge$pairs, end.xy, ge$memb)
+	res <- prevent_snapped_loops(ge$pairs, end.xy, ge$memb)
 	expect_equal(res$memb[2], res$memb[4])
 	expect_false(res$memb[1] == res$memb[2])
 	expect_false(res$memb[3] %in% res$memb[c(1, 2, 4)])
 	expect_equal(sort(res$blocked), c(1, 4))
 })
 
-test_that("split_self_loops() leaves a line with identical ends as a self-loop", {
+test_that("prevent_snapped_loops() leaves a line with identical ends as a self-loop", {
 	# Line 1 is a ring starting where line 2 starts
 	end.xy <- rbind(c(0, 0), c(0, 0), c(0, 0), c(10, 10))
 	ge <- group_ends(end.xy, 0.3)
-	res <- split_self_loops(ge$pairs, end.xy, ge$memb)
+	res <- prevent_snapped_loops(ge$pairs, end.xy, ge$memb)
 	expect_identical(res$memb, ge$memb)
 	expect_equal(length(unique(res$memb[1:3])), 1)
 	expect_length(res$blocked, 0)
@@ -274,6 +274,68 @@ test_that("a short line longer than snap_tolerance is not collapsed", {
 	expect_false(lsn$noderel$fromnode[2] == lsn$noderel$tonode[2])
 	expect_equal(lsn$rel, data.frame(fromedge = 1:2, toedge = 2:3))
 	expect_length(lsn$errors, 0)
+})
+
+test_that("snapping never makes a chain of short lines flow into itself", {
+	# Lines 2 and 3 are 0.4 long and meet their neighbours exactly. Snapping
+	# x0 to x0 + 0.8 would make lines 2 and 3 flow into each other
+	expect_warning(lsn <- grid_lsn(list(rbind(c(x0 - 100, y0), c(x0, y0)),
+		rbind(c(x0, y0), c(x0 + 0.4, y0)),
+		rbind(c(x0 + 0.4, y0), c(x0 + 0.8, y0)),
+		rbind(c(x0 + 0.8, y0), c(x0 + 100, y0))), snap = 1),
+		"length <= snap_tolerance")
+	expect_equal(lsn$rel, data.frame(fromedge = 1:3, toedge = 2:4))
+	expect_length(lsn$errors, 0)
+
+	# The same with a 0.2 gap between lines 2 and 3: the gap is snapped, and
+	# the snaps left out near the short lines are reported
+	expect_warning(lsn <- grid_lsn(list(rbind(c(x0 - 100, y0), c(x0, y0)),
+		rbind(c(x0, y0), c(x0 + 0.4, y0)),
+		rbind(c(x0 + 0.6, y0), c(x0 + 1, y0)),
+		rbind(c(x0 + 1, y0), c(x0 + 100, y0))), snap = 1),
+		"length <= snap_tolerance")
+	expect_equal(lsn$rel, data.frame(fromedge = 1:3, toedge = 2:4))
+	expect_true(length(lsn$errors) > 0)
+	expect_true(all(lsn$errors == "Unsnapped Node"))
+})
+
+test_that("a short side channel is not snapped into a loop", {
+	# Line 2 is a 0.67 side channel leaving line 3 (the main stem) at x0.
+	# Its downstream end is 0.3 from where line 3 ends: snapping it would
+	# close a loop, so line 2 is left as a dead end
+	main.stem <- rbind(c(x0, y0), c(x0, y0 - 50), c(x0 + 0.6, y0 - 50),
+		c(x0 + 0.6, y0))
+	expect_warning(lsn <- grid_lsn(list(rbind(c(x0 - 100, y0), c(x0, y0)),
+		rbind(c(x0, y0), c(x0 + 0.6, y0 + 0.3)), main.stem,
+		rbind(c(x0 + 0.6, y0), c(x0 + 100, y0))), snap = 1),
+		"length <= snap_tolerance")
+	expect_equal(lsn$rel, data.frame(fromedge = c(1L, 1L, 3L),
+		toedge = c(2L, 3L, 4L)))
+	expect_equal(lsn$errors, "Downstream Divergence")
+
+	# A side channel that meets the main stem exactly is not a snap, so it
+	# stays connected
+	expect_warning(lsn <- grid_lsn(list(rbind(c(x0 - 100, y0), c(x0, y0)),
+		rbind(c(x0, y0), c(x0 + 0.6, y0)), main.stem,
+		rbind(c(x0 + 0.6, y0), c(x0 + 100, y0))), snap = 1),
+		"length <= snap_tolerance")
+	expect_equal(lsn$rel, data.frame(fromedge = c(1L, 1L, 2L, 3L),
+		toedge = c(2L, 3L, 4L, 4L)))
+	expect_equal(lsn$errors, "Downstream Divergence")
+})
+
+test_that("lines all shorter than snap_tolerance keep the right connections", {
+	# Main stem of six 0.5 lines (1-6), tributary of three 0.5 lines (7-9)
+	# ending 0.1 short of the node between lines 3 and 4. Snap 2
+	main.stem <- lapply(0:5, function(i) rbind(c(x0, y0 + 3 - 0.5 * i),
+		c(x0, y0 + 2.5 - 0.5 * i)))
+	tributary <- lapply(0:2, function(i) rbind(c(x0 - 1.6 + 0.5 * i, y0 + 1.5),
+		c(x0 - 1.1 + 0.5 * i, y0 + 1.5)))
+	expect_warning(lsn <- grid_lsn(c(main.stem, tributary), snap = 2),
+		"length <= snap_tolerance")
+	expect_equal(lsn$rel, data.frame(fromedge = c(1:5, 7:9),
+		toedge = c(2:6, 8:9, 4L)))
+	expect_true(all(lsn$errors == "Unsnapped Node"))
 })
 
 test_that("a line with identical ends is a Self-loop that flows into itself", {
