@@ -6,7 +6,10 @@
 ##   errors at a node. The end node is reported by its own check (e.g. 
 ##   Confluence Without Node, Complex Confluence).
 ## - Crossings between two lines that are connected at a node, within
-##   max(eps, snap_tolerance) of that node. 
+##   max(eps, snap_tolerance) of that node, if the two lines' end nodes
+##   there were snapped (different coordinates). If they have identical
+##   coordinates, only eps is allowed, so a real crossing just above a
+##   confluence is still reported.
 ## A crossing near the end node of a line that is not connected to the
 ## other line (e.g. an overshoot) is still reported.
 ##
@@ -68,7 +71,8 @@ find_intersection_no_node <- function(in.edges,
 	ill.int <- points.only[lengths(near.end) == 0, ]
 
 	## Leave out crossings between lines connected at a node, if within
-	## max(eps, snap_tolerance) of that node. Line r's
+	## max(eps, snap_tolerance) of that node and the lines' end nodes
+	## there were snapped (eps if they are identical). Line r's
 	## end nodes are rows 2r - 1 (from) and 2r (to) of end.xy
 	if (nrow(ill.int) > 0) {
 		cross.xy <- st_coordinates(ill.int)
@@ -76,7 +80,6 @@ find_intersection_no_node <- function(in.edges,
 		cross.rids <- st_drop_geometry(ill.int)
 		rid.a <- cross.rids[[1]]
 		rid.b <- cross.rids[[2]]
-		connect.tol <- max(eps, snap_tolerance)
 		connected.ind <- logical(nrow(ill.int))
 
 		## Check each combo of end nodes from line a and line b
@@ -85,6 +88,10 @@ find_intersection_no_node <- function(in.edges,
 				end.a <- 2 * rid.a - 2 + i
 				end.b <- 2 * rid.b - 2 + j
 				same.node.ind <- node.of.end[end.a] == node.of.end[end.b]
+				snapped.ind <- end.xy[end.a, 1] != end.xy[end.b, 1] |
+					end.xy[end.a, 2] != end.xy[end.b, 2]
+				connect.tol <- ifelse(snapped.ind == TRUE,
+					max(eps, snap_tolerance), eps)
 				dist.a <- sqrt((cross.xy[, 1] - end.xy[end.a, 1])^2 +
 											 (cross.xy[, 2] - end.xy[end.a, 2])^2)
 				dist.b <- sqrt((cross.xy[, 1] - end.xy[end.b, 1])^2 +

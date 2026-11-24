@@ -116,7 +116,7 @@ defines the potential error type and can take on values of:
 \item Converging Node: two edges flow into the node and none flow out.
 \item Dangling Node: an outlet within \code{topo_tolerance} of an edge in a different network, unless the closest part of that edge is its outlet.
 \item Downstream Divergence: two or more edges flow out of the node.
-\item Intersection Without Node: two edges cross without a node. A crossing within \code{snap_tolerance} of a node that both edges flow into or out of is not reported.
+\item Intersection Without Node: two edges cross without a node. A crossing within \code{snap_tolerance} of a node that both edges flow into or out of is not reported if their end nodes were snapped together there.
 \item Confluence Without Node: an edge end node touches another edge somewhere other than its end nodes, or is within a tiny rounding distance of it, and is not connected to it (e.g. forms a T junction where the other edge is not split).
 \item Network Without Outlet: the node is part of a loop of edges with no outlet (e.g. edges digitised in a circle, with or without edges flowing into it). Every node on the loop is reported.
 \item Self-loop: the upstream and downstream end nodes of a line feature have identical coordinates.

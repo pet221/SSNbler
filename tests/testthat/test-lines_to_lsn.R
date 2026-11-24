@@ -920,6 +920,20 @@ test_that("crossings at a node are not reported as Intersection Without Node", {
 	expect_equal(lsn$errors, c("Dangling Node", "Intersection Without Node"))
 })
 
+test_that("tributaries crossing above their shared confluence are reported at any snap_tolerance", {
+	# Lines 1 and 2 meet exactly at (x0, y0 - 1) and flow into line 3, but
+	# cross each other 0.75 above that node
+	crossing.lines <- list(rbind(c(x0 - 100, y0 + 50), c(x0 + 0.5, y0 - 0.5),
+			c(x0, y0 - 1)),
+		rbind(c(x0 + 100, y0 + 50), c(x0 - 0.5, y0 - 0.5), c(x0, y0 - 1)),
+		rbind(c(x0, y0 - 1), c(x0, y0 - 100)))
+	for (snap in c(0.3, 1)) {
+		lsn <- grid_lsn(crossing.lines, snap = snap)
+		expect_equal(lsn$rel, data.frame(fromedge = 1:2, toedge = c(3L, 3L)))
+		expect_equal(lsn$errors, "Intersection Without Node")
+	}
+})
+
 test_that("separate networks each get their own outlet", {
 	lsn <- grid_lsn(c(two.lines,
 		lapply(two.lines, function(m) m + matrix(c(0, 1000), 2, 2, byrow = TRUE))),
