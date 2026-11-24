@@ -104,6 +104,21 @@ test_that("end nodes exactly a decimal snap_tolerance apart are snapped", {
 	expect_equal(lsn$rel, data.frame(fromedge = 1L, toedge = 2L))
 })
 
+test_that("grid_pairs() finds every pair with a tiny tolerance at large coordinates", {
+	# Coordinates around 1e7 with a 0.1 micrometre tolerance: rounding in
+	# the cell calculation must not put two close points in cells that are
+	# not compared. Each point has a partner 0.999 * tol away
+	set.seed(3)
+	n <- 2000
+	tol <- 1e-7
+	p <- cbind(1e7 + runif(n, 0, 1000), 1e7 + runif(n, 0, 1000))
+	angle <- runif(n, 0, 2 * pi)
+	q <- p + 0.999 * tol * cbind(cos(angle), sin(angle))
+	pairs <- norm_pairs(grid_pairs(rbind(p, q), tol))
+	expected <- paste(seq_len(n), seq_len(n) + n)
+	expect_true(all(expected %in% paste(pairs[, 1], pairs[, 2])))
+})
+
 test_that("grid_pairs() pairs a point at -0 with its neighbour cell", {
 	# floor(-0 / h) is -0; the cell key must still match "0"
 	xy <- rbind(c(-0.05, 0), c(-0, -0))
