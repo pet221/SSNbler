@@ -1,4 +1,4 @@
-#' MF_streams: Middle Fork streams
+#' MF_streams: Middle Fork streams.
 #'
 #' \code{MF_streams} is an `sf` object with LINESTRING geometry representing a subset of
 #' streams and rivers in the Middle Fork Basin, Idaho, USA.

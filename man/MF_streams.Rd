@@ -3,7 +3,7 @@
 \docType{data}
 \name{MF_streams}
 \alias{MF_streams}
-\title{MF_streams: Middle Fork streams}
+\title{MF_streams: Middle Fork streams.}
 \format{
 An object of class \code{sf} (inherits from \code{data.frame}) with 163 rows and 10 columns.
 }
