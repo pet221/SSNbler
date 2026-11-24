@@ -537,6 +537,36 @@ test_that("blocked snaps give a warning only when check_topology = FALSE", {
 		sf::st_read(file.path(p, "node_errors.gpkg"), quiet = TRUE)$error)
 })
 
+test_that("snap_tolerance = 0 warns about end nodes a rounding distance apart", {
+	# Line 2 starts 1e-7 from where line 1 ends: not joined at snap 0
+	streams <- make_streams(list(rbind(c(x0 - 100, y0), c(x0, y0)),
+		rbind(c(x0 + 1e-7, y0), c(x0 + 100, y0))))
+	p <- withr::local_tempdir()
+	expect_warning(lines_to_lsn(streams, lsn_path = p, check_topology = FALSE,
+		snap_tolerance = 0, overwrite = TRUE, verbose = FALSE),
+		"2 line end node\\(s\\) are within")
+	warnings.seen <- capture_warnings(lines_to_lsn(streams, lsn_path = p,
+		check_topology = TRUE, snap_tolerance = 0, topo_tolerance = 20,
+		overwrite = TRUE, verbose = FALSE))
+	expect_true(any(grepl("2 line end node\\(s\\) are within", warnings.seen)))
+
+	# No warning when snap_tolerance > 0 (the end nodes are snapped)
+	warnings.seen <- capture_warnings(lines_to_lsn(streams, lsn_path = p,
+		check_topology = FALSE, snap_tolerance = 0.01, overwrite = TRUE,
+		verbose = FALSE))
+	expect_false(any(grepl("are within", warnings.seen)))
+
+	# No warning for exact junctions, or for the two end nodes of one tiny
+	# line
+	streams <- make_streams(list(rbind(c(x0 - 100, y0), c(x0, y0)),
+		rbind(c(x0, y0), c(x0 + 100, y0)),
+		rbind(c(x0, y0 + 50), c(x0 + 1e-7, y0 + 50))))
+	warnings.seen <- capture_warnings(lines_to_lsn(streams, lsn_path = p,
+		check_topology = FALSE, snap_tolerance = 0, overwrite = TRUE,
+		verbose = FALSE))
+	expect_false(any(grepl("are within", warnings.seen)))
+})
+
 test_that("ends chained within tolerance form one Chained Node, or give a warning", {
 	# A-B and B-C are 0.2 apart, A-C 0.4 (> snap 0.3)
 	streams <- make_streams(list(
@@ -782,8 +812,9 @@ test_that("an end node near another line's end node is not a Confluence Without 
 	# Line 2 starts 1e-7 m after line 1 ends, so at snap 0 they are not
 	# snapped. Line 1's outlet stops just short of a different network,
 	# so it is a Dangling Node. Line 2's Source is not flagged
-	lsn <- grid_lsn(list(rbind(c(x0 - 100, y0), c(x0, y0)),
-		rbind(c(x0 + 1e-7, y0), c(x0 + 100, y0))), snap = 0)
+	expect_warning(lsn <- grid_lsn(list(rbind(c(x0 - 100, y0), c(x0, y0)),
+		rbind(c(x0 + 1e-7, y0), c(x0 + 100, y0))), snap = 0),
+		"are within")
 	expect_equal(nrow(lsn$rel), 0)
 	expect_equal(lsn$errors, "Dangling Node")
 	err <- lsn$error.table

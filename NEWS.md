@@ -37,6 +37,8 @@ This update focuses on improving the computational efficiency of `lines_to_lsn()
 
 * `updist_edges()`, `afv_edges()` and `accum_edges()` now stop with an error if an edge starts and ends at the same node (a Self-loop), and list its rid. Previously, a Self-loop at an outlet gave incorrect upDist, AFV and accumulated values without an error.
 
+* When `snap_tolerance = 0`, `lines_to_lsn()` now gives a warning if any line end nodes are within a tiny rounding distance of each other and not snapped.
+
 
 ## Bug fixes
 

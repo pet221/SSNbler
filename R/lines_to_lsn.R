@@ -119,7 +119,7 @@
 #' is too large, more false errors will be flagged in
 #' \code{node_errors.gpkg}.
 #'
-#' WARNING: When \code{snap_tolerance > 0}, a warning is given if the length of any line feature in \code{streams} is <= \code{snap_tolerance}, because snapping near that line feature may result in unintended connections. Use \code{\link[sf]{st_length}} to obtain and check the minimum length of the line features prior to running \code{lines_to_lsn}.
+#' WARNING: When \code{snap_tolerance > 0}, a warning is given if the length of any line feature in \code{streams} is <= \code{snap_tolerance}, because snapping near that line feature may result in unintended connections. Use \code{\link[sf]{st_length}} to obtain and check the minimum length of the line features prior to running \code{lines_to_lsn}. When \code{snap_tolerance = 0}, a warning is given if any line end nodes are within a tiny rounding distance of another line end node but do not have identical coordinates, because they are not snapped. Check these locations, or use a small \code{snap_tolerance > 0}.
 #'
 #' When \code{check_topology = FALSE}, a warning is also given if:
 #' \itemize{
@@ -371,6 +371,29 @@ lines_to_lsn <- function(streams,
   end.xy[ind.from, ] <- line.xy[first.v, c("X", "Y")]
   end.xy[ind.to, ] <- line.xy[last.v, c("X", "Y")]
   rm(line.xy, first.v, last.v)
+
+  ## Tolerance for rounding error, used to find intersections and
+  ## near-identical end nodes. Scales w/coords to stay above
+  ## double-precision rounding
+  eps <- max(1e-6, 1e-10 * max(abs(st_bbox(in.edges))))
+
+  ## With snap_tolerance = 0, only identical coordinates are joined.
+  ## Warn about end nodes within eps of each other, but not
+  ## identical
+  if (snap_tolerance == 0) {
+    near.pairs <- grid_pairs(end.xy, eps)
+    near.ends <- c(near.pairs[, 1], near.pairs[, 2])
+    near.ends.other <- c(near.pairs[, 2], near.pairs[, 1])
+    not.joined.ind <- (end.xy[near.ends, 1] != end.xy[near.ends.other, 1] |
+      end.xy[near.ends, 2] != end.xy[near.ends.other, 2]) &
+      (near.ends + 1) %/% 2 != (near.ends.other + 1) %/% 2
+    n.not.joined <- length(unique(near.ends[not.joined.ind]))
+    if (n.not.joined > 0) {
+      warning(n.not.joined, " line end node(s) are within ", signif(eps, 2),
+        " map units of one another but were not snapped because snap_tolerance = 0. These may be rounding differences in line features that should connect. Check them, or use a small snap_tolerance > 0.", call. = FALSE)
+    }
+    rm(near.pairs, near.ends, near.ends.other, not.joined.ind)
+  }
 	
   ## Find line end nodes <= snap_tolerance apart
   end.pairs <- grid_pairs(end.xy, snap_tolerance)
@@ -520,10 +543,6 @@ lines_to_lsn <- function(streams,
     																						coords = c("X", "Y"), 
     																						crs = lst.crs))
     
-    ## Tolerance for rounding error, used to find intersections. Scales
-    ## w/coords to stay above double-precision rounding
-    eps <- max(1e-6, 1e-10 * max(abs(st_bbox(in.edges))))
-
     ## Confluence w/out node ----
     confluence.nodes <- find_confluence_no_node(all.nodes.as.single,
                                                 in.edges, 

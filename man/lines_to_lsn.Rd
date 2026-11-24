@@ -153,7 +153,7 @@ separate will be snapped together in error. If \code{topo_tolerance}
 is too large, more false errors will be flagged in
 \code{node_errors.gpkg}.
 
-WARNING: When \code{snap_tolerance > 0}, a warning is given if the length of any line feature in \code{streams} is <= \code{snap_tolerance}, because snapping near that line feature may result in unintended connections. Use \code{\link[sf]{st_length}} to obtain and check the minimum length of the line features prior to running \code{lines_to_lsn}.
+WARNING: When \code{snap_tolerance > 0}, a warning is given if the length of any line feature in \code{streams} is <= \code{snap_tolerance}, because snapping near that line feature may result in unintended connections. Use \code{\link[sf]{st_length}} to obtain and check the minimum length of the line features prior to running \code{lines_to_lsn}. When \code{snap_tolerance = 0}, a warning is given if any line end nodes are within a tiny rounding distance of another line end node but do not have identical coordinates, because they are not snapped. Check these locations, or use a small \code{snap_tolerance > 0}.
 
 When \code{check_topology = FALSE}, a warning is also given if:
 \itemize{
