@@ -45,11 +45,10 @@ removed from streams, if they exist. If \code{FALSE} and
 \code{streams} has Z and/or M dimensions, the function stops with
 an error. Default is \code{FALSE}.}
 
-\item{overwrite}{Logical. If \code{TRUE}, output files will
-overwrite existing files with the same names, and a
-node_errors.gpkg file from an earlier run is deleted. If \code{FALSE},
-\code{lines_to_lsn()} stops if any output file, including
-node_errors.gpkg, already exists in \code{lsn_path}. Default is \code{FALSE}.}
+\item{overwrite}{Logical. If \code{TRUE}, existing output files in
+\code{lsn_path} are replaced. If \code{FALSE}, \code{lines_to_lsn()}
+stops if any output file already exists (see Details). Default is
+\code{FALSE}.}
 
 \item{use_parallel}{Deprecated and ignored. Parallel processing is
 no longer needed. Supplying it gives a warning.}
@@ -155,6 +154,8 @@ connected and are snapped together. An outlet within \code{topo_tolerance} of an
 separate will be snapped together in error. If \code{topo_tolerance}
 is too large, more false errors will be flagged in
 \code{node_errors.gpkg}.
+
+When \code{overwrite = TRUE}, output files in \code{lsn_path} are replaced, and a node_errors.gpkg file from an earlier run is deleted. Existing \code{rid} and \code{fid} columns in \code{streams} are also removed (a new \code{rid} column is added). When \code{overwrite = FALSE}, \code{lines_to_lsn()} stops if any output file, including node_errors.gpkg, already exists in \code{lsn_path}, or if \code{streams} has a \code{rid} or \code{fid} column.
 
 WARNING: When \code{snap_tolerance > 0}, a warning is given if the length of any line feature in \code{streams} is <= \code{snap_tolerance}, because snapping near that line feature may result in unintended connections. Use \code{\link[sf]{st_length}} to obtain and check the minimum length of the line features prior to running \code{lines_to_lsn}. When \code{snap_tolerance = 0}, a warning is given if any line end nodes are within a tiny rounding distance of another line end node but do not have identical coordinates, because they are not snapped. Check these locations, or use a small \code{snap_tolerance > 0}.
 

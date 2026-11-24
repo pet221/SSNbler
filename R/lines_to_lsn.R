@@ -25,11 +25,10 @@
 #'   removed from streams, if they exist. If \code{FALSE} and
 #'   \code{streams} has Z and/or M dimensions, the function stops with
 #'   an error. Default is \code{FALSE}.
-#' @param overwrite Logical. If \code{TRUE}, output files will
-#'   overwrite existing files with the same names, and a
-#'   node_errors.gpkg file from an earlier run is deleted. If \code{FALSE},
-#'   \code{lines_to_lsn()} stops if any output file, including
-#'   node_errors.gpkg, already exists in \code{lsn_path}. Default is \code{FALSE}.
+#' @param overwrite Logical. If \code{TRUE}, existing output files in
+#'   \code{lsn_path} are replaced. If \code{FALSE}, \code{lines_to_lsn()}
+#'   stops if any output file already exists (see Details). Default is
+#'   \code{FALSE}.
 #' @param verbose Logical. If \code{TRUE}, messages describing
 #'   function progress will be printed to the console. Default is
 #'   \code{TRUE}.
@@ -122,6 +121,8 @@
 #' is too large, more false errors will be flagged in
 #' \code{node_errors.gpkg}.
 #'
+#' When \code{overwrite = TRUE}, output files in \code{lsn_path} are replaced, and a node_errors.gpkg file from an earlier run is deleted. Existing \code{rid} and \code{fid} columns in \code{streams} are also removed (a new \code{rid} column is added). When \code{overwrite = FALSE}, \code{lines_to_lsn()} stops if any output file, including node_errors.gpkg, already exists in \code{lsn_path}, or if \code{streams} has a \code{rid} or \code{fid} column.
+#'
 #' WARNING: When \code{snap_tolerance > 0}, a warning is given if the length of any line feature in \code{streams} is <= \code{snap_tolerance}, because snapping near that line feature may result in unintended connections. Use \code{\link[sf]{st_length}} to obtain and check the minimum length of the line features prior to running \code{lines_to_lsn}. When \code{snap_tolerance = 0}, a warning is given if any line end nodes are within a tiny rounding distance of another line end node but do not have identical coordinates, because they are not snapped. Check these locations, or use a small \code{snap_tolerance > 0}.
 #'
 #' When \code{check_topology = FALSE}, a warning is also given if:
@@ -183,6 +184,17 @@ lines_to_lsn <- function(streams,
   }
   rm(logical.args, arg.name, arg.value)
 
+  ## Check that lsn_path is a single, non-empty character string
+  if (missing(lsn_path) == TRUE) {
+    stop("lsn_path must be provided.",
+      call. = FALSE)
+  }
+  if (is.character(lsn_path) == FALSE || length(lsn_path) != 1 ||
+      is.na(lsn_path) == TRUE || nchar(lsn_path) == 0) {
+    stop("lsn_path must be a single folder path in character format (e.g. \"C:/data/lsn\").",
+      call. = FALSE)
+  }
+
   # check empty geometries
   if (any(st_is_empty(streams)) == TRUE) {
     stop("streams has at least one empty geometry. Check and/or use sf::st_is_empty() to remove.",
@@ -228,6 +240,18 @@ lines_to_lsn <- function(streams,
   ## Check that every line has at least two vertices. line.xy 
   ## used later to get line end nodes
   line.xy <- st_coordinates(in.edges)
+
+  ## Check that every coordinate is finite (not NA, NaN or Inf)
+  bad.xy.ind <- is.finite(line.xy[, "X"]) == FALSE |
+    is.finite(line.xy[, "Y"]) == FALSE
+  if (any(bad.xy.ind) == TRUE) {
+    bad.rows <- unique(line.xy[bad.xy.ind, "L1"])
+    stop("streams has non-finite coordinates (NA, NaN or Inf) in ",
+      length(bad.rows), " line feature(s) (row ", format_rids(bad.rows),
+      "). Correct these coordinates before running lines_to_lsn().",
+      call. = FALSE)
+  }
+  rm(bad.xy.ind)
   n.vert <- tabulate(line.xy[, "L1"], nrow(in.edges))
   if (any(n.vert < 2) == TRUE) {
     stop("Each line feature in streams must have at least two vertices. ",

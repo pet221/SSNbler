@@ -584,6 +584,29 @@ test_that("lines_to_lsn() input checks stop with informative errors", {
 		"2 line feature\\(s\\) in streams have a length <= snap_tolerance")
 })
 
+test_that("non-finite coordinates and a bad lsn_path stop with informative errors", {
+	# Line 2 has an infinite y coordinate. Nothing is written
+	streams <- make_streams(list(rbind(c(x0 - 100, y0), c(x0, y0)),
+		rbind(c(x0, y0), c(x0 + 50, Inf), c(x0 + 100, y0))))
+	p <- file.path(withr::local_tempdir(), "lsn")
+	for (check in c(FALSE, TRUE)) {
+		expect_error(lines_to_lsn(streams, lsn_path = p, check_topology = check,
+			snap_tolerance = 1, topo_tolerance = 20, overwrite = TRUE,
+			verbose = FALSE), "non-finite coordinates .*row 2")
+	}
+	expect_false(dir.exists(p))
+
+	# lsn_path must be a single, non-empty character string
+	streams <- make_streams(two.lines)
+	for (bad.path in list(5, NA_character_, c("a", "b"), "")) {
+		expect_error(lines_to_lsn(streams, lsn_path = bad.path,
+			check_topology = FALSE, snap_tolerance = 1, overwrite = TRUE,
+			verbose = FALSE), "lsn_path must be a single folder path")
+	}
+	expect_error(lines_to_lsn(streams, check_topology = FALSE,
+		snap_tolerance = 1, verbose = FALSE), "lsn_path must be provided")
+})
+
 test_that("blocked snaps give a warning only when check_topology = FALSE", {
 	# Line 1 is 1.5 long. Line 2's to end is within snap 1 of both its ends
 	streams <- make_streams(list(rbind(c(x0, y0), c(x0 + 1.5, y0)),
