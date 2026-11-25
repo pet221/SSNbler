@@ -94,8 +94,17 @@ from this rule. Snapping is transitive: if end node A is within
 \code{snap_tolerance} of end node B, and B is within
 \code{snap_tolerance} of end node C, then A, B and C are snapped
 even if A and C are further apart. The upstream and downstream end
-nodes of the same line feature, or the two ends of a chain of line
-features, are never snapped into one node. The node takes the
+nodes of a line feature are never snapped into one node. Where
+snapping would do this, the end nodes nearby are snapped closest
+first, and any snap that would make a line feature, or a chain of
+line features, form a loop is skipped (see Unsnapped Node below).
+Other snaps are not checked for loops. For example, if line feature
+A flows into line feature B, both longer than \code{snap_tolerance},
+and the downstream end node of B is within \code{snap_tolerance} of
+the upstream end node of A, they are snapped and A and B form a loop.
+This is reported as a Network Without Outlet error when
+\code{check_topology = TRUE}, and \code{\link[=updist_edges]{updist_edges()}}, \code{\link[=afv_edges]{afv_edges()}}
+and \code{\link[=accum_edges]{accum_edges()}} stop with an error. The node takes the
 coordinates of the line end node with the smallest x coordinate (or
 the smallest y coordinate, if x coordinates are equal). Snapping and
 node coordinates in \code{lines_to_lsn} no longer depend on the order

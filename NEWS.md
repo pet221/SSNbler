@@ -51,7 +51,7 @@ This update focuses on improving the computational efficiency of `lines_to_lsn()
 
 	When this happened, `relationships.csv` was usually still correct, but `afv_edges()` calculated incorrect segment PIs at the affected nodes. This gave incorrect AFVs for the edges and sites upstream. `ssn_check()` does not detect this problem.
 
-	Nodes and edge relationships are now built using the same method: line end nodes `<= snap_tolerance` apart are snapped into one node, unless this would put both end nodes of a line feature, or of a chain of line features, into one node (reported as an Unsnapped Node). Snapping is transitive, so a node can contain line end nodes more than `snap_tolerance` apart (reported as a Chained Node). AFVs calculated from LSNs built with earlier versions should be checked, especially if `snap_tolerance = 0` was used or the streams contain very short line features (#8).
+	Nodes and edge relationships are now built using the same method: line end nodes `<= snap_tolerance` apart are snapped into one node, unless this would put both end nodes of a line feature into one node, or make a chain of short line features form a loop (reported as an Unsnapped Node). A loop formed by snapping the end nodes of longer line features is not prevented; it is reported as a Network Without Outlet. Snapping is transitive, so a node can contain line end nodes more than `snap_tolerance` apart (reported as a Chained Node). AFVs calculated from LSNs built with earlier versions should be checked, especially if `snap_tolerance = 0` was used or the streams contain very short line features (#8).
 
 * When the two end nodes of a line feature were `<= snap_tolerance` apart (e.g. a very short line feature, a line that nearly forms a loop, or a short line feature whose end nodes were read as 0 m apart because of the `pdist::pdist()` precision problem described above), `lines_to_lsn()` recorded the line as flowing into itself (`fromedge == toedge`) in `relationships.csv`, even when `noderelationships.csv` was correct. This could give false Downstream Divergence, Complex Confluence and Unsnapped Node errors at nearby nodes, and `updist_edges()`, `afv_edges()` and `accum_edges()` stopped with a downstream divergence error (from version 1.1.0; earlier versions did not check for this). The two end nodes of a line feature are now kept as separate nodes, so a line feature can no longer flow into itself unless its end nodes have identical coordinates (a Self-loop, which is reported as an error) (#8).
 
@@ -70,13 +70,13 @@ This update focuses on improving the computational efficiency of `lines_to_lsn()
 
 ## Behaviour changes
 
-* In `lines_to_lsn()`, Unsnapped Node now means that a line end node `<= snap_tolerance` from another line end node was not snapped to it, because this would have put both end nodes of a line feature, or of a chain of line features, into one node. It is not reported when the two line end nodes are already joined by line features that meet at identical coordinates (e.g. they have the same coordinates as the two end nodes of the line feature that prevented the snap).
+* In `lines_to_lsn()`, Unsnapped Node now means that a line end node `<= snap_tolerance` from another line end node was not snapped to it, because this would have put both end nodes of a line feature into one node, or made a chain of short line features form a loop. It is not reported when the two line end nodes are already joined by line features that meet at identical coordinates (e.g. they have the same coordinates as the two end nodes of the line feature that prevented the snap).
 
 * If `snap_tolerance > 0` and any line feature has a length `<= snap_tolerance`, `lines_to_lsn()` now gives a warning, rather than stopping with an error. This check now applies whether or not `check_topology = TRUE`.
 
 * In `lines_to_lsn()`, `topo_tolerance` must now be greater than `snap_tolerance`. 
 
-* When `check_topology = FALSE`, `lines_to_lsn()` now gives a warning if any line end nodes within `snap_tolerance` of another line end node were not snapped because this would have put both end nodes of a line feature, or of a chain of line features, into one node.
+* When `check_topology = FALSE`, `lines_to_lsn()` now gives a warning if any line end nodes within `snap_tolerance` of another line end node were not snapped because this would have put both end nodes of a line feature into one node, or made a chain of short line features form a loop.
 
 * `node_errors.gpkg` now has three additional columns: `up_rid` and `down_rid`, which give the rids of the edges flowing into and out of each node as comma-separated text. `node_width` records the maximum distance between line end nodes associated with a Chained Node. 
 
