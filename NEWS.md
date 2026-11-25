@@ -1,10 +1,10 @@
 # SSNbler (development version)
 
-This update focuses on improving the computational efficiency of `lines_to_lsn()` and addresses several bugs.
+This update focuses on improving the computational efficiency of `lines_to_lsn()` and fixes bugs that could give incorrect edge relationships and AFVs.
 
 ## Major updates
 
-* `lines_to_lsn()` now uses a new, faster method to build the LSN. Previously, distance matrices between all line end nodes were computed, so memory use grew with the square of the number of line features, and parallel processing was required for more than 46340 line features. Line end nodes `<= snap_tolerance` apart are now found using a spatial grid, so memory use and computation time grow roughly linearly with the number of line features and there is no limit on the number of line features. 
+* `lines_to_lsn()` now uses a new, faster method to build the LSN. Previously, distance matrices between all line end nodes were computed, so memory use grew with the square of the number of line features, and parallel processing was required for more than 46340 line features. Line end nodes `<= snap_tolerance` apart are now found using a spatial grid, so for typical data memory use and computation time grow roughly linearly with the number of line features, and there is no limit on the number of line features. 
 
 * `snap_tolerance` and `topo_tolerance` in `lines_to_lsn()` no longer have defaults (previously both 0). `snap_tolerance` must always be set by the user, and `topo_tolerance` must be set when `check_topology = TRUE`.
 
@@ -33,8 +33,6 @@ This update focuses on improving the computational efficiency of `lines_to_lsn()
 
 * `lines_to_lsn()` now checks the geometry type of every feature in `streams`, and stops with an error if any feature is not a LINESTRING. Previously only the first feature was checked.
 
-* `sites_to_lsn()` now checks the geometry type of every feature in `sites` and `edges`, and stops with an error if any site is not a POINT or any edge is not a LINESTRING. Previously only the first feature was checked, and MULTIPOINT sites and MULTILINESTRING edges were accepted. Use `sf::st_cast()` to convert them.
-
 * `updist_edges()`, `afv_edges()` and `accum_edges()` now stop with an error if an edge starts and ends at the same node (a Self-loop), and list its rid. Previously, a Self-loop at an outlet gave incorrect upDist, AFV and accumulated values without an error.
 
 * When `snap_tolerance = 0`, `lines_to_lsn()` now gives a warning if any line end nodes are within a tiny rounding distance of each other and not snapped.
@@ -51,7 +49,7 @@ This update focuses on improving the computational efficiency of `lines_to_lsn()
 
 	When this happened, `relationships.csv` was usually still correct, but `afv_edges()` calculated incorrect segment PIs at the affected nodes. This gave incorrect AFVs for the edges and sites upstream. `ssn_check()` does not detect this problem.
 
-	Nodes and edge relationships are now built using the same method: line end nodes `<= snap_tolerance` apart are snapped into one node, unless this would put both end nodes of a line feature into one node, or make a chain of short line features form a loop (reported as an Unsnapped Node). A loop formed by snapping the end nodes of longer line features is not prevented; it is reported as a Network Without Outlet. Snapping is transitive, so a node can contain line end nodes more than `snap_tolerance` apart (reported as a Chained Node). AFVs calculated from LSNs built with earlier versions should be checked, especially if `snap_tolerance = 0` was used or the streams contain very short line features (#8).
+	Nodes and edge relationships are now built using the same method: line end nodes `<= snap_tolerance` apart are snapped into one node, unless this would put both end nodes of a line feature into one node, or make a chain of short line features form a loop (reported as an Unsnapped Node). A loop formed by snapping the end nodes of longer line features is not prevented; it is reported as a Network Without Outlet when `check_topology = TRUE`, and `updist_edges()`, `afv_edges()` and `accum_edges()` stop if an LSN contains one. Snapping is transitive, so a node can contain line end nodes more than `snap_tolerance` apart (reported as a Chained Node). AFVs calculated from LSNs built with earlier versions should be checked, especially if `snap_tolerance = 0` was used or the streams contain very short line features (#8).
 
 * When the two end nodes of a line feature were `<= snap_tolerance` apart (e.g. a very short line feature, a line that nearly forms a loop, or a short line feature whose end nodes were read as 0 m apart because of the `pdist::pdist()` precision problem described above), `lines_to_lsn()` recorded the line as flowing into itself (`fromedge == toedge`) in `relationships.csv`, even when `noderelationships.csv` was correct. This could give false Downstream Divergence, Complex Confluence and Unsnapped Node errors at nearby nodes, and `updist_edges()`, `afv_edges()` and `accum_edges()` stopped with a downstream divergence error (from version 1.1.0; earlier versions did not check for this). The two end nodes of a line feature are now kept as separate nodes, so a line feature can no longer flow into itself unless its end nodes have identical coordinates (a Self-loop, which is reported as an error) (#8).
 
@@ -65,16 +63,18 @@ This update focuses on improving the computational efficiency of `lines_to_lsn()
 
 * `lines_to_lsn()` with `overwrite = TRUE` left `node_errors.gpkg` from an earlier run in `lsn_path` when the new run found no errors. It is now deleted. With `overwrite = FALSE`, an existing `node_errors.gpkg` now stops `lines_to_lsn()`, even when `check_topology = FALSE`.
 
-* `updist_edges()`, `afv_edges()` and `accum_edges()` now stop with an error, listing the rids, if any edge is in a network without an outlet (e.g. a loop of edges). Previously these edges were silently dropped from the results and from `edges.gpkg`. `updist_sites()` and `afv_sites()` now stop if a site is on an edge with no upDist or AFV value, rather than giving it `NA` (`updist_sites()`) or dropping it (`afv_sites()`).
+* `updist_edges()`, `afv_edges()` and `accum_edges()` now stop with an error, listing the rids, if any edge is in a network without an outlet (e.g. a loop of edges). Previously these edges were silently dropped from the results and from `edges.gpkg`. `updist_sites()` and `afv_sites()` now stop if a site is on an edge with no upDist or AFV value, rather than giving it `NA` (`updist_sites()`) or dropping it (`afv_sites()`). `updist_edges()`, `afv_edges()` and `accum_edges()` also stop if any edge would be missing from the result, whatever the cause. `edges.gpkg` is not changed when they stop.
 
 
 ## Behaviour changes
 
 * In `lines_to_lsn()`, Unsnapped Node now means that a line end node `<= snap_tolerance` from another line end node was not snapped to it, because this would have put both end nodes of a line feature into one node, or made a chain of short line features form a loop. It is not reported when the two line end nodes are already joined by line features that meet at identical coordinates (e.g. they have the same coordinates as the two end nodes of the line feature that prevented the snap).
 
+* Line end nodes exactly `snap_tolerance` apart are now always snapped, including at large projected coordinates, where rounding error previously could leave them unsnapped. The 1.1.1 entry below said nodes are snapped if they are `< snap_tolerance` apart; edge relationships in 1.1.1 and 1.1.2 used `<= snap_tolerance`.
+
 * If `snap_tolerance > 0` and any line feature has a length `<= snap_tolerance`, `lines_to_lsn()` now gives a warning, rather than stopping with an error. This check now applies whether or not `check_topology = TRUE`.
 
-* In `lines_to_lsn()`, `topo_tolerance` must now be greater than `snap_tolerance`. 
+* In `lines_to_lsn()`, `topo_tolerance` must now be greater than `snap_tolerance` when `check_topology = TRUE`.
 
 * When `check_topology = FALSE`, `lines_to_lsn()` now gives a warning if any line end nodes within `snap_tolerance` of another line end node were not snapped because this would have put both end nodes of a line feature into one node, or made a chain of short line features form a loop.
 
@@ -84,11 +84,13 @@ This update focuses on improving the computational efficiency of `lines_to_lsn()
 
 * In `lines_to_lsn()`, a Dangling Node is now an outlet within `topo_tolerance` of a line feature in a different network. Previously, it was an outlet whose `topo_tolerance` buffer was crossed by more than one line feature. An outlet that touches another line feature somewhere other than its end nodes is now reported only as a Confluence Without Node, not also as a Dangling Node. Outlets close to another network's outlet (e.g. two streams ending in a lake) are not reported. 
 
-* In `nodes.gpkg`, `nodecat` is now Source for every node with no inflowing edges, and Outlet for every node with inflowing edges but no outflowing edges. Previously, a node with no inflowing edges and two or more outflowing edges (a Downstream Divergence) and a node with three or more inflowing edges and no outflowing edges (a Complex Confluence) were both categorised as Confluence. These nodes are still reported as errors in `node_errors.gpkg`. 
+* In `nodes.gpkg`, `nodecat` is now Source for every node with no inflowing edges, and Outlet for every node with inflowing edges but no outflowing edges. Previously, a node with no inflowing edges and two or more outflowing edges (a Downstream Divergence) and a node with three or more inflowing edges and no outflowing edges (a Complex Confluence) were both categorised as Confluence. These nodes are still reported as errors in `node_errors.gpkg`. Self-loop lines are no longer counted as inflowing or outflowing edges, so a Self-loop at an outlet no longer turns the Outlet into a Confluence, and the node of an isolated Self-loop is a Source. 
 
 * Snapping and node coordinates in `lines_to_lsn()` no longer depend on the order of the line features in `streams`:
   * When two snaps are the same distance apart, the end node coordinates decide which is made first, not the row order.
   * A snapped node takes the coordinates of its end node with the smallest x (then y) coordinate. Previously it took the coordinates of the first end node.
+
+* `sites_to_lsn()` now checks the geometry type of every feature in `sites` and `edges`, and stops with an error if any site is not a POINT or any edge is not a LINESTRING. Previously only the first feature was checked, and MULTIPOINT sites and MULTILINESTRING edges were accepted. Use `sf::st_cast()` to convert them.
 
 # SSNbler 1.1.2
 
